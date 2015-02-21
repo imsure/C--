@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -DDEBUG
 
 DEST = compile
 
-HFILES = error.h  global.h  protos.h symbol-table.h  syntax-tree.h
+HFILES = error.h  global.h  protos.h symbol-table.h  syntax-tree.h three-address-code.h
 
 CFILES = error.c \
 	lex.yy.c \
@@ -13,7 +13,8 @@ CFILES = error.c \
 	symbol-table.c\
         syntax-tree.c \
 	util.c\
-	y.tab.c
+	y.tab.c\
+	three-address-code.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -22,7 +23,8 @@ OFILES = error.o \
 	symbol-table.o \
         syntax-tree.o \
 	util.o \
-	y.tab.o
+	y.tab.o \
+	three-address-code.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -37,6 +39,8 @@ main.o : global.h main.c
 symbol-table.o : global.h symbol-table.h symbol-table.c
 
 syntax-tree.o : global.h syntax-tree.h syntax-tree.c
+
+three-address-code.o : global.h three-address-code.h three-address-code.c
 
 util.o : global.h util.h util.c
 

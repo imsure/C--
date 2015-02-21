@@ -13,6 +13,7 @@ extern char *fnName;
 extern llistptr lptr;
 extern bool is_extern;
 extern symtabnode *currFun;
+extern int tmp_counter;
 
 #define HASHTBLSZ 256
 
@@ -246,6 +247,33 @@ symtabnode *SymTabRecordFunInfo(bool isProto)
   return func;
 }
 
+symtabnode *newtmp()
+{
+  int hval;
+  char *name;
+  symtabnode *sptr;
+  int sc = Local;
+
+  name = (char *) zalloc( 10 );
+  sprintf( name, "t%d", tmp_counter++ );
+
+  sptr = SymTabLookup(name, sc);
+  CASSERT(sptr == NULL, ("multiple declarations of %s", name));
+
+  if (sptr != NULL) return sptr;
+
+  hval = hash(name);
+  
+  sptr = (symtabnode *) zalloc(sizeof(symtabnode));
+  sptr->name = name;
+  sptr->scope = sc;
+  sptr->type = t_Tmp;
+  
+  sptr->next = SymTab[sc][hval];
+  SymTab[sc][hval] = sptr;
+  
+  return sptr;
+}
 
 /*
  * CleanupFnInfo() -- clean up after processing information

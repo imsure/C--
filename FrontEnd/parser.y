@@ -15,10 +15,15 @@
 #include "error.h"
 #include "syntax-tree.h"
 #include "symbol-table.h"
+#include "three-address-code.h"
 
-extern int yylex();
-extern void yyerror();
-extern void printSyntaxTree(tnode *t, int n, int depth);
+  extern int yylex();
+  extern void yyerror();
+  extern void printSyntaxTree(tnode *t, int n, int depth);
+  extern void DumpSymTabLocal();
+  extern void DumpSymTabGlobal();
+  extern three_addr_code *code_gen( tnode *t );
+  extern void print_code( tnode *t );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -98,6 +103,11 @@ prog
       printf("@@BODY:\n");
       printSyntaxTree(currfnbodyTree, 4, 0);
       printf("-----\n");
+
+      DumpSymTabGlobal();
+      DumpSymTabLocal();
+      code_gen( currfnbodyTree );
+      print_code( currfnbodyTree );
 #endif
       CleanupFnInfo(); 
     }

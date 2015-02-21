@@ -8,6 +8,7 @@
 #define _SYNTAX_TREE_H_
 
 #include "symbol-table.h"
+#include "three-address-code.h"
 
 typedef enum SyntaxNodeType {
   Error,
@@ -64,6 +65,10 @@ typedef struct treenode {
     struct expr exprNode;
     struct stmt stmtNode;
   } val;
+
+  symtabnode *place; // symbol table location where the value of the expression
+                     // will be kept at runtime.
+  three_addr_code *code;
 } tnode, *tnptr;
 
 tnode *mkConstNode(SyntaxNodeType ntype, int etype, int n);
