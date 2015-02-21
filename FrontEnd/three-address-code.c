@@ -40,7 +40,7 @@ instr *newlabel()
   quad->op = Label;
   quad->dest = (address *) zalloc( sizeof(address) );
   quad->dest->atype = AT_Label;
-  sprintf( quad->dest->val, "%s%d", LABEL, label_counter++ );
+  sprintf( quad->dest->val.label, "%s%d", LABEL, label_counter++ );
   quad->operand1 = NULL;
   quad->operand2 = NULL;
   quad->is_empty = false;
@@ -105,6 +105,17 @@ void print_code( tnode *t )
     case Assg:
       printf( "%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "" );
+      break;
+    case Gt:
+      printf( "if ( " ); 
+      print_operands( inst, ">" );
+      printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Label: // label instruction
+      printf( "%s:", inst->dest->val.label );
+      break;
+    case Goto: // goto instruction
+      printf( "goto %s", inst->dest->val.goto_label->dest->val.label );
       break;
     case Return:
       printf( "Return" );
@@ -257,6 +268,93 @@ static three_addr_code *code_gen_arrayref( tnode *t )
   return t->code;
 }
 
+static three_addr_code *code_gen_bool( tnode *t, instr *L_then, instr *L_else )
+{
+  three_addr_code *tmpcode1, *tmpcode2;
+  address *dest, *operand1, *operand2;
+  instr *inst1, *inst2;
+  SyntaxNodeType op;
+  
+  tmpcode1 = code_gen( stBinop_Op1(t) ); // code for operand1
+  tmpcode2 = code_gen( stBinop_Op2(t) ); // code for operand2
+
+  /* Instruction for 'then' statement. */
+  op = t->ntype;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stBinop_Op1(t)->place;
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_StRef;
+  operand2->val.stptr = stBinop_Op2(t)->place;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_Label;
+  dest->val.goto_label = L_then;
+  
+  inst1 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Instruction for 'else' statement. */
+  op = Goto;
+  operand1 = NULL;
+  operand2 = NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_Label;
+  dest->val.goto_label = L_else;
+  
+  inst2 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Glue 4 pieces together. */
+  tmpcode1->end->next = tmpcode2->start;
+  tmpcode2->end->next = inst1;
+  inst1->next = inst2;
+  t->code = tmpcode1;
+  t->code->end = inst2;
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_ifelse( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  three_addr_code *tmpcode1, *tmpcode2, *tmpcode3;
+  instr *L_then, *L_else, *L_after, *inst1, *inst2;
+
+  /* Generating code for 'then' statement. */
+  L_then = newlabel(); // label instruction for 'then' part.
+  tmpcode1 = code_gen( stIf_Then(t) );
+
+  /* Generating code for 'else' statement. */
+  L_else = newlabel(); // label instruction for 'else' part.
+  tmpcode2 = code_gen( stIf_Else(t) );
+
+  L_after = newlabel(); // label instruction for the 'after' part.
+
+  /* Generating code for relational 'test' statement. */
+  tmpcode3 = code_gen_bool( stIf_Test(t), L_then, L_else );
+  
+  /* Instruction for jumping to then statement. */
+  op = Goto;
+  operand1 = NULL;
+  operand2 = NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_Label;
+  dest->val.goto_label = L_after;
+  
+  inst1 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Glue pieces together. */
+  t->code = tmpcode3;
+  tmpcode3->end->next = L_then;
+  L_then->next = tmpcode1->start;
+  tmpcode1->end->next = inst1;
+  inst1->next = L_else;
+  L_else->next = tmpcode2->start;
+  tmpcode2->end->next = L_after;
+  t->code->end = L_after;
+
+  return t->code;
+}
+
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
@@ -295,6 +393,10 @@ three_addr_code *code_gen( tnode *t )
   case ArraySubscript:
     printf( "Generating code for array ref...\n" );
     t->code = code_gen_arrayref( t );
+    break;
+  case If:
+    printf( "Generating code for if-else...\n" );
+    t->code = code_gen_ifelse( t );
     break;
   case STnodeList:
     printf( "Generating code for statment list...\n" );
