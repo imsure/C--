@@ -38,7 +38,9 @@ instr *newlabel()
 {
   instr *quad = (instr *) zalloc( sizeof(instr) );
   quad->op = Label;
-  quad->dest = NULL;
+  quad->dest = (address *) zalloc( sizeof(address) );
+  quad->dest->atype = AT_Label;
+  sprintf( quad->dest->val, "%s%d", LABEL, label_counter++ );
   quad->operand1 = NULL;
   quad->operand2 = NULL;
   quad->is_empty = false;
