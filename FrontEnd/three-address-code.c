@@ -87,27 +87,27 @@ void print_code( tnode *t )
     }
     switch ( inst->op ) {
     case Plus:
-      printf( "%s = ", inst->dest->val.stptr->name ); 
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "+" );
       break;
     case BinaryMinus:
-      printf( "%s = ", inst->dest->val.stptr->name ); 
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "-" );
       break;
     case Mult:
-      printf( "%s = ", inst->dest->val.stptr->name ); 
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "*" );
       break;
     case Div:
-      printf( "%s = ", inst->dest->val.stptr->name ); 
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "/" );
       break;
     case Assg:
-      printf( "%s = ", inst->dest->val.stptr->name ); 
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "" );
       break;
     case Gt:
-      printf( "if ( " ); 
+      printf( "\tif ( " ); 
       print_operands( inst, ">" );
       printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
       break;
@@ -115,10 +115,10 @@ void print_code( tnode *t )
       printf( "%s:", inst->dest->val.label );
       break;
     case Goto: // goto instruction
-      printf( "goto %s", inst->dest->val.goto_label->dest->val.label );
+      printf( "\tgoto %s", inst->dest->val.goto_label->dest->val.label );
       break;
     case Return:
-      printf( "Return" );
+      printf( "\tReturn" );
       break;
     }
     putchar( '\n' );
