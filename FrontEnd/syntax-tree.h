@@ -37,6 +37,7 @@ typedef enum SyntaxNodeType {
   While,
   If,
   STnodeList,
+  Label, // added for operation type of three address code
   Noop // added for operation type of three address code
 } SyntaxNodeType;
 
@@ -44,6 +45,7 @@ typedef enum addrtype {
   AT_Intcon, // integer constant
   AT_Stringcon, // string constant
   AT_StRef, // symbol table reference
+  AT_Label, // label
   AT_Noop // no operation
 } addrtype;
 
@@ -52,6 +54,7 @@ typedef struct address {
   union {
     int iconst;
     char *strconst;
+    char label[ 5 ]; // name of the label
     symtabnode *stptr;
   } val;
 } address;

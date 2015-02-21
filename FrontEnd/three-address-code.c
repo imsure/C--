@@ -66,7 +66,6 @@ void print_code( tnode *t )
 
   for (inst = t->code->start; inst != NULL; inst = inst->next) {
     if ( inst->is_empty ) {
-      printf( "empty instr: op code = %d\n", inst->op );
       continue;
     }
     switch ( inst->op ) {
@@ -150,24 +149,6 @@ static three_addr_code *code_gen_expr( tnode *t )
   t->code->end->next = newinstr( op, operand1, operand2, dest, false ); // concatenate tmpcode2 and new instruction.
   t->code->end = t->code->end->next; // move end pointer to the new instruction.
 
-  /* if ( tmpcode == NULL && tmpcode2 == NULL ) { */
-  /*   t->code->start = newinstr( op, operand1, operand2, dest ); */
-  /*   t->code->end = t->code->start; */
-  /* } else if ( tmpcode == NULL && tmpcode2 != NULL ) { */
-  /*   t->code = tmpcode2; */
-  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
-  /*   t->code->end = t->code->end->next; */
-  /* } else if ( tmpcode != NULL && tmpcode2 == NULL ) { */
-  /*   t->code = tmpcode; */
-  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
-  /*   t->code->end = t->code->end->next; */
-  /* } else if ( tmpcode != NULL && tmpcode2 != NULL ) { */
-  /*   t->code = tmpcode; */
-  /*   t->code->end->next = tmpcode2->start; */
-  /*   t->code->end = tmpcode2->end; */
-  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
-  /*   t->code->end = t->code->end->next; */
-  /* } */
   return t->code;
 }
 
@@ -217,20 +198,20 @@ three_addr_code *code_gen( tnode *t )
   case Intcon:
     printf( "Generating code for Intcon...\n" );
     t->code = code_gen_intcon( t );
-    //print_code( t );
     break;
   case Var:
     t->code = code_gen_var( t );
     break;
+  case BinaryMinus:
+  case Mult:
+  case Div:
   case Plus:
     printf( "Generating code for plus...\n" );
     t->code = code_gen_expr( t );
-    //print_code( t );
     break;    
   case Assg:
     printf( "Generating code for assignment...\n" );
     t->code = code_gen_assg( t );
-    //print_code( t );
     break;
   case STnodeList:
     printf( "Generating code for statment list...\n" );
