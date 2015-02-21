@@ -13,6 +13,8 @@
 #include "protos.h"
 #include "syntax-tree.h"
 
+#define LABEL "L"
+
 int label_counter = 0; // counter for the labels.
 int tmp_counter = 0; // counter for the temp variables.
 
@@ -27,6 +29,19 @@ instr *newinstr( SyntaxNodeType op, address *operand1, address *operand2,
   quad->operand1 = operand1;
   quad->operand2 = operand2;
   quad->is_empty = is_empty;
+  quad->next = NULL;
+
+  return quad;
+}
+
+instr *newlabel()
+{
+  instr *quad = (instr *) zalloc( sizeof(instr) );
+  quad->op = Label;
+  quad->dest = NULL;
+  quad->operand1 = NULL;
+  quad->operand2 = NULL;
+  quad->is_empty = false;
   quad->next = NULL;
 
   return quad;
