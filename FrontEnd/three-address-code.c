@@ -11,74 +11,197 @@
 #include <string.h>
 #include "global.h"
 #include "protos.h"
-#include "three-address-code.h"
 #include "syntax-tree.h"
 
 int label_counter = 0; // counter for the labels.
 int tmp_counter = 0; // counter for the temp variables.
 
-instr *newinstr( optype op, address *operand1,
-		 address *operand2, address *dest )
+three_addr_code *code_gen( tnode *t );
+
+instr *newinstr( SyntaxNodeType op, address *operand1, address *operand2,
+		 address *dest, bool is_empty )
 {
   instr *quad = (instr *) zalloc( sizeof(instr) );
   quad->op = op;
   quad->dest = dest;
   quad->operand1 = operand1;
   quad->operand2 = operand2;
+  quad->is_empty = is_empty;
   quad->next = NULL;
 
   return quad;
 }
 
+static void print_operands( instr *inst, char *op )
+{
+  if ( inst->operand1 != NULL ) {
+    switch (inst->operand1->atype) {
+    case AT_Intcon:
+      printf( "%d ", inst->operand1->val.iconst );
+      break;
+    case AT_StRef:
+      printf( "%s ", inst->operand1->val.stptr->name );
+      break;
+    }
+  }
+
+  printf( "%s ", op );
+
+  if ( inst->operand2 != NULL ) {
+    switch (inst->operand2->atype) {
+    case AT_Intcon:
+      printf( "%d ", inst->operand2->val.iconst );
+      break;
+    case AT_StRef:
+      printf( "%s", inst->operand2->val.stptr->name );
+      break;
+    }
+  }
+}
+
 void print_code( tnode *t )
 {
   instr *inst;
-  symtabnode *stptr;
   instr *end = t->code->end;
 
   for (inst = t->code->start; inst != NULL; inst = inst->next) {
-    printf( "op: %d, ", inst->op );
-    if ( inst->operand1 != NULL ) {
-      switch (inst->operand1->atype) {
-      case AT_Intcon:
-	printf( "operand1: %d, ", inst->operand1->val.iconst );
-	break;
-      case AT_StRef:
-	printf( "operand1: %s, ", inst->operand1->val.stptr->name );
-	break;
-      }
+    if ( inst->is_empty ) {
+      printf( "empty instr: op code = %d\n", inst->op );
+      continue;
     }
-
-    if ( inst->operand2 != NULL ) {
-      switch (inst->operand2->atype) {
-      case AT_Intcon:
-	printf( "operand2: %d, ", inst->operand2->val.iconst );
-	break;
-      case AT_StRef:
-	printf( "operand2: %s, ", inst->operand2->val.stptr->name );
-	break;
-      }
-    }
-
-    if ( inst->dest != NULL ) {
-      switch (inst->dest->atype) {
-      case AT_Intcon:
-	printf( "dest: %d", inst->dest->val.iconst );
-	break;
-      case AT_StRef:
-	printf( "dest: %s", inst->dest->val.stptr->name );
-	break;
-      }
+    switch ( inst->op ) {
+    case Plus:
+      printf( "%s = ", inst->dest->val.stptr->name ); // destination
+      print_operands( inst, "+" );
+      break;
+    case Assg:
+      printf( "%s = ", inst->dest->val.stptr->name ); // destination
+      print_operands( inst, "" );
+      break;
+    case Return:
+      printf( "Return" );
+      break;
     }
     putchar( '\n' );
   }
+}
+
+static three_addr_code *code_gen_intcon( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+
+  t->place = newtmp();
+  op = Assg;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_Intcon;
+  operand1->val.iconst = stIntcon( t );
+  operand2 = (address *) NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place;
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code->start = newinstr( op, operand1, operand2, dest, false );
+  t->code->end = t->code->start;
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_var( tnode *t )
+{
+  symtabnode *stptr;
+  stptr = stVar( t );
+  t->place = stptr;
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code->start = newinstr( Noop, NULL, NULL, NULL, true );
+  t->code->end = t->code->start;
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_expr( tnode *t )
+{
+  three_addr_code *tmpcode, *tmpcode2;
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  
+  tmpcode = code_gen( stBinop_Op1(t) ); // code for operand1
+  tmpcode2 = code_gen( stBinop_Op2(t) ); // code for operand2
+  
+  t->place = newtmp(); // symbol table entry for the value of the expression
+  op = t->ntype; // operation type
+
+  /* Generate the quadruple. */
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stBinop_Op1(t)->place;
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_StRef;
+  operand2->val.stptr = stBinop_Op2(t)->place;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place;
+  
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  /* Final code = tmpcode || tmpcode2 || newinstr */
+  t->code = tmpcode;
+  t->code->end->next = tmpcode2->start; // concatenate tmpcode and tmpcode2.
+  t->code->end = tmpcode2->end;
+  t->code->end->next = newinstr( op, operand1, operand2, dest, false ); // concatenate tmpcode2 and new instruction.
+  t->code->end = t->code->end->next; // move end pointer to the new instruction.
+
+  /* if ( tmpcode == NULL && tmpcode2 == NULL ) { */
+  /*   t->code->start = newinstr( op, operand1, operand2, dest ); */
+  /*   t->code->end = t->code->start; */
+  /* } else if ( tmpcode == NULL && tmpcode2 != NULL ) { */
+  /*   t->code = tmpcode2; */
+  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
+  /*   t->code->end = t->code->end->next; */
+  /* } else if ( tmpcode != NULL && tmpcode2 == NULL ) { */
+  /*   t->code = tmpcode; */
+  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
+  /*   t->code->end = t->code->end->next; */
+  /* } else if ( tmpcode != NULL && tmpcode2 != NULL ) { */
+  /*   t->code = tmpcode; */
+  /*   t->code->end->next = tmpcode2->start; */
+  /*   t->code->end = tmpcode2->end; */
+  /*   t->code->end->next = newinstr( op, operand1, operand2, dest ); */
+  /*   t->code->end = t->code->end->next; */
+  /* } */
+  return t->code;
+}
+
+static three_addr_code *code_gen_assg( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+
+  three_addr_code *tmpcode;
+  tmpcode = code_gen( stAssg_Lhs(t) );
+  t->code = tmpcode;
+  tmpcode = code_gen( stAssg_Rhs(t) );
+  t->code->end->next = tmpcode->start;
+  t->code->end = tmpcode->end;
+
+  op = Assg;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stAssg_Rhs(t)->place;
+  operand2 = NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = stAssg_Lhs(t)->place;
+  t->code->end->next = newinstr( op, operand1, operand2, dest, false );
+  t->code->end = t->code->end->next;
+
+  return t->code;
 }
 
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
   tnode *tntmp;
-  optype op;
+  SyntaxNodeType op;
   address *dest, *operand1, *operand2;
   three_addr_code *tmpcode, *tmpcode2;
 
@@ -93,82 +216,20 @@ three_addr_code *code_gen( tnode *t )
     break;
   case Intcon:
     printf( "Generating code for Intcon...\n" );
-    t->place = newtmp();
-    op = TAC_Assg;
-    operand1 = (address *) zalloc( sizeof(address) );
-    operand1->atype = AT_Intcon;
-    operand1->val.iconst = stIntcon( t );
-    operand2 = (address *) NULL;
-    dest = (address *) zalloc( sizeof(address) );
-    dest->atype = AT_StRef;
-    dest->val.stptr = t->place;
-    t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
-    t->code->start = newinstr( op, operand1, operand2, dest );
-    t->code->end = t->code->start;
+    t->code = code_gen_intcon( t );
     //print_code( t );
     break;
   case Var:
-    stptr = stVar( t );
-    t->place = stptr;
-    t->code = NULL; // no instruction needed.
+    t->code = code_gen_var( t );
     break;
   case Plus:
     printf( "Generating code for plus...\n" );
-    tmpcode = code_gen( stBinop_Op1(t) );
-    tmpcode2 = code_gen( stBinop_Op2(t) );
-    t->place = newtmp();
-    op = TAC_Plus;
-    operand1 = (address *) zalloc( sizeof(address) );
-    operand1->atype = AT_StRef;
-    operand1->val.stptr = stBinop_Op1(t)->place;
-    operand2 = (address *) zalloc( sizeof(address) );
-    operand2->atype = AT_StRef;
-    operand2->val.stptr = stBinop_Op2(t)->place;
-    dest = (address *) zalloc( sizeof(address) );
-    dest->atype = AT_StRef;
-    dest->val.stptr = t->place;
-    t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
-    if ( tmpcode == NULL && tmpcode2 == NULL ) {
-      t->code->start = newinstr( op, operand1, operand2, dest );
-      t->code->end = t->code->start;
-    } else if ( tmpcode == NULL && tmpcode2 != NULL ) {
-      t->code = tmpcode2;
-      t->code->end->next = newinstr( op, operand1, operand2, dest );
-      t->code->end = t->code->end->next;
-    } else if ( tmpcode != NULL && tmpcode2 == NULL ) {
-      t->code = tmpcode;
-      t->code->end->next = newinstr( op, operand1, operand2, dest );
-      t->code->end = t->code->end->next;
-    } else if ( tmpcode != NULL && tmpcode2 != NULL ) {
-      t->code = tmpcode;
-      t->code->end->next = tmpcode2->start;
-      t->code->end = tmpcode2->end;
-      t->code->end->next = newinstr( op, operand1, operand2, dest );
-      t->code->end = t->code->end->next;
-    }
+    t->code = code_gen_expr( t );
     //print_code( t );
     break;    
   case Assg:
     printf( "Generating code for assignment...\n" );
-    tmpcode = code_gen( stAssg_Lhs(t) );
-    if ( tmpcode != NULL ) { 
-      t->code = tmpcode;
-      tmpcode = code_gen( stAssg_Rhs(t) );
-      t->code->end->next = tmpcode->start;
-      t->code->end = t->code->end->next;
-    } else { // lhs is a variable
-      t->code = code_gen( stAssg_Rhs(t) );
-    }
-    op = TAC_Assg;
-    operand1 = (address *) zalloc( sizeof(address) );
-    operand1->atype = AT_StRef;
-    operand1->val.stptr = stAssg_Rhs(t)->place;
-    operand2 = NULL;
-    dest = (address *) zalloc( sizeof(address) );
-    dest->atype = AT_StRef;
-    dest->val.stptr = stAssg_Lhs(t)->place;
-    t->code->end->next = newinstr( op, operand1, operand2, dest );
-    t->code->end = t->code->end->next;
+    t->code = code_gen_assg( t );
     //print_code( t );
     break;
   case STnodeList:
@@ -181,16 +242,15 @@ three_addr_code *code_gen( tnode *t )
       t->code->end->next = tmpcode->start;
       t->code->end = tmpcode->end;
     }
-    //    print_code( t );
     break;
   case Return:
     printf( "Returning....\n" );
     t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
-    op = TAC_Return;
+    op = Return;
     operand1 = NULL;
     operand2 = NULL;
     dest = NULL;
-    t->code->start = newinstr( op, operand1, operand2, dest );
+    t->code->start = newinstr( op, operand1, operand2, dest, false );
     t->code->end = t->code->start;
     break;
   }

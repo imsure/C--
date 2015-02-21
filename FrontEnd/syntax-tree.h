@@ -8,7 +8,6 @@
 #define _SYNTAX_TREE_H_
 
 #include "symbol-table.h"
-#include "three-address-code.h"
 
 typedef enum SyntaxNodeType {
   Error,
@@ -37,8 +36,39 @@ typedef enum SyntaxNodeType {
   For,
   While,
   If,
-  STnodeList
-} SyntaxNodeType; 
+  STnodeList,
+  Noop // added for operation type of three address code
+} SyntaxNodeType;
+
+typedef enum addrtype {
+  AT_Intcon, // integer constant
+  AT_Stringcon, // string constant
+  AT_StRef, // symbol table reference
+  AT_Noop // no operation
+} addrtype;
+
+typedef struct address {
+  enum addrtype atype;
+  union {
+    int iconst;
+    char *strconst;
+    symtabnode *stptr;
+  } val;
+} address;
+
+typedef struct instr {
+  bool is_empty;
+  SyntaxNodeType op;
+  struct address *dest, *operand1, *operand2;
+  struct instr *prev;
+  struct instr *next;
+} instr;
+
+typedef struct three_addr_code {
+  struct instr *start;
+  struct instr *end;
+} three_addr_code;
+
 
 struct stref {  // symbol table reference: subscripted expr or function call
   symtabnode *stptr;

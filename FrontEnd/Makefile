@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -DDEBUG
 
 DEST = compile
 
-HFILES = error.h  global.h  protos.h symbol-table.h  syntax-tree.h three-address-code.h
+HFILES = error.h  global.h  protos.h symbol-table.h  syntax-tree.h
 
 CFILES = error.c \
 	lex.yy.c \
@@ -40,7 +40,7 @@ symbol-table.o : global.h symbol-table.h symbol-table.c
 
 syntax-tree.o : global.h syntax-tree.h syntax-tree.c
 
-three-address-code.o : global.h three-address-code.h three-address-code.c
+three-address-code.o : global.h three-address-code.c
 
 util.o : global.h util.h util.c
 

@@ -15,7 +15,6 @@
 #include "error.h"
 #include "syntax-tree.h"
 #include "symbol-table.h"
-#include "three-address-code.h"
 
   extern int yylex();
   extern void yyerror();
