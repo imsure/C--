@@ -373,7 +373,6 @@ three_addr_code *code_gen( tnode *t )
     fprintf( stderr, "Error!\n" );
     break;
   case Intcon:
-    printf( "Generating code for Intcon...\n" );
     t->code = code_gen_intcon( t );
     break;
   case Var:
@@ -383,34 +382,27 @@ three_addr_code *code_gen( tnode *t )
   case Mult:
   case Div:
   case Plus:
-    printf( "Generating code for plus...\n" );
     t->code = code_gen_expr( t );
     break;    
   case Assg:
-    printf( "Generating code for assignment...\n" );
     t->code = code_gen_assg( t );
     break;
   case ArraySubscript:
-    printf( "Generating code for array ref...\n" );
     t->code = code_gen_arrayref( t );
     break;
   case If:
-    printf( "Generating code for if-else...\n" );
     t->code = code_gen_ifelse( t );
     break;
   case STnodeList:
-    printf( "Generating code for statment list...\n" );
     t->code = code_gen( stList_Head(t) );
     for ( tntmp = stList_Rest( t ); tntmp != NULL;
 	  tntmp = stList_Rest(tntmp) ) {
-      printf( "Generating code for statment list...\n" );
       tmpcode = code_gen( stList_Head(tntmp) );
       t->code->end->next = tmpcode->start;
       t->code->end = tmpcode->end;
     }
     break;
   case Return:
-    printf( "Returning....\n" );
     t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
     op = Return;
     operand1 = NULL;
