@@ -10,4 +10,8 @@ void foo(void)
   y = 2;
   z = 3;
   g = x + y + z;
+
+  y = x * 8;
+  z = y / x;
+  x = z - y;
 }

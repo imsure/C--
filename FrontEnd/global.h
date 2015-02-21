@@ -24,6 +24,8 @@
 #define t_Func   4
 #define t_None   5
 #define t_Error  6
-#define t_Tmp   7
+#define t_Tmp    7
+
+#define INT_SZ   4
 
 #endif  /* _GLOBAL_H_ */

@@ -70,11 +70,23 @@ void print_code( tnode *t )
     }
     switch ( inst->op ) {
     case Plus:
-      printf( "%s = ", inst->dest->val.stptr->name ); // destination
+      printf( "%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "+" );
       break;
+    case BinaryMinus:
+      printf( "%s = ", inst->dest->val.stptr->name ); 
+      print_operands( inst, "-" );
+      break;
+    case Mult:
+      printf( "%s = ", inst->dest->val.stptr->name ); 
+      print_operands( inst, "*" );
+      break;
+    case Div:
+      printf( "%s = ", inst->dest->val.stptr->name ); 
+      print_operands( inst, "/" );
+      break;
     case Assg:
-      printf( "%s = ", inst->dest->val.stptr->name ); // destination
+      printf( "%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "" );
       break;
     case Return:
@@ -178,6 +190,56 @@ static three_addr_code *code_gen_assg( tnode *t )
   return t->code;
 }
 
+static three_addr_code *code_gen_arrayref( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  three_addr_code *tmpcode2;
+  symtabnode *tmp1, *tmp2;
+  instr *inst1, *inst2;
+  
+  tmpcode2 = code_gen( stArraySubscript_Subscript(t) );
+
+  tmp1 = newtmp();
+  tmp2 = newtmp(); // hold the offset of array element
+  t->place = tmp1; // to be mapped to the memory address
+
+  /* calculate array offset */
+  op = Mult;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stArraySubscript_Subscript(t)->place;
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_Intcon;
+  operand2->val.iconst = INT_SZ;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = tmp2;
+  
+  inst1 = newinstr( op, operand1, operand2, dest, false );
+
+  op = Plus;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stArraySubscript_Array(t);
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_StRef;
+  operand2->val.stptr = tmp2;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place;
+  
+  inst2 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Glue 4 pieces togeter: tmpcode1 || tmpcode2 || inst1 || inst2. */
+  t->code = tmpcode2;
+  t->code->end->next = inst1;
+  inst1->next = inst2;
+  t->code->end = inst2;
+
+  return t->code;
+}
+
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
@@ -212,6 +274,10 @@ three_addr_code *code_gen( tnode *t )
   case Assg:
     printf( "Generating code for assignment...\n" );
     t->code = code_gen_assg( t );
+    break;
+  case ArraySubscript:
+    printf( "Generating code for array ref...\n" );
+    t->code = code_gen_arrayref( t );
     break;
   case STnodeList:
     printf( "Generating code for statment list...\n" );
