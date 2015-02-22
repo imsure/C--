@@ -45,6 +45,7 @@ typedef enum SyntaxNodeType {
 
 typedef enum addrtype {
   AT_Intcon, // integer constant
+  AT_Charcon, // char constant
   AT_Stringcon, // string constant
   AT_StRef, // symbol table reference
   AT_Label, // label

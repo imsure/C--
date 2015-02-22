@@ -53,6 +53,7 @@ static void print_operands( instr *inst, char *op )
 {
   if ( inst->operand1 != NULL ) {
     switch (inst->operand1->atype) {
+    case AT_Charcon:
     case AT_Intcon:
       printf( "%d ", inst->operand1->val.iconst );
       break;
@@ -137,8 +138,13 @@ static three_addr_code *code_gen_intcon( tnode *t )
   t->place = newtmp();
   op = Assg;
   operand1 = (address *) zalloc( sizeof(address) );
-  operand1->atype = AT_Intcon;
-  operand1->val.iconst = stIntcon( t );
+  if ( t->ntype == Intcon ) {
+    operand1->atype = AT_Intcon;
+    operand1->val.iconst = stIntcon( t );
+  } else { // charcon
+    operand1->atype = AT_Charcon;
+    operand1->val.iconst = stCharcon( t );
+  }
   operand2 = (address *) NULL;
   dest = (address *) zalloc( sizeof(address) );
   dest->atype = AT_StRef;
@@ -406,6 +412,7 @@ three_addr_code *code_gen( tnode *t )
   case Error:
     fprintf( stderr, "Error!\n" );
     break;
+  case Charcon:
   case Intcon:
     t->code = code_gen_intcon( t );
     break;
