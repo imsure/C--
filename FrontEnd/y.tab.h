@@ -86,7 +86,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 51 "parser.y"
+#line 53 "parser.y"
 {
   tnptr tptr;
   llistptr idlistptr;

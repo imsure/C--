@@ -51,6 +51,36 @@ instr *newlabel()
   return quad;
 }
 
+instr *newenter( symtabnode *func )
+{
+  instr *quad = (instr *) zalloc( sizeof(instr) );
+  quad->op = Enter;
+  quad->operand1 = (address *) zalloc( sizeof(address) );
+  quad->operand1->atype = AT_StRef;
+  quad->operand1->val.stptr = func;
+  quad->operand2 = NULL;
+  quad->dest = NULL;
+  quad->is_empty = false;
+  quad->next = NULL;
+
+  return quad;
+}
+
+instr *newleave( symtabnode *func )
+{
+  instr *quad = (instr *) zalloc( sizeof(instr) );
+  quad->op = Leave;
+  quad->operand1 = (address *) zalloc( sizeof(address) );
+  quad->operand1->atype = AT_StRef;
+  quad->operand1->val.stptr = func;
+  quad->operand2 = NULL;
+  quad->dest = NULL;
+  quad->is_empty = false;
+  quad->next = NULL;
+
+  return quad;
+}
+
 static three_addr_code *code_gen_intcon( tnode *t )
 {
   address *dest, *operand1, *operand2;

@@ -42,6 +42,8 @@ typedef enum SyntaxNodeType {
   Param, // added for operation type of three address code
   Call, // added for operation type of three address code
   Retrieve, // added for operation type of three address code
+  Enter, // added for operation type of three address code
+  Leave, // added for operation type of three address code
   Noop // added for operation type of three address code
 } SyntaxNodeType;
 

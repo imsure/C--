@@ -384,6 +384,14 @@ void print_code( tnode *t )
       printf( "\tRetrieve " );
       print_operands( inst );
       break;
+    case Enter:
+      printf( "\tEnter " );
+      print_operands( inst );
+      break;
+    case Leave:
+      printf( "\tLeave " );
+      print_operands( inst );
+      break;
     }
     putchar( '\n' );
   }
