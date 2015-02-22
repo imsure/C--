@@ -102,6 +102,10 @@ void print_code( tnode *t )
       printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "/" );
       break;
+    case UnaryMinus:
+      printf( "\t%s = -", inst->dest->val.stptr->name ); 
+      print_operands( inst, "" );
+      break;
     case Assg:
       printf( "\t%s = ", inst->dest->val.stptr->name ); 
       print_operands( inst, "" );
@@ -188,6 +192,36 @@ static three_addr_code *code_gen_expr( tnode *t )
   t->code->end = tmpcode2->end;
   t->code->end->next = newinstr( op, operand1, operand2, dest, false ); // concatenate tmpcode2 and new instruction.
   t->code->end = t->code->end->next; // move end pointer to the new instruction.
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_unary( tnode *t )
+{
+  three_addr_code *tmpcode;
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  
+  tmpcode = code_gen( stUnop_Op(t) ); // code for operand1
+  
+  t->place = newtmp(); // symbol table entry for the value of the expression
+  op = t->ntype; // operation type
+
+  /* Generate the quadruple. */
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stUnop_Op(t)->place;
+  operand2 = NULL;
+
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place;
+  
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  /* Final code = tmpcode || newinstr */
+  t->code = tmpcode;
+  tmpcode->end->next = newinstr( op, operand1, operand2, dest, false );
+  t->code->end = tmpcode->end->next;
 
   return t->code;
 }
@@ -383,7 +417,10 @@ three_addr_code *code_gen( tnode *t )
   case Div:
   case Plus:
     t->code = code_gen_expr( t );
-    break;    
+    break;
+  case UnaryMinus:
+    t->code = code_gen_unary( t );
+    break;
   case Assg:
     t->code = code_gen_assg( t );
     break;
