@@ -277,6 +277,7 @@ static three_addr_code *code_gen_ifelse( tnode *t )
   SyntaxNodeType op;
   three_addr_code *tmpcode1, *tmpcode2, *tmpcode3;
   instr *L_then, *L_else, *L_after, *inst1, *inst2;
+  tnode *tnode_else;
 
   /* Generating code for 'then' statement. */
   L_then = newlabel(); // label instruction for 'then' part.
@@ -284,32 +285,47 @@ static three_addr_code *code_gen_ifelse( tnode *t )
 
   /* Generating code for 'else' statement. */
   L_else = newlabel(); // label instruction for 'else' part.
-  tmpcode2 = code_gen( stIf_Else(t) );
+  tnode_else = stIf_Else( t );
+  if ( tnode_else != NULL ) {
+    tmpcode2 = code_gen( tnode_else );
+  }
 
   L_after = newlabel(); // label instruction for the 'after' part.
 
   /* Generating code for relational 'test' statement. */
-  tmpcode3 = code_gen_bool( stIf_Test(t), L_then, L_else );
-  
-  /* Instruction for jumping to then statement. */
-  op = Goto;
-  operand1 = NULL;
-  operand2 = NULL;
-  dest = (address *) zalloc( sizeof(address) );
-  dest->atype = AT_Label;
-  dest->val.goto_label = L_after;
-  
-  inst1 = newinstr( op, operand1, operand2, dest, false );
+  if ( tnode_else != NULL ) {
+    tmpcode3 = code_gen_bool( stIf_Test(t), L_then, L_else );
+  } else {
+    tmpcode3 = code_gen_bool( stIf_Test(t), L_then, L_after );
+  }
 
-  /* Glue pieces together. */
-  t->code = tmpcode3;
-  tmpcode3->end->next = L_then;
-  L_then->next = tmpcode1->start;
-  tmpcode1->end->next = inst1;
-  inst1->next = L_else;
-  L_else->next = tmpcode2->start;
-  tmpcode2->end->next = L_after;
-  t->code->end = L_after;
+  if ( tnode_else != NULL ) {
+  /* Instruction for jumping to after part. */
+    op = Goto;
+    operand1 = NULL;
+    operand2 = NULL;
+    dest = (address *) zalloc( sizeof(address) );
+    dest->atype = AT_Label;
+    dest->val.goto_label = L_after;
+  
+    inst1 = newinstr( op, operand1, operand2, dest, false );
+
+    /* Glue pieces together. */
+    t->code = tmpcode3;
+    tmpcode3->end->next = L_then;
+    L_then->next = tmpcode1->start;
+    tmpcode1->end->next = inst1;
+    inst1->next = L_else;
+    L_else->next = tmpcode2->start;
+    tmpcode2->end->next = L_after;
+    t->code->end = L_after;
+  } else {
+    t->code = tmpcode3;
+    tmpcode3->end->next = L_then;
+    L_then->next = tmpcode1->start;
+    tmpcode1->end->next = L_after;
+    t->code->end = L_after;
+  }
 
   return t->code;
 }

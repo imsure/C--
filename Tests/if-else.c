@@ -17,11 +17,26 @@ void bar(void)
   y = 2;
   z = 3;
   
-  if (x+y > 2*z) {
+  if (x+y <= 2*z) {
     z = x + y;
   } else {
     z = x - y;
   }
 
   z = (x + y) / 2;
+}
+
+void foo1(void)
+{
+  int x, y;
+  x = 0;
+  y = 1;
+  
+  if ( x != y ) {
+    x = y;
+  } else {
+    x = -y;
+  }
+  
+  y = 2 * y;
 }
