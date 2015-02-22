@@ -10,7 +10,7 @@ void foo(void)
   n = 5;
 }
 
-void foo(void)
+void bar(void)
 {
   int n, m;
   

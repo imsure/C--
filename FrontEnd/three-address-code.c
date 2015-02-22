@@ -397,6 +397,47 @@ static three_addr_code *code_gen_while( tnode *t )
   return t->code;
 }
 
+static three_addr_code *code_gen_for( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  three_addr_code *tmpcode1, *tmpcode2, *tmpcode3, *tmpcode4;
+  instr *L_eval, *L_top, *L_after, *inst1;
+
+  L_top = newlabel();
+  L_eval = newlabel();
+  L_after = newlabel();
+
+  tmpcode1 = code_gen( stFor_Init(t) );
+  tmpcode2 = code_gen_bool( stFor_Test(t), L_top, L_after );
+  tmpcode3 = code_gen( stFor_Body(t) );
+  tmpcode4 = code_gen( stFor_Update(t) );
+
+  /* Instruction for the unconditional jump to L_eval. */
+  op = Goto;
+  operand1 = NULL;
+  operand2 = NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_Label;
+  dest->val.goto_label = L_eval;
+  
+  inst1 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Glue pieces together. */
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code = tmpcode1;
+  t->code->end->next = inst1;
+  inst1->next = L_top;
+  L_top->next = tmpcode3->start;
+  tmpcode3->end->next = tmpcode4->start;
+  tmpcode4->end->next = L_eval;
+  L_eval->next = tmpcode2->start;
+  tmpcode2->end->next = L_after;
+  t->code->end = L_after;
+
+  return t->code;
+}
+
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
@@ -441,6 +482,9 @@ three_addr_code *code_gen( tnode *t )
     break;
   case While:
     t->code = code_gen_while( t );
+    break;
+  case For:
+    t->code = code_gen_for( t );
     break;
   case STnodeList:
     t->code = code_gen( stList_Head(t) );
