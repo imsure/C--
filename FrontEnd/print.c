@@ -269,3 +269,103 @@ static void printUnop(int op)
 
   return;
 }
+
+static bool is_binop( SyntaxNodeType op )
+{
+  switch ( op ) {
+  case Plus:
+  case BinaryMinus:
+  case Mult:
+  case Div:
+  case Equals:
+  case Neq:
+  case Leq:
+  case Lt:
+  case Geq:
+  case Gt:
+  case LogicalAnd:
+  case LogicalOr:
+    return true;
+  default:
+    return false;
+  }
+}
+
+static void print_operands( instr *inst  )
+{
+  if ( inst->operand1 != NULL ) {
+    switch (inst->operand1->atype) {
+    case AT_Charcon:
+    case AT_Intcon:
+      printf( "%d ", inst->operand1->val.iconst );
+      break;
+    case AT_StRef:
+      printf( "%s ", inst->operand1->val.stptr->name );
+      break;
+    }
+  }
+
+  if ( is_binop(inst->op) )
+    printBinop( inst->op );
+
+  if ( inst->operand2 != NULL ) {
+    switch (inst->operand2->atype) {
+    case AT_Intcon:
+      printf( " %d ", inst->operand2->val.iconst );
+      break;
+    case AT_StRef:
+      printf( " %s", inst->operand2->val.stptr->name );
+      break;
+    }
+  }
+}
+
+void print_code( tnode *t )
+{
+  instr *inst;
+
+  for (inst = t->code->start; inst != NULL; inst = inst->next) {
+    if ( inst->is_empty ) {
+      continue;
+    }
+    switch ( inst->op ) {
+    case Plus:
+    case BinaryMinus:
+    case Mult:
+    case Div:
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
+      print_operands( inst );
+      break;
+    case UnaryMinus:
+      printf( "\t%s = -", inst->dest->val.stptr->name );
+      print_operands( inst );
+      break;
+    case Assg:
+      printf( "\t%s = ", inst->dest->val.stptr->name ); 
+      print_operands( inst );
+      break;
+    case Equals:
+    case Neq:
+    case Leq:
+    case Lt:
+    case Geq:
+    case Gt:
+    case LogicalAnd:
+    case LogicalOr:
+      printf( "\tif ( " ); 
+      print_operands( inst );
+      printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Label: // label instruction
+      printf( "%s:", inst->dest->val.label );
+      break;
+    case Goto: // goto instruction
+      printf( "\tgoto %s", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Return:
+      printf( "\tReturn" );
+      break;
+    }
+    putchar( '\n' );
+  }
+}
