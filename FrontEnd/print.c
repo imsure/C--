@@ -369,7 +369,20 @@ void print_code( tnode *t )
       printf( "\tgoto %s", inst->dest->val.goto_label->dest->val.label );
       break;
     case Return:
-      printf( "\tReturn" );
+      printf( "\tReturn " );
+      print_operands( inst );
+      break;
+    case Param:
+      printf( "\tParam " );
+      print_operands( inst );
+      break;
+    case Call:
+      printf( "\tCall " );
+      print_operands( inst );
+      break;
+    case Retrieve:
+      printf( "\tRetrieve " );
+      print_operands( inst );
       break;
     }
     putchar( '\n' );

@@ -39,6 +39,9 @@ typedef enum SyntaxNodeType {
   STnodeList,
   Goto, // added for operation type of three address code
   Label, // added for operation type of three address code
+  Param, // added for operation type of three address code
+  Call, // added for operation type of three address code
+  Retrieve, // added for operation type of three address code
   Noop // added for operation type of three address code
 } SyntaxNodeType;
 

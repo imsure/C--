@@ -444,6 +444,98 @@ static three_addr_code *code_gen_for( tnode *t )
   return t->code;
 }
 
+static three_addr_code *code_gen_funcall( tnode *t )
+{
+  int num_args = 0, i;
+  tnode *args = stFunCall_Args( t );
+  three_addr_code *tmpcode1;
+  instr *inst;
+  tnode *tntmp, *arg;
+  SyntaxNodeType op;
+  address *dest, *operand1, *operand2;
+  
+  t->place = newtmp(); // place to hold the return value
+  tmpcode1 = code_gen( args );
+
+  //  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code = tmpcode1;
+
+  /* Generate code for argument expression and param code one by one. */
+  for (tntmp = args; tntmp != NULL; tntmp = stList_Rest(tntmp)) {
+    arg = stList_Head( tntmp );
+    op = Param;
+    operand1 = (address *) zalloc( sizeof(address) );
+    operand1->atype = AT_StRef;
+    operand1->val.stptr = arg->place;
+    operand2 = NULL;
+    dest = NULL;
+    inst = newinstr( op, operand1, operand2, dest, false );
+
+    t->code->end->next = inst;
+    t->code->end = inst;
+    
+    ++num_args;
+  }
+
+  /* call instruction */
+  op = Call;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stFunCall_Fun( t ); // symbol table entry for the callee
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_Intcon;
+  operand2->val.iconst = num_args;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->end->next = inst;
+  t->code->end = inst;
+
+  /* retrieve instruction */
+  op = Retrieve;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = t->place; // symbol table entry for the return value.
+  operand2 = NULL;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->end->next = inst;
+  t->code->end = inst;
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_return( tnode *t )
+{
+  tnode *return_expr = stReturn( t );
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  three_addr_code *tmpcode;
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+
+  op = Return;
+  if ( return_expr == NULL ) { // return type is void
+    operand1 = NULL;
+    operand2 = NULL;
+    dest = NULL;
+    t->code->start = newinstr( op, operand1, operand2, dest, false );
+    t->code->end = t->code->start;
+    return t->code;
+  } else {
+    tmpcode = code_gen( return_expr );
+    operand1 = (address *) zalloc( sizeof(address) );
+    operand1->atype = AT_StRef;
+    operand1->val.stptr = return_expr->place; // symbol table entry for the value to be returned
+    operand2 = NULL;
+    dest = NULL;
+    t->code->start = tmpcode->start;
+    tmpcode->end->next = newinstr( op, operand1, operand2, dest, false );
+    t->code->end = tmpcode->end->next;
+    return t->code;
+  }
+}
+
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
@@ -492,6 +584,9 @@ three_addr_code *code_gen( tnode *t )
   case For:
     t->code = code_gen_for( t );
     break;
+  case FunCall:
+    t->code = code_gen_funcall( t );
+    break;
   case STnodeList:
     t->code = code_gen( stList_Head(t) );
     for ( tntmp = stList_Rest( t ); tntmp != NULL;
@@ -502,14 +597,10 @@ three_addr_code *code_gen( tnode *t )
     }
     break;
   case Return:
-    t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
-    op = Return;
-    operand1 = NULL;
-    operand2 = NULL;
-    dest = NULL;
-    t->code->start = newinstr( op, operand1, operand2, dest, false );
-    t->code->end = t->code->start;
+    t->code = code_gen_return( t );
     break;
+  default:
+    fprintf(stderr, "Unknown syntax tree node type %d\n", t->ntype);
   }
 
   return t->code;
