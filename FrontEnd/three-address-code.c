@@ -15,6 +15,8 @@
 
 #define LABEL "L"
 
+extern void print_code( tnode *t );
+
 int label_counter = 0; // counter for the labels.
 int tmp_counter = 0; // counter for the temp variables.
 
@@ -289,10 +291,11 @@ static three_addr_code *code_gen_bool( tnode *t, instr *L_then, instr *L_else )
   inst2 = newinstr( op, operand1, operand2, dest, false );
 
   /* Glue 4 pieces together. */
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
   tmpcode1->end->next = tmpcode2->start;
   tmpcode2->end->next = inst1;
   inst1->next = inst2;
-  t->code = tmpcode1;
+  t->code->start = tmpcode1->start;
   t->code->end = inst2;
 
   return t->code;
@@ -357,6 +360,43 @@ static three_addr_code *code_gen_ifelse( tnode *t )
   return t->code;
 }
 
+static three_addr_code *code_gen_while( tnode *t )
+{
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op;
+  three_addr_code *tmpcode1, *tmpcode2;
+  instr *L_eval, *L_top, *L_after, *inst1;
+
+  L_top = newlabel();
+  L_eval = newlabel();
+  L_after = newlabel();
+
+  tmpcode1 = code_gen_bool( stWhile_Test(t), L_top, L_after );
+  tmpcode2 = code_gen( stWhile_Body(t) );
+
+  /* Instruction for the unconditional jump to L_eval. */
+  op = Goto;
+  operand1 = NULL;
+  operand2 = NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_Label;
+  dest->val.goto_label = L_eval;
+  
+  inst1 = newinstr( op, operand1, operand2, dest, false );
+
+  /* Glue pieces together. */
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code->start = inst1;
+  inst1->next = L_top;
+  L_top->next = tmpcode2->start;
+  tmpcode2->end->next = L_eval;
+  L_eval->next = tmpcode1->start;
+  tmpcode1->end->next = L_after;
+  t->code->end = L_after;
+
+  return t->code;
+}
+
 three_addr_code *code_gen( tnode *t )
 {
   symtabnode *stptr;
@@ -398,6 +438,9 @@ three_addr_code *code_gen( tnode *t )
     break;
   case If:
     t->code = code_gen_ifelse( t );
+    break;
+  case While:
+    t->code = code_gen_while( t );
     break;
   case STnodeList:
     t->code = code_gen( stList_Head(t) );

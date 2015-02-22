@@ -37,7 +37,6 @@ typedef enum SyntaxNodeType {
   While,
   If,
   STnodeList,
-  IfGoto, // added for operation type of three address code
   Goto, // added for operation type of three address code
   Label, // added for operation type of three address code
   Noop // added for operation type of three address code

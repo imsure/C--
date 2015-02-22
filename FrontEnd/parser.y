@@ -105,8 +105,8 @@ prog
 
       DumpSymTabGlobal();
       DumpSymTabLocal();
-      code_gen( currfnbodyTree );
-      print_code( currfnbodyTree );
+      //code_gen( currfnbodyTree );
+      //print_code( currfnbodyTree );
 #endif
       CleanupFnInfo(); 
     }
