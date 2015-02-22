@@ -231,14 +231,41 @@ static three_addr_code *code_gen_bool( tnode *t, instr *L_then, instr *L_else )
 {
   three_addr_code *tmpcode1, *tmpcode2;
   address *dest, *operand1, *operand2;
-  instr *inst1, *inst2;
+  instr *inst1, *inst2, *label1;
   SyntaxNodeType op;
-  
+
+  op = t->ntype;
+
+  /* short circuit evaluation for && */
+  if ( op == LogicalAnd ) { 
+    label1 = newlabel();
+    tmpcode1 = code_gen_bool( stBinop_Op1(t), label1, L_else );
+    tmpcode2 = code_gen_bool( stBinop_Op2(t), L_then, L_else );
+    /* code for && = tmpcode1 || label1 || tmpcode2 */
+    t->code = tmpcode1;
+    tmpcode1->end->next = label1;
+    label1->next = tmpcode2->start;
+    t->code->end = tmpcode2->end;
+    return t->code;
+  }
+
+  /* short circuit evaluation for || */
+  if ( op == LogicalOr ) {
+    label1 = newlabel();
+    tmpcode1 = code_gen_bool( stBinop_Op1(t), L_then, label1 );
+    tmpcode2 = code_gen_bool( stBinop_Op2(t), L_then, L_else );
+    /* code for && = tmpcode1 || label1 || tmpcode2 */
+    t->code = tmpcode1;
+    tmpcode1->end->next = label1;
+    label1->next = tmpcode2->start;
+    t->code->end = tmpcode2->end;
+    return t->code;
+  }
+
   tmpcode1 = code_gen( stBinop_Op1(t) ); // code for operand1
   tmpcode2 = code_gen( stBinop_Op2(t) ); // code for operand2
 
   /* Instruction for 'then' statement. */
-  op = t->ntype;
   operand1 = (address *) zalloc( sizeof(address) );
   operand1->atype = AT_StRef;
   operand1->val.stptr = stBinop_Op1(t)->place;
