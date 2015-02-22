@@ -444,7 +444,8 @@ static three_addr_code *code_gen_for( tnode *t )
   return t->code;
 }
 
-static three_addr_code *code_gen_funcall( tnode *t )
+/* return: non void; args: non void */
+static three_addr_code *code_gen_funcall1( tnode *t )
 {
   int num_args = 0, i;
   tnode *args = stFunCall_Args( t );
@@ -504,6 +505,138 @@ static three_addr_code *code_gen_funcall( tnode *t )
   t->code->end = inst;
 
   return t->code;
+}
+
+/* return: non void; arg: void */
+static three_addr_code *code_gen_funcall2( tnode *t )
+{
+  instr *inst;
+  SyntaxNodeType op;
+  address *dest, *operand1, *operand2;
+  
+  t->place = newtmp(); // place to hold the return value
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+
+  /* call instruction */
+  op = Call;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stFunCall_Fun( t ); // symbol table entry for the callee
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_Intcon;
+  operand2->val.iconst = 0;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->start = inst;
+  t->code->end = t->code->start;
+
+  /* retrieve instruction */
+  op = Retrieve;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = t->place; // symbol table entry for the return value.
+  operand2 = NULL;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->end->next = inst;
+  t->code->end = inst;
+
+  return t->code;
+}
+
+/* return: void; args: non void */
+static three_addr_code *code_gen_funcall3( tnode *t )
+{
+  int num_args = 0, i;
+  tnode *args = stFunCall_Args( t );
+  three_addr_code *tmpcode1;
+  instr *inst;
+  tnode *tntmp, *arg;
+  SyntaxNodeType op;
+  address *dest, *operand1, *operand2;
+  
+  tmpcode1 = code_gen( args );
+
+  //  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code = tmpcode1;
+
+  /* Generate code for argument expression and param code one by one. */
+  for (tntmp = args; tntmp != NULL; tntmp = stList_Rest(tntmp)) {
+    arg = stList_Head( tntmp );
+    op = Param;
+    operand1 = (address *) zalloc( sizeof(address) );
+    operand1->atype = AT_StRef;
+    operand1->val.stptr = arg->place;
+    operand2 = NULL;
+    dest = NULL;
+    inst = newinstr( op, operand1, operand2, dest, false );
+
+    t->code->end->next = inst;
+    t->code->end = inst;
+    
+    ++num_args;
+  }
+
+  /* call instruction */
+  op = Call;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stFunCall_Fun( t ); // symbol table entry for the callee
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_Intcon;
+  operand2->val.iconst = num_args;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->end->next = inst;
+  t->code->end = inst;
+
+  return t->code;
+}
+
+/* return: void; arg: void */
+static three_addr_code *code_gen_funcall4( tnode *t )
+{
+  instr *inst;
+  SyntaxNodeType op;
+  address *dest, *operand1, *operand2;
+  
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+
+  /* call instruction */
+  op = Call;
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_StRef;
+  operand1->val.stptr = stFunCall_Fun( t ); // symbol table entry for the callee
+  operand2 = (address *) zalloc( sizeof(address) );
+  operand2->atype = AT_Intcon;
+  operand2->val.iconst = 0;
+  dest = NULL;
+  inst = newinstr( op, operand1, operand2, dest, false );
+
+  t->code->start = inst;
+  t->code->end = t->code->start;
+
+  return t->code;
+}
+
+static three_addr_code *code_gen_funcall( tnode *t )
+{
+  tnode *args = stFunCall_Args( t );
+  symtabnode *stptr = stFunCall_Fun(t); // sym tab entry for the callee.
+  int ret_type = stptr->ret_type; // return type of the callee.
+
+  if ( args != NULL && ret_type != t_None ) {
+    return code_gen_funcall1( t );
+  } else if ( args == NULL && ret_type != t_None ) {
+    return code_gen_funcall2( t );
+  } else if ( args != NULL && ret_type == t_None ) {
+    return code_gen_funcall3( t );
+  } else {
+    return code_gen_funcall4( t );
+  }
 }
 
 static three_addr_code *code_gen_return( tnode *t )
