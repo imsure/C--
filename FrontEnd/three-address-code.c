@@ -264,10 +264,16 @@ static three_addr_code *code_gen_bool( tnode *t, instr *L_then, instr *L_else )
     return t->code;
   }
 
+  /* evaluation for ! */
+  if ( op == LogicalNot ) {
+    t->code = code_gen_bool( stUnop_Op(t), L_else, L_then );
+    return t->code;
+  }
+
   tmpcode1 = code_gen( stBinop_Op1(t) ); // code for operand1
   tmpcode2 = code_gen( stBinop_Op2(t) ); // code for operand2
 
-  /* Instruction for 'then' statement. */
+  /* Instruction for binary relational operation. */
   operand1 = (address *) zalloc( sizeof(address) );
   operand1->atype = AT_StRef;
   operand1->val.stptr = stBinop_Op1(t)->place;
@@ -280,7 +286,7 @@ static three_addr_code *code_gen_bool( tnode *t, instr *L_then, instr *L_else )
   
   inst1 = newinstr( op, operand1, operand2, dest, false );
 
-  /* Instruction for 'else' statement. */
+  /* Instruction for goto 'else' statement. */
   op = Goto;
   operand1 = NULL;
   operand2 = NULL;

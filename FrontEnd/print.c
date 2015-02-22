@@ -356,6 +356,12 @@ void print_code( tnode *t )
       print_operands( inst );
       printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
       break;
+    case LogicalNot:
+      printf( "\tif ( !" ); 
+      print_operands( inst );
+      printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
+      break;
+
     case Label: // label instruction
       printf( "%s:", inst->dest->val.label );
       break;
