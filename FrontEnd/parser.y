@@ -24,6 +24,7 @@
   extern three_addr_code *code_gen( tnode *t );
   extern instr *newenter( symtabnode *func );
   extern instr *newleave( symtabnode *func );
+  extern instr *newfunclabel( const char *funcname );
   extern void print_code( tnode *t );
 
   /*
@@ -108,11 +109,13 @@ prog
       DumpSymTabGlobal();
       DumpSymTabLocal();
 #endif
+      instr *func_label = newfunclabel( $3 );
       instr *enter_func = newenter( currFun );
       instr *leave_func = newleave( currFun );
       currfnbodyTree->code = code_gen( currfnbodyTree );
+      func_label->next = enter_func;
       enter_func->next = currfnbodyTree->code->start;
-      currfnbodyTree->code->start = enter_func;
+      currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
       print_code( currfnbodyTree );

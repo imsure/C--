@@ -63,7 +63,7 @@ typedef struct address {
   union {
     int iconst;
     char *strconst;
-    char label[ 5 ]; // name of the label
+    char label[ 50 ]; // name of the label
     symtabnode *stptr;
     struct instr *goto_label;
   } val;

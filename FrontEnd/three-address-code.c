@@ -51,6 +51,21 @@ instr *newlabel()
   return quad;
 }
 
+instr *newfunclabel( const char *funcname )
+{
+  instr *quad = (instr *) zalloc( sizeof(instr) );
+  quad->op = Label;
+  quad->dest = (address *) zalloc( sizeof(address) );
+  quad->dest->atype = AT_Label;
+  sprintf( quad->dest->val.label, "%s", funcname );
+  quad->operand1 = NULL;
+  quad->operand2 = NULL;
+  quad->is_empty = false;
+  quad->next = NULL;
+
+  return quad;
+}
+
 instr *newenter( symtabnode *func )
 {
   instr *quad = (instr *) zalloc( sizeof(instr) );
