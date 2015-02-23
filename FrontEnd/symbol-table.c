@@ -303,16 +303,16 @@ void printType(symtabnode *stptr)
   symtabnode *formals;
   switch (stptr->type) {
   case t_Char:
-    printf("C");
+    printf("C(offset=%d)", stptr->fp_offset);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
-  case t_Int:  printf("I");
+  case t_Int:  printf("I(offset=%d)", stptr->fp_offset);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
   case t_Array:
     switch(stptr->elt_type) {
-    case t_Char: printf("C[%d]", stptr->num_elts); break;
-    case t_Int: printf("I[%d]", stptr->num_elts); break;
+    case t_Char: printf("C[%d](offset=%d)", stptr->num_elts, stptr->fp_offset); break;
+    case t_Int: printf("I[%d](offset=%d)", stptr->num_elts, stptr->fp_offset); break;
     default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
     }
     break;
@@ -337,6 +337,9 @@ void printType(symtabnode *stptr)
     default: printf("??%d", stptr->ret_type);
     }
     break;
+  case t_Tmp:
+    printf("Tmp(offset=%d)", stptr->fp_offset);
+    break;
   case t_None:
     printf("-");
     break;
@@ -352,6 +355,42 @@ void printSTNode(symtabnode *stptr)
 	 (stptr->formal == true ? "<formal param>" : ""));
   printType(stptr);
   printf("\n");
+}
+
+int compute_fp_offset()
+{
+  int i, offset = 0;
+  symtabnode *stptr;
+
+  for (i = 0; i < HASHTBLSZ; i++) {
+    for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
+      switch (stptr->type) {
+      case t_Char:
+	offset += 1;
+	stptr->fp_offset = offset;
+	break;
+      case t_Tmp:
+      case t_Int:
+	offset += 4;
+	stptr->fp_offset = offset;
+	break;
+      case t_Array:
+	switch(stptr->elt_type) {
+	case t_Char:
+	  offset += stptr->num_elts;
+	  stptr->fp_offset = offset;
+	  break;
+	case t_Int:
+	  offset += stptr->num_elts * 4;
+	  stptr->fp_offset = offset;
+	  break;
+	default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
+	}
+	break;
+      }
+    }
+  }
+  return offset;
 }
 
 void DumpSymTabLocal()

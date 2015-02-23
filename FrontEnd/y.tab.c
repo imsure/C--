@@ -128,7 +128,9 @@
   extern instr *newenter( symtabnode *func );
   extern instr *newleave( symtabnode *func );
   extern instr *newfunclabel( const char *funcname );
+  extern void tac2mips( tnode *t, int stack_bytes );
   extern void print_code( tnode *t );
+  extern int compute_fp_offset();
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -174,7 +176,7 @@ int errstate = 0;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 54 "parser.y"
+#line 56 "parser.y"
 {
   tnptr tptr;
   llistptr idlistptr;
@@ -182,7 +184,7 @@ typedef union YYSTYPE
   int nval;
 }
 /* Line 193 of yacc.c.  */
-#line 186 "y.tab.c"
+#line 188 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -195,7 +197,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 199 "y.tab.c"
+#line 201 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -518,16 +520,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    87,    87,    89,    91,    94,    93,   125,   128,   130,
-     139,   139,   140,   144,   156,   157,   161,   162,   166,   167,
-     172,   173,   174,   178,   179,   183,   187,   187,   188,   188,
-     189,   193,   204,   218,   222,   223,   227,   233,   239,   245,
-     269,   270,   271,   272,   273,   281,   282,   282,   286,   287,
-     287,   291,   295,   296,   300,   301,   305,   306,   310,   311,
-     315,   337,   338,   339,   340,   341,   342,   343,   344,   345,
-     346,   350,   351,   352,   353,   354,   355,   356,   357,   358,
-     359,   360,   361,   366,   390,   412,   423,   449,   475,   486,
-     496,   523,   538,   539,   542
+       0,    89,    89,    91,    93,    96,    95,   136,   139,   141,
+     150,   150,   151,   155,   167,   168,   172,   173,   177,   178,
+     183,   184,   185,   189,   190,   194,   198,   198,   199,   199,
+     200,   204,   215,   229,   233,   234,   238,   244,   250,   256,
+     280,   281,   282,   283,   284,   292,   293,   293,   297,   298,
+     298,   302,   306,   307,   311,   312,   316,   317,   321,   322,
+     326,   348,   349,   350,   351,   352,   353,   354,   355,   356,
+     357,   361,   362,   363,   364,   365,   366,   367,   368,   369,
+     370,   371,   372,   377,   401,   423,   434,   460,   486,   497,
+     507,   534,   549,   550,   553
 };
 #endif
 
@@ -1572,12 +1574,12 @@ yyreduce:
   switch (yyn)
     {
         case 5:
-#line 94 "parser.y"
+#line 96 "parser.y"
     { currFun = SymTabRecordFunInfo(false);}
     break;
 
   case 6:
-#line 96 "parser.y"
+#line 98 "parser.y"
     { 
       currfnbodyTree = AppendReturn((yyvsp[(11) - (12)].tptr));
       /*
@@ -1603,19 +1605,28 @@ yyreduce:
       currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
-      print_code( currfnbodyTree );
+      //  printf( "Three Address Code:\n\n" );
+      //print_code( currfnbodyTree );
+
+      int stack_bytes = compute_fp_offset();
+      //printf( "Number of bytes on stack = %d\n", stack_bytes );
+      //printf( "\nMIPS:\n\n" );
+      tac2mips( currfnbodyTree, stack_bytes );
+
+      //      DumpSymTabGlobal();
+      //      DumpSymTabLocal();
 
       CleanupFnInfo(); 
     }
     break;
 
   case 8:
-#line 128 "parser.y"
+#line 139 "parser.y"
     { is_extern = true; }
     break;
 
   case 9:
-#line 130 "parser.y"
+#line 141 "parser.y"
     { 
 	CurrScope = Local; 
 	fnRetType = CurrType;
@@ -1625,17 +1636,17 @@ yyreduce:
     break;
 
   case 10:
-#line 139 "parser.y"
+#line 150 "parser.y"
     { SymTabRecordFunInfo(true); }
     break;
 
   case 12:
-#line 140 "parser.y"
+#line 151 "parser.y"
     { SymTabRecordFunInfo(true); CleanupFnInfo(); }
     break;
 
   case 13:
-#line 144 "parser.y"
+#line 155 "parser.y"
     { 
     stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
     if (stptr != NULL) {
@@ -1648,62 +1659,62 @@ yyreduce:
     break;
 
   case 14:
-#line 156 "parser.y"
+#line 167 "parser.y"
     { (yyval.idlistptr) = NULL; }
     break;
 
   case 15:
-#line 157 "parser.y"
+#line 168 "parser.y"
     { (yyval.idlistptr) = (yyvsp[(1) - (1)].idlistptr); }
     break;
 
   case 16:
-#line 161 "parser.y"
+#line 172 "parser.y"
     { lptr = Attach((yyvsp[(1) - (3)].idlistptr), (yyvsp[(3) - (3)].idlistptr)); (yyval.idlistptr) = lptr; }
     break;
 
   case 17:
-#line 162 "parser.y"
+#line 173 "parser.y"
     { (yyval.idlistptr) = (yyvsp[(1) - (1)].idlistptr); }
     break;
 
   case 18:
-#line 166 "parser.y"
+#line 177 "parser.y"
     { lptr = NewListNode((yyvsp[(2) - (2)].chptr), (yyvsp[(1) - (2)].nval), false); (yyval.idlistptr) = lptr; }
     break;
 
   case 19:
-#line 167 "parser.y"
+#line 178 "parser.y"
     { lptr = NewListNode((yyvsp[(2) - (4)].chptr), (yyvsp[(1) - (4)].nval), true); (yyval.idlistptr) = lptr; }
     break;
 
   case 20:
-#line 172 "parser.y"
+#line 183 "parser.y"
     { (yyval.nval) = CurrType = t_Int; }
     break;
 
   case 21:
-#line 173 "parser.y"
+#line 184 "parser.y"
     { (yyval.nval) = CurrType = t_Char; }
     break;
 
   case 22:
-#line 174 "parser.y"
+#line 185 "parser.y"
     { (yyval.nval) = CurrType = t_None; }
     break;
 
   case 26:
-#line 187 "parser.y"
+#line 198 "parser.y"
     {yyerrok;}
     break;
 
   case 28:
-#line 188 "parser.y"
+#line 199 "parser.y"
     {yyerrok;}
     break;
 
   case 31:
-#line 193 "parser.y"
+#line 204 "parser.y"
     { 
     if (CurrType == t_None) {
       errmsg("Illegal type [void] for variable %s", id_name);
@@ -1718,7 +1729,7 @@ yyreduce:
     break;
 
   case 32:
-#line 204 "parser.y"
+#line 215 "parser.y"
     { 
     if (CurrType == t_None) {
       errmsg("Illegal type [void] for variable %s", id_name);
@@ -1734,22 +1745,22 @@ yyreduce:
     break;
 
   case 33:
-#line 218 "parser.y"
+#line 229 "parser.y"
     { (yyval.nval) = atoi(yytext); }
     break;
 
   case 34:
-#line 222 "parser.y"
+#line 233 "parser.y"
     { (yyval.tptr) = mkListNode((yyvsp[(1) - (2)].tptr), (yyvsp[(2) - (2)].tptr)); }
     break;
 
   case 35:
-#line 223 "parser.y"
+#line 234 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 36:
-#line 227 "parser.y"
+#line 238 "parser.y"
     {
       if ((yyvsp[(3) - (6)].tptr)->etype != t_Bool && (yyvsp[(3) - (6)].tptr)->etype != t_Error) {
         errmsg("conditional does not have Boolean type");
@@ -1759,7 +1770,7 @@ yyreduce:
     break;
 
   case 37:
-#line 233 "parser.y"
+#line 244 "parser.y"
     {
       if ((yyvsp[(3) - (5)].tptr)->etype != t_Bool && (yyvsp[(3) - (5)].tptr)->etype != t_Error) {
         errmsg("conditional does not have Boolean type");
@@ -1769,7 +1780,7 @@ yyreduce:
     break;
 
   case 38:
-#line 239 "parser.y"
+#line 250 "parser.y"
     {
       if ((yyvsp[(5) - (9)].tptr) != NULL && (yyvsp[(5) - (9)].tptr)->etype != t_Bool && (yyvsp[(5) - (9)].tptr)->etype != t_Error) {
         errmsg("conditional does not have Boolean type");
@@ -1779,7 +1790,7 @@ yyreduce:
     break;
 
   case 39:
-#line 245 "parser.y"
+#line 256 "parser.y"
     {
       if (currFun->ret_type != t_None) {
 	if ((yyvsp[(2) - (3)].tptr) == NULL) {
@@ -1807,87 +1818,87 @@ yyreduce:
     break;
 
   case 40:
-#line 269 "parser.y"
+#line 280 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (2)].tptr); }
     break;
 
   case 41:
-#line 270 "parser.y"
+#line 281 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (2)].tptr); }
     break;
 
   case 42:
-#line 271 "parser.y"
+#line 282 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
     break;
 
   case 43:
-#line 272 "parser.y"
+#line 283 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 44:
-#line 273 "parser.y"
+#line 284 "parser.y"
     { (yyval.tptr) = mkErrorNode(); }
     break;
 
   case 46:
-#line 282 "parser.y"
+#line 293 "parser.y"
     {errstate = NOSEMICOLON;}
     break;
 
   case 49:
-#line 287 "parser.y"
+#line 298 "parser.y"
     {errstate = NOCOMMA;}
     break;
 
   case 51:
-#line 291 "parser.y"
+#line 302 "parser.y"
     { (yyval.tptr) = (yyvsp[(2) - (3)].tptr); }
     break;
 
   case 52:
-#line 295 "parser.y"
+#line 306 "parser.y"
     { (yyval.tptr) = (yyvsp[(2) - (2)].tptr); }
     break;
 
   case 53:
-#line 296 "parser.y"
+#line 307 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 54:
-#line 300 "parser.y"
+#line 311 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
     break;
 
   case 55:
-#line 301 "parser.y"
+#line 312 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 56:
-#line 305 "parser.y"
+#line 316 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
     break;
 
   case 57:
-#line 306 "parser.y"
+#line 317 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 58:
-#line 310 "parser.y"
+#line 321 "parser.y"
     { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
     break;
 
   case 59:
-#line 311 "parser.y"
+#line 322 "parser.y"
     { (yyval.tptr) = NULL; }
     break;
 
   case 60:
-#line 315 "parser.y"
+#line 326 "parser.y"
     {
     if ((yyvsp[(1) - (3)].tptr)->ntype == Error) {
       (yyval.tptr) = (yyvsp[(1) - (3)].tptr);
@@ -1910,118 +1921,118 @@ yyreduce:
     break;
 
   case 61:
-#line 337 "parser.y"
+#line 348 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Equals, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 62:
-#line 338 "parser.y"
+#line 349 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Neq, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 63:
-#line 339 "parser.y"
+#line 350 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Leq, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 64:
-#line 340 "parser.y"
+#line 351 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Geq, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 65:
-#line 341 "parser.y"
+#line 352 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Lt, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 66:
-#line 342 "parser.y"
+#line 353 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(Gt, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 67:
-#line 343 "parser.y"
+#line 354 "parser.y"
     { (yyval.tptr) = SynTreeUnExp(LogicalNot, (yyvsp[(2) - (2)].tptr)); }
     break;
 
   case 68:
-#line 344 "parser.y"
+#line 355 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(LogicalAnd, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 69:
-#line 345 "parser.y"
+#line 356 "parser.y"
     { (yyval.tptr) = SynTreeBinExp(LogicalOr, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 70:
-#line 346 "parser.y"
-    { (yyval.tptr) = (yyvsp[(2) - (3)].tptr); }
-    break;
-
-  case 71:
-#line 350 "parser.y"
-    { (yyval.tptr) = SynTreeUnExp(UnaryMinus, (yyvsp[(2) - (2)].tptr)); }
-    break;
-
-  case 72:
-#line 351 "parser.y"
-    { (yyval.tptr) = SynTreeBinExp(Plus, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
-    break;
-
-  case 73:
-#line 352 "parser.y"
-    { (yyval.tptr) = SynTreeBinExp(BinaryMinus, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
-    break;
-
-  case 74:
-#line 353 "parser.y"
-    { (yyval.tptr) = SynTreeBinExp(Mult, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
-    break;
-
-  case 75:
-#line 354 "parser.y"
-    { (yyval.tptr) = SynTreeBinExp(Div, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
-    break;
-
-  case 76:
-#line 355 "parser.y"
-    { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
-    break;
-
-  case 77:
-#line 356 "parser.y"
-    { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
-    break;
-
-  case 78:
 #line 357 "parser.y"
     { (yyval.tptr) = (yyvsp[(2) - (3)].tptr); }
     break;
 
+  case 71:
+#line 361 "parser.y"
+    { (yyval.tptr) = SynTreeUnExp(UnaryMinus, (yyvsp[(2) - (2)].tptr)); }
+    break;
+
+  case 72:
+#line 362 "parser.y"
+    { (yyval.tptr) = SynTreeBinExp(Plus, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
+    break;
+
+  case 73:
+#line 363 "parser.y"
+    { (yyval.tptr) = SynTreeBinExp(BinaryMinus, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
+    break;
+
+  case 74:
+#line 364 "parser.y"
+    { (yyval.tptr) = SynTreeBinExp(Mult, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
+    break;
+
+  case 75:
+#line 365 "parser.y"
+    { (yyval.tptr) = SynTreeBinExp(Div, (yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
+    break;
+
+  case 76:
+#line 366 "parser.y"
+    { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
+    break;
+
+  case 77:
+#line 367 "parser.y"
+    { (yyval.tptr) = (yyvsp[(1) - (1)].tptr); }
+    break;
+
+  case 78:
+#line 368 "parser.y"
+    { (yyval.tptr) = (yyvsp[(2) - (3)].tptr); }
+    break;
+
   case 79:
-#line 358 "parser.y"
+#line 369 "parser.y"
     { (yyval.tptr) = mkErrorNode(); }
     break;
 
   case 80:
-#line 359 "parser.y"
+#line 370 "parser.y"
     { (yyval.tptr) = mkConstNode(Intcon, t_Int, ival); }
     break;
 
   case 81:
-#line 360 "parser.y"
+#line 371 "parser.y"
     { (yyval.tptr) = mkConstNode(Charcon, t_Char, ival); }
     break;
 
   case 82:
-#line 361 "parser.y"
+#line 372 "parser.y"
     { yytext[strlen(yytext)-1] = '\0'; /* to remove the trailing " */
                (yyval.tptr) = mkStrNode(strdup(yytext+1)); }
     break;
 
   case 83:
-#line 366 "parser.y"
+#line 377 "parser.y"
     {
       bool err_occurred = false;
       stptr = SymTabLookupAll((yyvsp[(1) - (3)].chptr));
@@ -2049,7 +2060,7 @@ yyreduce:
     break;
 
   case 84:
-#line 390 "parser.y"
+#line 401 "parser.y"
     {
       bool err_occurred = false;
       stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
@@ -2075,7 +2086,7 @@ yyreduce:
     break;
 
   case 85:
-#line 412 "parser.y"
+#line 423 "parser.y"
     {
       stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
       if (stptr == NULL) {
@@ -2087,7 +2098,7 @@ yyreduce:
     break;
 
   case 86:
-#line 423 "parser.y"
+#line 434 "parser.y"
     {
       bool err_occurred = false;
       stptr = SymTabLookupAll((yyvsp[(1) - (3)].chptr));
@@ -2117,7 +2128,7 @@ yyreduce:
     break;
 
   case 87:
-#line 449 "parser.y"
+#line 460 "parser.y"
     {
       bool err_occurred = false;
       stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
@@ -2147,7 +2158,7 @@ yyreduce:
     break;
 
   case 88:
-#line 475 "parser.y"
+#line 486 "parser.y"
     {
     stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
     if (stptr == NULL) {
@@ -2159,7 +2170,7 @@ yyreduce:
     break;
 
   case 89:
-#line 486 "parser.y"
+#line 497 "parser.y"
     { 
 	stptr = SymTabLookupAll((yyvsp[(1) - (1)].chptr));
 	if (stptr == NULL) {
@@ -2173,7 +2184,7 @@ yyreduce:
     break;
 
   case 90:
-#line 496 "parser.y"
+#line 507 "parser.y"
     {
 	bool err_occurred = false;
 
@@ -2204,7 +2215,7 @@ yyreduce:
     break;
 
   case 91:
-#line 523 "parser.y"
+#line 534 "parser.y"
     {
 	stptr = SymTabLookupAll((yyvsp[(1) - (4)].chptr));
 
@@ -2220,23 +2231,23 @@ yyreduce:
     break;
 
   case 92:
-#line 538 "parser.y"
+#line 549 "parser.y"
     { (yyval.tptr) = mkListNode((yyvsp[(1) - (3)].tptr), (yyvsp[(3) - (3)].tptr)); }
     break;
 
   case 93:
-#line 539 "parser.y"
+#line 550 "parser.y"
     { (yyval.tptr) = mkListNode((yyvsp[(1) - (1)].tptr), NULL); }
     break;
 
   case 94:
-#line 542 "parser.y"
+#line 553 "parser.y"
     { (yyval.chptr) = id_name; }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 2240 "y.tab.c"
+#line 2251 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2450,7 +2461,7 @@ yyreturn:
 }
 
 
-#line 544 "parser.y"
+#line 555 "parser.y"
 
 
 

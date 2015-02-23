@@ -25,7 +25,9 @@
   extern instr *newenter( symtabnode *func );
   extern instr *newleave( symtabnode *func );
   extern instr *newfunclabel( const char *funcname );
+  extern void tac2mips( tnode *t, int stack_bytes );
   extern void print_code( tnode *t );
+  extern int compute_fp_offset();
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -118,7 +120,16 @@ prog
       currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
-      print_code( currfnbodyTree );
+      //  printf( "Three Address Code:\n\n" );
+      //print_code( currfnbodyTree );
+
+      int stack_bytes = compute_fp_offset();
+      //printf( "Number of bytes on stack = %d\n", stack_bytes );
+      //printf( "\nMIPS:\n\n" );
+      tac2mips( currfnbodyTree, stack_bytes );
+
+      //      DumpSymTabGlobal();
+      //      DumpSymTabLocal();
 
       CleanupFnInfo(); 
     }
