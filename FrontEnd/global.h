@@ -17,6 +17,7 @@
 #include "error.h"
 #include "util.h"
 
+/* types for symbol table entries */
 #define t_Char   0
 #define t_Int    1
 #define t_Bool   2
@@ -26,6 +27,10 @@
 #define t_Error  6
 #define t_Tmp    7
 
+/* int size and char size for the target architecture. */
 #define INT_SZ   4
+#define CHAR_SZ   1
+
+#define MAX_16bits 65536 // 2^16, max of 16-bits wide integer.
 
 #endif  /* _GLOBAL_H_ */

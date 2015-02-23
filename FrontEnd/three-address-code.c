@@ -246,7 +246,13 @@ static three_addr_code *code_gen_arrayref( tnode *t )
   operand1->val.stptr = stArraySubscript_Subscript(t)->place;
   operand2 = (address *) zalloc( sizeof(address) );
   operand2->atype = AT_Intcon;
-  operand2->val.iconst = INT_SZ;
+  if ( stArraySubscript_Array(t)->elt_type == t_Int) {
+    operand2->val.iconst = INT_SZ;
+    t->place->elt_type = t_Int; // record type of array element
+  } else { // char array
+    operand2->val.iconst = CHAR_SZ;
+    t->place->elt_type = t_Char; // record type of array element
+  }
   dest = (address *) zalloc( sizeof(address) );
   dest->atype = AT_StRef;
   dest->val.stptr = tmp2;

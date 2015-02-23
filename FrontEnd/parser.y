@@ -123,13 +123,13 @@ prog
       //printf( "Three Address Code:\n\n" );
       //print_code( currfnbodyTree );
 
-      int stack_bytes = compute_fp_offset();
-      //printf( "Number of bytes on stack = %d\n", stack_bytes );
+      int stack_frame_size = compute_fp_offset();
+      //printf( "stack frame size = %d\n", stack_frame_size );
       //printf( "\nMIPS:\n\n" );
-      tac2mips( currfnbodyTree, stack_bytes );
+      tac2mips( currfnbodyTree, stack_frame_size );
 
       //      DumpSymTabGlobal();
-      //      DumpSymTabLocal();
+      //DumpSymTabLocal();
 
       CleanupFnInfo(); 
     }

@@ -360,14 +360,14 @@ void printSTNode(symtabnode *stptr)
 
 int compute_fp_offset()
 {
-  int i, offset = 0;
+  int i, offset = 0, num_chars;
   symtabnode *stptr;
 
   for (i = 0; i < HASHTBLSZ; i++) {
     for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
       switch (stptr->type) {
       case t_Char:
-	offset += 1;
+	offset += 4; // enforce 4 bytes alignment
 	stptr->fp_offset = offset;
 	break;
       case t_Tmp:
@@ -378,7 +378,15 @@ int compute_fp_offset()
       case t_Array:
 	switch(stptr->elt_type) {
 	case t_Char:
-	  offset += stptr->num_elts;
+	  num_chars = stptr->num_elts;
+	  /* make sure 4 bytes alignment */
+	  switch ( num_chars % 4 ) {
+	  case 0: break;
+	  case 1: num_chars += 3; break;
+	  case 2: num_chars += 2; break;
+	  case 3: num_chars += 1; break;
+	  }
+	  offset += num_chars;
 	  stptr->fp_offset = offset;
 	  break;
 	case t_Int:
@@ -391,6 +399,7 @@ int compute_fp_offset()
       }
     }
   }
+  
   return offset;
 }
 
