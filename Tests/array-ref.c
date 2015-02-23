@@ -1,11 +1,11 @@
-void foo(void)
+extern void print_int( int n );
+
+void main(void)
 {
   int x;
-  int y;
   int A[ 2 ];
 
-  x = 0;
-  y = 1;
   A[0] = 8;
-  A[y] = x;
+  x = A[0];
+  print_int( x );
 }

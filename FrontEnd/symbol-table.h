@@ -23,6 +23,7 @@ typedef struct stblnode {
   bool is_extern;          /* whether or not an ID was declared as an extern */
   struct stblnode *next;
   int fp_offset; // offset to frame pointer for local variables and tmps.
+  bool is_addr; // indicate if the entry represent an array address
 } symtabnode;
 
 /*********************************************************************

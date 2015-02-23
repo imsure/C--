@@ -268,6 +268,7 @@ symtabnode *newtmp()
   sptr->name = name;
   sptr->scope = sc;
   sptr->type = t_Tmp;
+  sptr->is_addr = false;
   
   sptr->next = SymTab[sc][hval];
   SymTab[sc][hval] = sptr;

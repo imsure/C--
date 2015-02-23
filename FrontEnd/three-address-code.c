@@ -236,6 +236,7 @@ static three_addr_code *code_gen_arrayref( tnode *t )
 
   tmp1 = newtmp();
   tmp2 = newtmp(); // hold the offset of array element
+  tmp1->is_addr = true;
   t->place = tmp1; // to be mapped to the memory address
 
   /* calculate array offset */

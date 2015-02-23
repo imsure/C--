@@ -120,7 +120,7 @@ prog
       currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
-      //  printf( "Three Address Code:\n\n" );
+      //printf( "Three Address Code:\n\n" );
       //print_code( currfnbodyTree );
 
       int stack_bytes = compute_fp_offset();
