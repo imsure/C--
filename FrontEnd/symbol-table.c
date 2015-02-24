@@ -353,16 +353,16 @@ void printType(symtabnode *stptr)
   symtabnode *formals;
   switch (stptr->type) {
   case t_Char:
-    printf("C(offset=%d)", stptr->fp_offset);
+    printf("C(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
-  case t_Int:  printf("I(offset=%d)", stptr->fp_offset);
+  case t_Int:  printf("I(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
   case t_Array:
     switch(stptr->elt_type) {
-    case t_Char: printf("C[%d](offset=%d)", stptr->num_elts, stptr->fp_offset); break;
-    case t_Int: printf("I[%d](offset=%d)", stptr->num_elts, stptr->fp_offset); break;
+    case t_Char: printf("C[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->index); break;
+    case t_Int: printf("I[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->index); break;
     default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
     }
     break;
@@ -388,7 +388,7 @@ void printType(symtabnode *stptr)
     }
     break;
   case t_Tmp:
-    printf("Tmp(offset=%d)", stptr->fp_offset);
+    printf("Tmp(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
     break;
   case t_None:
     printf("-");
@@ -407,6 +407,27 @@ void printSTNode(symtabnode *stptr)
   printf("\n");
 }
 
+void compute_formal_index( symtabnode *func )
+{
+  int i;
+  int index = 1;
+  symtabnode *formal, *stptr;
+  formal = func->formals;
+
+  while ( formal != NULL ) {
+    formal->index = index++;
+    for (i = 0; i < HASHTBLSZ; i++) {
+      for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
+	if ( stptr->formal && strcmp(stptr->name, formal->name) == 0 ) { 
+	  stptr->index = formal->index;
+	}
+      }
+    }
+    
+    formal = formal->next;
+  }
+}
+
 int compute_fp_offset()
 {
   int i, offset = 0, num_chars;
@@ -414,6 +435,9 @@ int compute_fp_offset()
 
   for (i = 0; i < HASHTBLSZ; i++) {
     for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
+      if ( stptr->formal ) { // ignore formals
+	continue;
+      }
       switch (stptr->type) {
       case t_Char:
 	offset += 4; // enforce 4 bytes alignment

@@ -27,6 +27,7 @@ typedef struct stblnode {
   bool is_addr; // indicate if the entry represent an array address
   bool is_strcon; // indicate if the entry is for a string constant
   bool to_mips;
+  int index; // index number for formal argument
 } symtabnode;
 
 /*********************************************************************

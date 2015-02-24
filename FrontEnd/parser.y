@@ -28,6 +28,7 @@
   extern void tac2mips( tnode *t, int stack_bytes );
   extern void print_code( tnode *t );
   extern int compute_fp_offset();
+  extern void compute_formal_index( symtabnode *func );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -120,15 +121,16 @@ prog
       currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
-      printf( "Three Address Code:\n\n" );
-      print_code( currfnbodyTree );
+      //printf( "Three Address Code:\n\n" );
+      //print_code( currfnbodyTree );
 
       int stack_frame_size = compute_fp_offset();
-      //mips_data_section();
+      compute_formal_index( currFun );
+      mips_data_section();
       //      printf( "stack frame size = %d\n", stack_frame_size );
       //      printf( "\nMIPS:\n\n" );
-      //tac2mips( currfnbodyTree, stack_frame_size );
-      DumpSymTabLocal();
+      tac2mips( currfnbodyTree, stack_frame_size );
+      
       CleanupFnInfo(); 
     }
   | /* epsilon */
