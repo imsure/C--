@@ -266,6 +266,45 @@ static void mips_binop( instr *inst )
   printf( "\tsw $10, -%d($fp)\n", inst->dest->val.stptr->fp_offset );
 }
 
+static void mips_bincond( instr *inst )
+{
+  symtabnode *op1, *op2;
+  if ( inst->operand1->atype == AT_Intcon ||
+       inst->operand1->atype == AT_Charcon ) {
+    printf( "\tli $8, %d\n", inst->operand1->val.iconst );
+  } else {
+    printf( "\tlw $8, -%d($fp)\n", inst->operand1->val.stptr->fp_offset );
+  }
+
+  if ( inst->operand2->atype == AT_Intcon ||
+       inst->operand2->atype == AT_Charcon ) {
+    printf( "\tli $9, %d\n", inst->operand2->val.iconst );
+  } else {
+    printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+  }
+
+  switch (inst->op) {
+    case Equals:
+      printf( "\tbeq $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Neq:
+      printf( "\tbne $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Leq:
+      printf( "\tble $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Lt:
+      printf( "\tblt $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Geq:
+      printf( "\tbge $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+    case Gt:
+      printf( "\tbgt $8, $9, %s\n", inst->dest->val.goto_label->dest->val.label );
+      break;
+  }
+}
+
 void tac2mips( tnode *t, int num_bytes_on_stack )
 {
   instr *inst;
@@ -291,6 +330,14 @@ void tac2mips( tnode *t, int num_bytes_on_stack )
     case Assg: // mips code for assignement
       mips_assg( inst );
       break;
+    case Equals:
+    case Neq:
+    case Leq:
+    case Lt:
+    case Geq:
+    case Gt:
+      mips_bincond( inst );
+      break;
     case Return:
       mips_return( inst );
       break;
@@ -299,6 +346,9 @@ void tac2mips( tnode *t, int num_bytes_on_stack )
       break;
     case Call:
       mips_call( inst );
+      break;
+    case Goto:
+      printf( "\tj %s\n", inst->dest->val.goto_label->dest->val.label );
       break;
     default:
       return;
