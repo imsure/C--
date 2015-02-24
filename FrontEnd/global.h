@@ -26,6 +26,7 @@
 #define t_None   5
 #define t_Error  6
 #define t_Tmp    7
+#define t_String 8
 
 /* int size and char size for the target architecture. */
 #define INT_SZ   4

@@ -96,6 +96,34 @@ instr *newleave( symtabnode *func )
   return quad;
 }
 
+static three_addr_code *code_gen_strcon( tnode *t )
+{
+  char *str = stStringcon(t);
+
+  /* stptr is a global symbol table entry to string constant. */
+  symtabnode *stptr = newstrcon( str );
+
+  address *dest, *operand1, *operand2;
+  SyntaxNodeType op = Assg;
+
+  t->place = newtmp();
+
+  operand1 = (address *) zalloc( sizeof(address) );
+  operand1->atype = AT_Stringcon;
+  operand1->val.stptr = stptr; // point to sym tab entry
+  operand2 = (address *) NULL;
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place;
+  dest->val.stptr->is_strcon = true;
+
+  t->code = (three_addr_code *) zalloc( sizeof(three_addr_code) );
+  t->code->start = newinstr( op, operand1, operand2, dest, false );
+  t->code->end = t->code->start;
+
+  return t->code;
+}
+
 static three_addr_code *code_gen_intcon( tnode *t )
 {
   address *dest, *operand1, *operand2;
@@ -741,6 +769,9 @@ three_addr_code *code_gen( tnode *t )
   case Charcon:
   case Intcon:
     t->code = code_gen_intcon( t );
+    break;
+  case Stringcon:
+    t->code = code_gen_strcon( t );
     break;
   case Var:
     t->code = code_gen_var( t );

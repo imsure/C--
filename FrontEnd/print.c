@@ -302,6 +302,9 @@ static void print_operands( instr *inst  )
     case AT_StRef:
       printf( "%s ", inst->operand1->val.stptr->name );
       break;
+    case AT_Stringcon:
+      printf( "\"%s\" ", inst->operand1->val.stptr->strcon );
+      break;
     }
   }
 

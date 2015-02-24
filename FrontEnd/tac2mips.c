@@ -24,6 +24,18 @@ void mips_print_int()
   printf( "\tjr $ra\n\n" );
 }
 
+void mips_print_string()
+{
+  printf( "\t.text\n" );
+  printf( "print_string:\n" );
+
+  printf( "\tli $v0, 4\n" );  
+  printf( "\tlw $a0, 0($sp)\n" );
+  printf( "\tsyscall\n" );
+
+  printf( "\tjr $ra\n\n" );
+}
+
 /* MIPS code for entering a function routine.
    'stack_frame_size': size of locals/tmps in bytes. */
 static void mips_entering_func( int stack_frame_size )
@@ -43,7 +55,7 @@ static void mips_assg( instr *inst )
   symtabnode *lhs_stptr = inst->dest->val.stptr; // LHS must be a symbol table entry.
   symtabnode *rhs_stptr;
   bool is_rhs_array = false, is_int_array = false;
-  
+
   /* Only operand1 is valid (RHS). put value of operand1 into $8. */
   switch (inst->operand1->atype) {
   case AT_Charcon: 
@@ -57,7 +69,11 @@ static void mips_assg( instr *inst )
 	printf( "\tori $8, %d # load lower 16-bits\n", val & 0xffff );
       }
     break;
-  case AT_StRef: // assigning a global/local/tmp variable
+  case AT_Stringcon:   /* a special case when we are passing a string constant to a function. */
+    printf( "\tla $8, %s # load string const addr\n", inst->operand1->val.stptr->name );
+    printf( "\tsw $8, -%d($fp) # store string const address\n", lhs_stptr->fp_offset );
+    break;
+  case AT_StRef: // assigning a global/local/tmp/strcon variable
     rhs_stptr = inst->operand1->val.stptr;
     if ( rhs_stptr->scope != Global ) {
       printf( "\tlw $8, -%d($fp) # load local/tmp\n", rhs_stptr->fp_offset );
@@ -136,9 +152,9 @@ static void mips_param( instr *inst )
   if ( stptr->is_addr ) {
     printf( "\tlw $9, -%d($fp) # load address of parameter\n", stptr->fp_offset );
     if ( stptr->elt_type == t_Int ) {
-      printf( "\tlw $8, ($9) # load value of int\n", stptr->fp_offset );
+      printf( "\tlw $8, ($9) # load value of int\n" );
     } else { // char array
-      printf( "\tlb $8, ($9) # load value of char\n", stptr->fp_offset );
+      printf( "\tlb $8, ($9) # load value of char\n" );
     }
   } else {
     printf( "\tlw $8, -%d($fp) # load parameter\n", stptr->fp_offset );

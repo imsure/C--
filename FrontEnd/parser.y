@@ -120,17 +120,15 @@ prog
       currfnbodyTree->code->start = func_label;
       currfnbodyTree->code->end->next = leave_func;
       currfnbodyTree->code->end = leave_func;
-      //printf( "Three Address Code:\n\n" );
-      //print_code( currfnbodyTree );
+      printf( "Three Address Code:\n\n" );
+      print_code( currfnbodyTree );
 
       int stack_frame_size = compute_fp_offset();
-      //printf( "stack frame size = %d\n", stack_frame_size );
-      //printf( "\nMIPS:\n\n" );
-      tac2mips( currfnbodyTree, stack_frame_size );
-
-      //      DumpSymTabGlobal();
-      //DumpSymTabLocal();
-
+      //mips_data_section();
+      //      printf( "stack frame size = %d\n", stack_frame_size );
+      //      printf( "\nMIPS:\n\n" );
+      //tac2mips( currfnbodyTree, stack_frame_size );
+      DumpSymTabLocal();
       CleanupFnInfo(); 
     }
   | /* epsilon */

@@ -276,6 +276,55 @@ symtabnode *newtmp()
   return sptr;
 }
 
+symtabnode *newstrcon( const char *str )
+{
+  int hval;
+  char *name;
+  symtabnode *sptr;
+  int sc = Global;
+
+  name = (char *) zalloc( 5 );
+  sprintf( name, "t%d", tmp_counter++ );
+
+  sptr = SymTabLookup(name, sc);
+  CASSERT(sptr == NULL, ("multiple declarations of %s", name));
+
+  if (sptr != NULL) return sptr;
+
+  hval = hash(name);
+  
+  sptr = (symtabnode *) zalloc(sizeof(symtabnode));
+  sptr->name = name;
+  sptr->scope = sc;
+  sptr->type = t_Tmp;
+  sptr->is_addr = false;
+  sptr->is_strcon = true;
+  sptr->strcon = (char *) zalloc( strlen(str) + 1 );
+  sprintf( sptr->strcon, "%s", str );
+  
+  sptr->next = SymTab[sc][hval];
+  SymTab[sc][hval] = sptr;
+  
+  return sptr;
+}
+
+void mips_data_section()
+{
+  int i;
+  symtabnode *stptr;
+
+  printf("\t.data\n");
+
+  for (i = 0; i < HASHTBLSZ; i++) {
+    for (stptr = SymTab[Global][i]; stptr != NULL; stptr = stptr->next) {
+      if (stptr->type == t_Tmp && stptr->to_mips != true ) {
+	printf( "%s:\t.asciiz \"%s\"\n", stptr->name, stptr->strcon );
+	stptr->to_mips = true;
+      }
+    }
+  }
+}
+
 /*
  * CleanupFnInfo() -- clean up after processing information
  * for a function prototype/definition.

@@ -12,6 +12,7 @@
 
 typedef struct stblnode {
   char *name;
+  char *strcon; // if a string constant value
   int scope;
   bool formal;             /* true if formal, false o/2 */
   int type;                /* the type of the symbol */
@@ -24,6 +25,8 @@ typedef struct stblnode {
   struct stblnode *next;
   int fp_offset; // offset to frame pointer for local variables and tmps.
   bool is_addr; // indicate if the entry represent an array address
+  bool is_strcon; // indicate if the entry is for a string constant
+  bool to_mips;
 } symtabnode;
 
 /*********************************************************************

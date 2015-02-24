@@ -98,4 +98,6 @@ tnode *stList_Rest(tnode *t);
 
 symtabnode *newtmp();
 
+symtabnode *newstrcon( const char *str );
+
 #endif /* _PROTOS_H_ */
