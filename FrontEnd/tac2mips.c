@@ -80,7 +80,7 @@ static void mips_assg( instr *inst )
     return;
   case AT_StRef: // assigning a global/local/tmp/strcon variable
     rhs_stptr = inst->operand1->val.stptr;
-    if ( rhs_stptr->scope != Global ) {
+    if ( rhs_stptr->scope != Global ) { // todo: make rhs value always in $8
       if ( !rhs_stptr->formal ) { // local/tmp
 	printf( "\tlw $8, -%d($fp) # load local/tmp\n", rhs_stptr->fp_offset );
 	/* The value of the rhs might be an address for array assignment like:
@@ -105,6 +105,11 @@ static void mips_assg( instr *inst )
   }
 
   if ( lhs_stptr->scope == Local ) {
+    if ( lhs_stptr->formal ) { // assign to formals
+      printf( "\tsw $8, %d($fp) # load formal argument/tmp\n",
+	      4*lhs_stptr->index + 4 );
+      return;
+    }
     if ( is_rhs_array ) { // RHS is an array ref, value is in $9
       switch ( lhs_stptr->type ) {
       case t_Char:
@@ -223,7 +228,7 @@ static void mips_retrieve( instr *inst )
   if ( inst->operand1 != NULL ) { // non void function
     /* store return value from $v0 */
     if ( inst->operand1->val.stptr->formal ) {     /* formal parameters */
-      printf( "\tsw $v0, %d($fp) # store value of (formal) %s\n",
+      printf( "\tsw $v0, %d($fp) # store return value to (formal) %s\n",
 	      4 * inst->operand1->val.stptr->index + 4,
 	      inst->operand1->val.stptr->name );
     } else { // local/tmp
@@ -349,14 +354,22 @@ static void mips_bincond( instr *inst )
        inst->operand1->atype == AT_Charcon ) {
     printf( "\tli $8, %d\n", inst->operand1->val.iconst );
   } else {
-    printf( "\tlw $8, -%d($fp)\n", inst->operand1->val.stptr->fp_offset );
+    if ( inst->operand1->val.stptr->formal ) { // formals
+      printf( "\tlw $8, %d($fp)\n", 4 * inst->operand1->val.stptr->index + 4 );
+    } else {
+      printf( "\tlw $8, -%d($fp)\n", inst->operand1->val.stptr->fp_offset );
+    }
   }
 
   if ( inst->operand2->atype == AT_Intcon ||
        inst->operand2->atype == AT_Charcon ) {
     printf( "\tli $9, %d\n", inst->operand2->val.iconst );
   } else {
-    printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+    if ( inst->operand2->val.stptr->formal ) { // formals
+      printf( "\tlw $9, %d($fp)\n", 4 * inst->operand2->val.stptr->index +4 );
+    } else {
+      printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+    }
   }
 
   switch (inst->op) {
