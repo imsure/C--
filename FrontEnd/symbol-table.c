@@ -317,13 +317,38 @@ void mips_data_section()
 
   for (i = 0; i < HASHTBLSZ; i++) {
     for (stptr = SymTab[Global][i]; stptr != NULL; stptr = stptr->next) {
-      if (stptr->type == t_Tmp && stptr->to_mips != true ) {
+      if ( stptr->type == t_Tmp && stptr->to_mips != true ) {
 	printf( "%s:\t.asciiz \"%s\"\n", stptr->name, stptr->strcon );
+	printf( "\t.align 2\n" );
 	stptr->to_mips = true;
+	continue;
+      }
+      if ( stptr->type == t_Int && stptr->to_mips != true ) {
+	printf( "%s:\t.space %d\n", stptr->name, INT_SZ );
+	stptr->to_mips = true;
+	continue;
+      }
+      if ( stptr->type == t_Char && stptr->to_mips != true ) {
+	printf( "%s:\t.space %d\n", stptr->name, CHAR_SZ );
+	printf( "\t.align 2\n" );
+	stptr->to_mips = true;
+	continue;
+      }
+      if ( stptr->type == t_Array && stptr->to_mips != true ) {
+	switch(stptr->elt_type) {
+	case t_Char:
+	  printf("%s:\t.space %d\n", stptr->name, stptr->num_elts * CHAR_SZ);
+	  printf( "\t.align 2\n" );
+	  break;
+	case t_Int:
+	  printf("%s:\t.space %d\n", stptr->name, stptr->num_elts * INT_SZ);
+	  break;
+	}
+	stptr->to_mips = true;
+	continue;
       }
     }
   }
-  printf( "\t.align 2\n" );
 }
 
 /*
