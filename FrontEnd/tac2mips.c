@@ -98,8 +98,18 @@ static void mips_assg( instr *inst )
 	printf( "\tlw $8, %d($fp) # load formal argument/tmp\n",
 		4*rhs_stptr->index + 4 );
       }
-    } else { // global variable
-      /* TODO: implement */
+    } else { // lhs is a global variable
+      switch( rhs_stptr->type ) {
+      case t_Int:
+	printf( "\tlw $8, %s # load global int %s\n", rhs_stptr->name );
+	break;
+      case t_Char:
+	printf( "\tlb $8, %s # load global char %s\n", rhs_stptr->name );
+	break;
+      case t_Array:
+	/* TODO: implement */
+	break;
+      }
     }
     break;
   }
@@ -155,14 +165,24 @@ static void mips_assg( instr *inst )
 	break;
       }
     }
-  } else { // RHS is a global
+  } else { // LHS is a global
     /* TODO: implement */
+    printf( "\tsw $8, %s # store value to global variable %s\n",
+	    lhs_stptr->name, lhs_stptr->name );
   }
 }
 
 static void mips_param( instr *inst )
 {
   symtabnode *stptr = inst->operand1->val.stptr;
+
+  if ( stptr->scope == Global ) { // global variable
+    printf( "\tlw $8 %s # pusing global variable as param\n", stptr->name );
+    printf( "\tla $sp, -4($sp) # allocate stack space for it\n" );
+    printf( "\tsw $8, 0($sp) # push the parameter value onto stack\n" );
+    return;
+  }
+
   if ( stptr->formal ) {
     if ( stptr->type != t_Array ) {
       printf( "\tlw $8 %d($fp)\n", 4 * stptr->index + 4 );
