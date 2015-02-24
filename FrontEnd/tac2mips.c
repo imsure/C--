@@ -266,6 +266,43 @@ static void mips_binop( instr *inst )
   printf( "\tsw $10, -%d($fp)\n", inst->dest->val.stptr->fp_offset );
 }
 
+static void mips_unary( instr *inst )
+{
+  /* TODO: add support for globals. */
+
+  /* formal parameters */
+  if ( inst->operand1->val.stptr->formal ) { // result in $8
+    if ( inst->operand1->val.stptr->type == t_Array ) {
+      printf( "\tlw $8, %d($fp) # load address of array(formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    } else {
+      printf( "\tlw $8, %d($fp) # load value of (formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    }
+  } else { // local/tmp, result in $8
+    if ( inst->operand1->val.stptr->type == t_Array ) {
+      printf( "\tla $8, -%d($fp) # load address of array %s\n",
+	      inst->operand1->val.stptr->fp_offset, inst->operand1->val.stptr->name );
+    } else if ( inst->operand1->val.stptr->is_addr ) {
+      printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
+      printf( "\tlw $9, ($8) # load array element from address\n" );
+      printf( "\tli $10, 0\n" );
+      printf( "\tadd $8, $9, $10\n" );
+    } else {
+      printf( "\tlw $8, -%d($fp) # load %s\n", inst->operand1->val.stptr->fp_offset,
+	      inst->operand1->val.stptr->name);
+    }
+  }
+
+  printf( "\tneg $9, $8\n" );
+
+  /* Todo: add support for formals and globals */
+  printf( "\tsw $9, -%d($fp)\n", inst->dest->val.stptr->fp_offset );
+}
+
+
 static void mips_bincond( instr *inst )
 {
   symtabnode *op1, *op2;
@@ -326,6 +363,9 @@ void tac2mips( tnode *t, int num_bytes_on_stack )
     case Mult:
     case Div:
       mips_binop( inst );
+      break;
+    case UnaryMinus:
+      mips_unary( inst );
       break;
     case Assg: // mips code for assignement
       mips_assg( inst );
