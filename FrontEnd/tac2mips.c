@@ -191,12 +191,51 @@ static void mips_call( instr *inst )
 
 static void mips_return( instr *inst )
 {
-  /* code for void func */
+  if ( inst->operand1 != NULL ) { // non void function
+    /* load return value into $8 */
+    /* formal parameters */
+    if ( inst->operand1->val.stptr->formal ) { // result in $8
+      printf( "\tlw $v0, %d($fp) # load value of (formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    } else { // local/tmp, result in $8
+      if ( inst->operand1->val.stptr->is_addr ) {
+	printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
+	printf( "\tlw $9, ($8) # load array element from address\n" );
+	printf( "\tli $10, 0\n" );
+	printf( "\tadd $v0, $9, $10\n" );
+      } else {
+	printf( "\tlw $v0, -%d($fp) # load %s\n", inst->operand1->val.stptr->fp_offset,
+		inst->operand1->val.stptr->name);
+      }
+    }
+  }
+
   printf( "\tla $sp, 0($fp)\n" );  
   printf( "\tlw $ra, 0($sp)\n" );
   printf( "\tlw $fp, 4($sp)\n" );
   printf( "\tla $sp, 8($sp)\n" );
   printf( "\tjr $ra\n" );
+}
+
+static void mips_retrieve( instr *inst )
+{
+  if ( inst->operand1 != NULL ) { // non void function
+    /* store return value from $v0 */
+    if ( inst->operand1->val.stptr->formal ) {     /* formal parameters */
+      printf( "\tsw $v0, %d($fp) # store value of (formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    } else { // local/tmp
+      if ( inst->operand1->val.stptr->is_addr ) {
+	printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
+	printf( "\tsw $v0, ($8) # store %s\n", inst->operand1->val.stptr->name );
+      } else {
+	printf( "\tsw $v0, -%d($fp) # store %s\n", inst->operand1->val.stptr->fp_offset,
+		inst->operand1->val.stptr->name);
+      }
+    }
+  }
 }
 
 static void mips_binop( instr *inst )
@@ -381,6 +420,9 @@ void tac2mips( tnode *t, int num_bytes_on_stack )
     case Return:
       mips_return( inst );
       break;
+    case Retrieve:
+      mips_retrieve( inst );
+      break;
     case Param:
       mips_param( inst );
       break;
@@ -390,6 +432,8 @@ void tac2mips( tnode *t, int num_bytes_on_stack )
     case Goto:
       printf( "\tj %s\n", inst->dest->val.goto_label->dest->val.label );
       break;
+    case Leave:
+      printf( "\t# Ignore Leave operation for now.\n" );
     default:
       return;
     }
