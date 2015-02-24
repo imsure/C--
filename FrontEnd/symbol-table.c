@@ -323,6 +323,7 @@ void mips_data_section()
       }
     }
   }
+  printf( "\t.align 2\n" );
 }
 
 /*
@@ -409,13 +410,18 @@ void printSTNode(symtabnode *stptr)
 
 void compute_formal_index( symtabnode *func )
 {
-  int i;
-  int index = 1;
+  int i, num_formals = 0;
   symtabnode *formal, *stptr;
   formal = func->formals;
 
   while ( formal != NULL ) {
-    formal->index = index++;
+    ++num_formals;
+    formal = formal->next;
+  }
+  formal = func->formals;
+
+  while ( formal != NULL ) {
+    formal->index = num_formals--;
     for (i = 0; i < HASHTBLSZ; i++) {
       for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
 	if ( stptr->formal && strcmp(stptr->name, formal->name) == 0 ) { 

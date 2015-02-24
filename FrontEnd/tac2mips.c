@@ -48,6 +48,16 @@ static void mips_entering_func( int stack_frame_size )
 	  stack_frame_size );
 }
 
+static void load_constant( int val )
+{
+  if ( val < MAX_16bits ) { // valie is less than 16 bits wide
+    printf( "\tli $8, %d # load constant < 16-bits\n", val );
+  } else { // greater than 16 bits wide
+    printf( "\tlui $8, %d # load higher 16-bits\n", val >> 16 );
+    printf( "\tori $8, %d # load lower 16-bits\n", val & 0xffff );
+  }
+}
+
 /* MIPS code for assignment: LHS = RHS. */
 static void mips_assg( instr *inst )
 {
@@ -62,31 +72,31 @@ static void mips_assg( instr *inst )
   case AT_Intcon:
     /* Loading constant */
     val = inst->operand1->val.iconst;
-      if ( val < MAX_16bits ) { // valie is less than 16 bits wide
-	printf( "\tli $8, %d # load constant < 16-bits\n", val );
-      } else { // greater than 16 bits wide
-	printf( "\tlui $8, %d # load higher 16-bits\n", val >> 16 );
-	printf( "\tori $8, %d # load lower 16-bits\n", val & 0xffff );
-      }
+    load_constant( val );
     break;
   case AT_Stringcon:   /* a special case when we are passing a string constant to a function. */
     printf( "\tla $8, %s # load string const addr\n", inst->operand1->val.stptr->name );
     printf( "\tsw $8, -%d($fp) # store string const address\n", lhs_stptr->fp_offset );
-    break;
+    return;
   case AT_StRef: // assigning a global/local/tmp/strcon variable
     rhs_stptr = inst->operand1->val.stptr;
     if ( rhs_stptr->scope != Global ) {
-      printf( "\tlw $8, -%d($fp) # load local/tmp\n", rhs_stptr->fp_offset );
-      /* The value of the rhs might be an address for array assignment like:
-	 x = A[5]; or A[i] = B[j]. */
-      if ( rhs_stptr->is_addr ) { // in this case, this is true.
-	if ( rhs_stptr->elt_type == t_Int ) { // int array
-	  printf( "\tlw $9, ($8) # load value of int array element\n" );
-	  is_int_array = true;
-	} else { // char array
-	  printf( "\tlb $9, ($8) # load value of char array element\n" );
+      if ( !rhs_stptr->formal ) { // local/tmp
+	printf( "\tlw $8, -%d($fp) # load local/tmp\n", rhs_stptr->fp_offset );
+	/* The value of the rhs might be an address for array assignment like:
+	   x = A[5]; or A[i] = B[j]. */
+	if ( rhs_stptr->is_addr ) { // in this case, this is true.
+	  if ( rhs_stptr->elt_type == t_Int ) { // int array
+	    printf( "\tlw $9, ($8) # load value of int array element\n" );
+	    is_int_array = true;
+	  } else { // char array
+	    printf( "\tlb $9, ($8) # load value of char array element\n" );
+	  }
+	  is_rhs_array = true;
 	}
-	is_rhs_array = true;
+      } else { // formal
+	printf( "\tlw $8, %d($fp) # load formal argument/tmp\n",
+		4*rhs_stptr->index + 4 );
       }
     } else { // global variable
       /* TODO: implement */
@@ -148,16 +158,26 @@ static void mips_assg( instr *inst )
 static void mips_param( instr *inst )
 {
   symtabnode *stptr = inst->operand1->val.stptr;
-  /* load parameter into register $8. TODO: check the type(array?) and scope! */
-  if ( stptr->is_addr ) {
-    printf( "\tlw $9, -%d($fp) # load address of parameter\n", stptr->fp_offset );
-    if ( stptr->elt_type == t_Int ) {
-      printf( "\tlw $8, ($9) # load value of int\n" );
-    } else { // char array
-      printf( "\tlb $8, ($9) # load value of char\n" );
+  if ( stptr->formal ) {
+    if ( stptr->type != t_Array ) {
+      printf( "\tlw $8 %d($fp)\n", 4 * stptr->index + 4 );
     }
   } else {
-    printf( "\tlw $8, -%d($fp) # load parameter\n", stptr->fp_offset );
+  /* load parameter into register $8. TODO: check the type(array?) and scope! */
+    if ( stptr->type == t_Array ) { // passing array
+      printf( "\tla $8 -%d($fp) # passing array\n", stptr->fp_offset );
+    } else {
+      if ( stptr->is_addr ) {
+	printf( "\tlw $9, -%d($fp) # load address of parameter\n", stptr->fp_offset );
+	if ( stptr->elt_type == t_Int ) {
+	  printf( "\tlw $8, ($9) # load value of int\n" );
+	} else { // char array
+	  printf( "\tlb $8, ($9) # load value of char\n" );
+	}
+      } else {
+	printf( "\tlw $8, -%d($fp) # load parameter\n", stptr->fp_offset );
+      }
+    }
   }
   printf( "\tla $sp, -4($sp) # allocate stack space for it\n" );
   printf( "\tsw $8, 0($sp) # push the parameter value onto stack\n" );
@@ -183,14 +203,47 @@ static void mips_binop( instr *inst )
 {
   /* TODO: add support for globals. */
 
-  if ( inst->operand1->val.stptr->type == t_Array ) {
-    printf( "\tla $8, -%d($fp)\n", inst->operand1->val.stptr->fp_offset );
-  } else {
-    printf( "\tlw $8, -%d($fp)\n", inst->operand1->val.stptr->fp_offset );
+  /* formal parameters */
+  if ( inst->operand1->val.stptr->formal ) { // result in $8
+    if ( inst->operand1->val.stptr->type == t_Array ) {
+      printf( "\tlw $8, %d($fp) # load address of array(formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    } else {
+      printf( "\tlw $8, %d($fp) # load value of (formal) %s\n",
+	      4 * inst->operand1->val.stptr->index + 4,
+	      inst->operand1->val.stptr->name );
+    }
+  } else { // local/tmp, result in $8
+    if ( inst->operand1->val.stptr->type == t_Array ) {
+      printf( "\tla $8, -%d($fp) # load address of array %s\n",
+	      inst->operand1->val.stptr->fp_offset, inst->operand1->val.stptr->name );
+    } else if ( inst->operand1->val.stptr->is_addr ) {
+      printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
+      printf( "\tlw $9, ($8) # load array element from address\n" );
+      printf( "\tli $10, 0\n" );
+      printf( "\tadd $8, $9, $10\n" );
+    } else {
+      printf( "\tlw $8, -%d($fp) # load %s\n", inst->operand1->val.stptr->fp_offset,
+	      inst->operand1->val.stptr->name);
+    }
   }
 
   if ( inst->operand2->atype != AT_Intcon ) {
-    printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+    if ( inst->operand2->val.stptr->formal ) { // result in $9
+      printf( "\tlw $9, %d($fp) # load value of (formal) %s\n",
+  	      4 * inst->operand2->val.stptr->index + 4,
+  	      inst->operand2->val.stptr->name );
+    } else {
+      if ( inst->operand2->val.stptr->is_addr ) {
+	printf( "\tlw $9, -%d($fp) # load array address\n", inst->operand2->val.stptr->fp_offset );
+	printf( "\tlw $10, ($9) # load array element from address\n" );
+	printf( "\tli $11, 0\n" );
+	printf( "\tadd $9, $10, $11\n" );
+      } else {
+	printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+      }
+    }
   } else {
     printf( "\tli $9, %d\n", inst->operand2->val.iconst );
   }

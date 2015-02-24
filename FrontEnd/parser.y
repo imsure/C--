@@ -130,7 +130,7 @@ prog
       //      printf( "stack frame size = %d\n", stack_frame_size );
       //      printf( "\nMIPS:\n\n" );
       tac2mips( currfnbodyTree, stack_frame_size );
-      
+      //DumpSymTabLocal();
       CleanupFnInfo(); 
     }
   | /* epsilon */
