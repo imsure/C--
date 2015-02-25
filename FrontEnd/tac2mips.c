@@ -166,9 +166,16 @@ static void mips_assg( instr *inst )
       }
     }
   } else { // LHS is a global
-    /* TODO: implement */
-    printf( "\tsw $8, %s # store value to global variable %s\n",
-	    lhs_stptr->name, lhs_stptr->name );
+    switch (lhs_stptr->type) {
+    case t_Int:
+      printf( "\tsw $8, %s # store value to global variable %s\n",
+	      lhs_stptr->name, lhs_stptr->name );
+      break;
+    case t_Char:
+      printf( "\tsb $8, %s # store value to global variable %s\n",
+	      lhs_stptr->name, lhs_stptr->name );
+      break;
+    }
   }
 }
 
@@ -339,7 +346,7 @@ static void mips_binop( instr *inst )
       } else {
 	if ( inst->operand2->val.stptr->is_addr ) {
 	  printf( "\tlw $9, -%d($fp) # load array address\n", inst->operand2->val.stptr->fp_offset );
-	  if ( inst->operand1->val.stptr->elt_type == t_Int ) { // int array element
+	  if ( inst->operand2->val.stptr->elt_type == t_Int ) { // int array element
 	    printf( "\tlw $10, ($9) # load array element from address\n" );
 	  } else {
 	    printf( "\tlb $10, ($9) # load array element from address\n" );

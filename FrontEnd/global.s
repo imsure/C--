@@ -119,21 +119,29 @@ foo:
 
 	# Ignore Leave operation for now.
 	.data
-t21:	.asciiz "\n"
+t20:	.asciiz "c2 = "
 	.align 2
-t40:	.asciiz "str1 = "
+t30:	.asciiz "str0 = "
 	.align 2
-t15:	.asciiz "c1 = "
+t22:	.asciiz "\n"
 	.align 2
-t34:	.asciiz "\n"
+t41:	.asciiz "str1 = "
 	.align 2
-t17:	.asciiz "\n"
+t16:	.asciiz "gc = "
 	.align 2
-t46:	.asciiz "\n"
+t80:	.asciiz "str[2] = "
 	.align 2
-t19:	.asciiz "c2 = "
+t35:	.asciiz "\n"
 	.align 2
-t29:	.asciiz "str0 = "
+t18:	.asciiz "\n"
+	.align 2
+t47:	.asciiz "\n"
+	.align 2
+t85:	.asciiz "\n"
+	.align 2
+t68:	.asciiz "\n"
+	.align 2
+t59:	.asciiz "ga[2] = "
 	.align 2
 	.text
 main:
@@ -141,48 +149,56 @@ main:
 	sw $fp, 4($sp) # save old $fp on stack
 	sw $ra, 0($sp) # save old $ra on stack
 	la $fp, 0($sp) # set up frame pointer
-	la $sp, -116($sp) # allocate stack frame for locals/tmps
+	la $sp, -256($sp) # allocate stack frame for locals/tmps
 
 	li $8, 99 # load constant < 16-bits
-	sw $8, -28($fp)
+	sw $8, -24($fp)
 
-	lw $8, -28($fp) # load local/tmp
+	lw $8, -24($fp) # load local/tmp
 	sb $8, -4($fp)
 
 	li $8, 100 # load constant < 16-bits
-	sw $8, -44($fp)
+	sw $8, -40($fp)
 
-	lw $8, -44($fp) # load local/tmp
+	lw $8, -40($fp) # load local/tmp
 	sb $8, -8($fp)
 
-	la $8, t15 # load string const addr
-	sw $8, -68($fp) # store string const address
+	lw $8, -4($fp) # load c1
+	lw $9, -8($fp)
+	add $10, $8, $9
+	sw $10, -64($fp)
 
-	lw $8, -68($fp) # load parameter
+	lw $8, -64($fp) # load local/tmp
+	sb $8, gc # store value to global variable gc
+
+	la $8, t16 # load string const addr
+	sw $8, -112($fp) # store string const address
+
+	lw $8, -112($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
 	jal print_string
 	la $sp, 4($sp)
 
-	lw $8, -4($fp) # load parameter
+	lw $8 gc # pusing global variable as param
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
 	jal print_int
 	la $sp, 4($sp)
 
-	la $8, t17 # load string const addr
-	sw $8, -96($fp) # store string const address
+	la $8, t18 # load string const addr
+	sw $8, -172($fp) # store string const address
 
-	lw $8, -96($fp) # load parameter
+	lw $8, -172($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
 	jal print_string
 	la $sp, 4($sp)
 
-	la $8, t19 # load string const addr
+	la $8, t20 # load string const addr
 	sw $8, -12($fp) # store string const address
 
 	lw $8, -12($fp) # load parameter
@@ -199,10 +215,10 @@ main:
 	jal print_int
 	la $sp, 4($sp)
 
-	la $8, t21 # load string const addr
-	sw $8, -24($fp) # store string const address
+	la $8, t22 # load string const addr
+	sw $8, -36($fp) # store string const address
 
-	lw $8, -24($fp) # load parameter
+	lw $8, -36($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
@@ -210,43 +226,43 @@ main:
 	la $sp, 4($sp)
 
 	li $8, 0 # load constant < 16-bits
-	sw $8, -40($fp)
+	sw $8, -60($fp)
 
-	lw $8, -40($fp) # load t23
+	lw $8, -60($fp) # load t24
 	li $9, 1
 	mul $10, $8, $9
-	sw $10, -64($fp)
+	sw $10, -108($fp)
 
 	la $8, str # load global array address str
-	lw $9, -64($fp)
+	lw $9, -108($fp)
 	add $10, $8, $9
-	sw $10, -56($fp)
+	sw $10, -88($fp)
 
 	lw $8, -4($fp) # load local/tmp
-	lw $9, -56($fp)
+	lw $9, -88($fp)
 	sb $8, ($9) # store value into char array
 
 	li $8, 1 # load constant < 16-bits
-	sw $8, -80($fp)
+	sw $8, -140($fp)
 
-	lw $8, -80($fp) # load t26
+	lw $8, -140($fp) # load t27
 	li $9, 1
 	mul $10, $8, $9
-	sw $10, -104($fp)
+	sw $10, -196($fp)
 
 	la $8, str # load global array address str
-	lw $9, -104($fp)
+	lw $9, -196($fp)
 	add $10, $8, $9
-	sw $10, -92($fp)
+	sw $10, -168($fp)
 
 	lw $8, -8($fp) # load local/tmp
-	lw $9, -92($fp)
+	lw $9, -168($fp)
 	sb $8, ($9) # store value into char array
 
-	la $8, t29 # load string const addr
-	sw $8, -16($fp) # store string const address
+	la $8, t30 # load string const addr
+	sw $8, -20($fp) # store string const address
 
-	lw $8, -16($fp) # load parameter
+	lw $8, -20($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
@@ -254,19 +270,19 @@ main:
 	la $sp, 4($sp)
 
 	li $8, 0 # load constant < 16-bits
-	sw $8, -20($fp)
+	sw $8, -32($fp)
 
-	lw $8, -20($fp) # load t31
+	lw $8, -32($fp) # load t32
 	li $9, 1
 	mul $10, $8, $9
-	sw $10, -52($fp)
+	sw $10, -84($fp)
 
 	la $8, str # load global array address str
-	lw $9, -52($fp)
+	lw $9, -84($fp)
 	add $10, $8, $9
-	sw $10, -36($fp)
+	sw $10, -56($fp)
 
-	lw $9, -36($fp) # load address of parameter
+	lw $9, -56($fp) # load address of parameter
 	lb $8, ($9) # load value of char
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
@@ -274,10 +290,10 @@ main:
 	jal print_int
 	la $sp, 4($sp)
 
-	la $8, t34 # load string const addr
-	sw $8, -76($fp) # store string const address
+	la $8, t35 # load string const addr
+	sw $8, -136($fp) # store string const address
 
-	lw $8, -76($fp) # load parameter
+	lw $8, -136($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
@@ -285,29 +301,29 @@ main:
 	la $sp, 4($sp)
 
 	li $8, 1 # load constant < 16-bits
-	sw $8, -88($fp)
+	sw $8, -164($fp)
 
-	lw $8, -88($fp) # load t36
+	lw $8, -164($fp) # load t37
 	li $9, 4
 	mul $10, $8, $9
-	sw $10, -112($fp)
+	sw $10, -220($fp)
 
 	la $8, ga # load global array address ga
-	lw $9, -112($fp)
+	lw $9, -220($fp)
 	add $10, $8, $9
-	sw $10, -100($fp)
+	sw $10, -192($fp)
 
 	li $8, 5 # load constant < 16-bits
-	sw $8, -116($fp)
+	sw $8, -16($fp)
 
-	lw $8, -116($fp) # load local/tmp
-	lw $9, -100($fp)
+	lw $8, -16($fp) # load local/tmp
+	lw $9, -192($fp)
 	sw $8, ($9) # store value into int array
 
-	la $8, t40 # load string const addr
-	sw $8, -32($fp) # store string const address
+	la $8, t41 # load string const addr
+	sw $8, -52($fp) # store string const address
 
-	lw $8, -32($fp) # load parameter
+	lw $8, -52($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
@@ -315,37 +331,250 @@ main:
 	la $sp, 4($sp)
 
 	li $8, 1 # load constant < 16-bits
-	sw $8, -48($fp)
+	sw $8, -80($fp)
 
-	lw $8, -48($fp) # load t42
+	lw $8, -80($fp) # load t43
 	li $9, 1
 	mul $10, $8, $9
-	sw $10, -72($fp)
+	sw $10, -132($fp)
 
 	la $8, str # load global array address str
-	lw $9, -72($fp)
+	lw $9, -132($fp)
 	add $10, $8, $9
-	sw $10, -60($fp)
+	sw $10, -104($fp)
 
 	lw $8, -4($fp) # load c1
-	lw $9, -60($fp) # load array address
+	lw $9, -104($fp) # load array address
 	lb $10, ($9) # load array element from address
 	li $11, 0
 	add $9, $10, $11
 	add $10, $8, $9
-	sw $10, -84($fp)
+	sw $10, -160($fp)
 
-	lw $8, -84($fp) # load parameter
+	lw $8, -160($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 
 	jal print_int
 	la $sp, 4($sp)
 
-	la $8, t46 # load string const addr
-	sw $8, -108($fp) # store string const address
+	la $8, t47 # load string const addr
+	sw $8, -216($fp) # store string const address
 
-	lw $8, -108($fp) # load parameter
+	lw $8, -216($fp) # load parameter
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_string
+	la $sp, 4($sp)
+
+	li $8, 2 # load constant < 16-bits
+	sw $8, -236($fp)
+
+	lw $8, -236($fp) # load t49
+	li $9, 4
+	mul $10, $8, $9
+	sw $10, -48($fp)
+
+	la $8, ga # load global array address ga
+	lw $9, -48($fp)
+	add $10, $8, $9
+	sw $10, -28($fp)
+
+	li $8, 1 # load constant < 16-bits
+	sw $8, -76($fp)
+
+	lw $8, -76($fp) # load t52
+	li $9, 4
+	mul $10, $8, $9
+	sw $10, -128($fp)
+
+	la $8, ga # load global array address ga
+	lw $9, -128($fp)
+	add $10, $8, $9
+	sw $10, -100($fp)
+
+	li $8, 0 # load constant < 16-bits
+	sw $8, -156($fp)
+
+	lw $8, -156($fp) # load t55
+	li $9, 4
+	mul $10, $8, $9
+	sw $10, -212($fp)
+
+	la $8, ga # load global array address ga
+	lw $9, -212($fp)
+	add $10, $8, $9
+	sw $10, -188($fp)
+
+	lw $8, -100($fp) # load array address
+	lw $9, ($8) # load array element from address
+	li $10, 0
+	add $8, $9, $10
+	lw $9, -188($fp) # load array address
+	lw $10, ($9) # load array element from address
+	li $11, 0
+	add $9, $10, $11
+	add $10, $8, $9
+	sw $10, -232($fp)
+
+	lw $8, -232($fp) # load local/tmp
+	lw $9, -28($fp)
+	sw $8, ($9) # store value into int array
+
+	la $8, t59 # load string const addr
+	sw $8, -44($fp) # store string const address
+
+	lw $8, -44($fp) # load parameter
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_string
+	la $sp, 4($sp)
+
+	li $8, 1 # load constant < 16-bits
+	sw $8, -72($fp)
+
+	lw $8, -72($fp) # load t61
+	li $9, 1
+	mul $10, $8, $9
+	sw $10, -124($fp)
+
+	la $8, str # load global array address str
+	lw $9, -124($fp)
+	add $10, $8, $9
+	sw $10, -96($fp)
+
+	li $8, 0 # load constant < 16-bits
+	sw $8, -152($fp)
+
+	lw $8, -152($fp) # load t64
+	li $9, 1
+	mul $10, $8, $9
+	sw $10, -208($fp)
+
+	la $8, str # load global array address str
+	lw $9, -208($fp)
+	add $10, $8, $9
+	sw $10, -184($fp)
+
+	lw $8, -96($fp) # load array address
+	lb $9, ($8) # load array element from address
+	li $10, 0
+	add $8, $9, $10
+	lw $9, -184($fp) # load array address
+	lb $10, ($9) # load array element from address
+	li $11, 0
+	add $9, $10, $11
+	add $10, $8, $9
+	sw $10, -228($fp)
+
+	lw $8, -228($fp) # load parameter
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_int
+	la $sp, 4($sp)
+
+	la $8, t68 # load string const addr
+	sw $8, -252($fp) # store string const address
+
+	lw $8, -252($fp) # load parameter
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_string
+	la $sp, 4($sp)
+
+	li $8, 2 # load constant < 16-bits
+	sw $8, -68($fp)
+
+	lw $8, -68($fp) # load t70
+	li $9, 1
+	mul $10, $8, $9
+	sw $10, -120($fp)
+
+	la $8, str # load global array address str
+	lw $9, -120($fp)
+	add $10, $8, $9
+	sw $10, -92($fp)
+
+	li $8, 2 # load constant < 16-bits
+	sw $8, -148($fp)
+
+	lw $8, -148($fp) # load t73
+	li $9, 4
+	mul $10, $8, $9
+	sw $10, -204($fp)
+
+	la $8, ga # load global array address ga
+	lw $9, -204($fp)
+	add $10, $8, $9
+	sw $10, -180($fp)
+
+	li $8, 1 # load constant < 16-bits
+	sw $8, -224($fp)
+
+	lw $8, -224($fp) # load t76
+	li $9, 1
+	mul $10, $8, $9
+	sw $10, -248($fp)
+
+	la $8, str # load global array address str
+	lw $9, -248($fp)
+	add $10, $8, $9
+	sw $10, -244($fp)
+
+	lw $8, -180($fp) # load array address
+	lw $9, ($8) # load array element from address
+	li $10, 0
+	add $8, $9, $10
+	lw $9, -244($fp) # load array address
+	lb $10, ($9) # load array element from address
+	li $11, 0
+	add $9, $10, $11
+	add $10, $8, $9
+	sw $10, -256($fp)
+
+	lw $8, -256($fp) # load local/tmp
+	lw $9, -92($fp)
+	sb $8, ($9) # store value into char array
+
+	la $8, t80 # load string const addr
+	sw $8, -116($fp) # store string const address
+
+	lw $8, -116($fp) # load parameter
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_string
+	la $sp, 4($sp)
+
+	li $8, 2 # load constant < 16-bits
+	sw $8, -144($fp)
+
+	lw $8, -144($fp) # load t82
+	li $9, 1
+	mul $10, $8, $9
+	sw $10, -200($fp)
+
+	la $8, str # load global array address str
+	lw $9, -200($fp)
+	add $10, $8, $9
+	sw $10, -176($fp)
+
+	lw $9, -176($fp) # load address of parameter
+	lb $8, ($9) # load value of char
+	la $sp, -4($sp) # allocate stack space for it
+	sw $8, 0($sp) # push the parameter value onto stack
+
+	jal print_int
+	la $sp, 4($sp)
+
+	la $8, t85 # load string const addr
+	sw $8, -240($fp) # store string const address
+
+	lw $8, -240($fp) # load parameter
 	la $sp, -4($sp) # allocate stack space for it
 	sw $8, 0($sp) # push the parameter value onto stack
 

@@ -54,8 +54,9 @@ void main( void )
 
   c1 = 'c';
   c2 = 'd';
-  print_string( "c1 = " );
-  print_int( c1 );
+  gc = c1 + c2;
+  print_string( "gc = " );
+  print_int( gc );
   print_string( "\n" );
 
   print_string( "c2 = " );
@@ -72,6 +73,16 @@ void main( void )
   ga[1] = 5;
   print_string( "str1 = " );
   print_int( c1 + str[1] );
+  print_string( "\n" );
+  
+  ga[2] = ga[1] + ga[0];
+  print_string( "ga[2] = " );
+  print_int( str[1] + str[0] );
+  print_string( "\n" );
+
+  str[2] = ga[2] + str[1];
+  print_string( "str[2] = " );
+  print_int( str[2] );
   print_string( "\n" );
 
 }
