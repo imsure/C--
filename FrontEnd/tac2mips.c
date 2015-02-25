@@ -266,50 +266,93 @@ static void mips_retrieve( instr *inst )
 static void mips_binop( instr *inst )
 {
   /* TODO: add support for globals. */
-
-  /* formal parameters */
-  if ( inst->operand1->val.stptr->formal ) { // result in $8
-    if ( inst->operand1->val.stptr->type == t_Array ) {
-      printf( "\tlw $8, %d($fp) # load address of array(formal) %s\n",
-	      4 * inst->operand1->val.stptr->index + 4,
-	      inst->operand1->val.stptr->name );
-    } else {
-      printf( "\tlw $8, %d($fp) # load value of (formal) %s\n",
-	      4 * inst->operand1->val.stptr->index + 4,
-	      inst->operand1->val.stptr->name );
+  if ( inst->operand1->val.stptr->scope == Global ) { // lhs is a global
+    switch ( inst->operand1->val.stptr->type ) {
+    case t_Int:
+      printf( "\tlw $8, %s # load global int %s\n",
+	      inst->operand1->val.stptr->name, inst->operand1->val.stptr->name );
+      break;
+    case t_Char:
+      printf( "\tlb $8, %s # load global char %s\n",
+	      inst->operand1->val.stptr->name, inst->operand1->val.stptr->name );
+      break;
+    case t_Array:
+      printf( "\tla $8, %s # load global array address %s\n",
+	      inst->operand1->val.stptr->name, inst->operand1->val.stptr->name );
+      break;
     }
-  } else { // local/tmp, result in $8
-    if ( inst->operand1->val.stptr->type == t_Array ) {
-      printf( "\tla $8, -%d($fp) # load address of array %s\n",
-	      inst->operand1->val.stptr->fp_offset, inst->operand1->val.stptr->name );
-    } else if ( inst->operand1->val.stptr->is_addr ) {
-      printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
-      printf( "\tlw $9, ($8) # load array element from address\n" );
-      printf( "\tli $10, 0\n" );
-      printf( "\tadd $8, $9, $10\n" );
-    } else {
-      printf( "\tlw $8, -%d($fp) # load %s\n", inst->operand1->val.stptr->fp_offset,
-	      inst->operand1->val.stptr->name);
+  } else { // scope: local
+
+    /* formal parameters */
+    if ( inst->operand1->val.stptr->formal ) { // result in $8
+      if ( inst->operand1->val.stptr->type == t_Array ) {
+	printf( "\tlw $8, %d($fp) # load address of array(formal) %s\n",
+		4 * inst->operand1->val.stptr->index + 4,
+		inst->operand1->val.stptr->name );
+      } else {
+	printf( "\tlw $8, %d($fp) # load value of (formal) %s\n",
+		4 * inst->operand1->val.stptr->index + 4,
+		inst->operand1->val.stptr->name );
+      }
+    } else { // local/tmp, result in $8
+      if ( inst->operand1->val.stptr->type == t_Array ) {
+	printf( "\tla $8, -%d($fp) # load address of array %s\n",
+		inst->operand1->val.stptr->fp_offset, inst->operand1->val.stptr->name );
+      } else if ( inst->operand1->val.stptr->is_addr ) {
+	printf( "\tlw $8, -%d($fp) # load array address\n", inst->operand1->val.stptr->fp_offset );
+	if ( inst->operand1->val.stptr->elt_type == t_Int ) { // int array element
+	  printf( "\tlw $9, ($8) # load array element from address\n" );
+	} else { // char array element
+	  printf( "\tlb $9, ($8) # load array element from address\n" );
+	}
+	printf( "\tli $10, 0\n" );
+	printf( "\tadd $8, $9, $10\n" );
+      } else {
+	printf( "\tlw $8, -%d($fp) # load %s\n", inst->operand1->val.stptr->fp_offset,
+		inst->operand1->val.stptr->name);
+      }
     }
   }
 
-  if ( inst->operand2->atype != AT_Intcon ) {
-    if ( inst->operand2->val.stptr->formal ) { // result in $9
-      printf( "\tlw $9, %d($fp) # load value of (formal) %s\n",
-  	      4 * inst->operand2->val.stptr->index + 4,
-  	      inst->operand2->val.stptr->name );
-    } else {
-      if ( inst->operand2->val.stptr->is_addr ) {
-	printf( "\tlw $9, -%d($fp) # load array address\n", inst->operand2->val.stptr->fp_offset );
-	printf( "\tlw $10, ($9) # load array element from address\n" );
-	printf( "\tli $11, 0\n" );
-	printf( "\tadd $9, $10, $11\n" );
-      } else {
-	printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
-      }
+  if ( inst->operand2->atype != AT_Intcon &&
+       inst->operand2->val.stptr->scope == Global ) { // lhs is a global
+    switch ( inst->operand2->val.stptr->type ) {
+    case t_Int:
+      printf( "\tlw $9, %s # load global int %s\n",
+	      inst->operand2->val.stptr->name, inst->operand2->val.stptr->name );
+      break;
+    case t_Char:
+      printf( "\tlb $9, %s # load global char %s\n",
+	      inst->operand2->val.stptr->name, inst->operand2->val.stptr->name );
+      break;
+    case t_Array:
+      printf( "\tla $9, %s # load global array address %s\n",
+	      inst->operand2->val.stptr->name, inst->operand2->val.stptr->name );
+      break;
     }
-  } else {
-    printf( "\tli $9, %d\n", inst->operand2->val.iconst );
+  } else { // scope: local
+    if ( inst->operand2->atype != AT_Intcon ) {
+      if ( inst->operand2->val.stptr->formal ) { // result in $9
+	printf( "\tlw $9, %d($fp) # load value of (formal) %s\n",
+		4 * inst->operand2->val.stptr->index + 4,
+		inst->operand2->val.stptr->name );
+      } else {
+	if ( inst->operand2->val.stptr->is_addr ) {
+	  printf( "\tlw $9, -%d($fp) # load array address\n", inst->operand2->val.stptr->fp_offset );
+	  if ( inst->operand1->val.stptr->elt_type == t_Int ) { // int array element
+	    printf( "\tlw $10, ($9) # load array element from address\n" );
+	  } else {
+	    printf( "\tlb $10, ($9) # load array element from address\n" );
+	  }
+	  printf( "\tli $11, 0\n" );
+	  printf( "\tadd $9, $10, $11\n" );
+	} else {
+	  printf( "\tlw $9, -%d($fp)\n", inst->operand2->val.stptr->fp_offset );
+	}
+      }
+    } else {
+      printf( "\tli $9, %d\n", inst->operand2->val.iconst );
+    }
   }
 
   switch( inst->op ) {
@@ -327,7 +370,12 @@ static void mips_binop( instr *inst )
       break;
   }
 
-  printf( "\tsw $10, -%d($fp)\n", inst->dest->val.stptr->fp_offset );
+  if ( inst->dest->val.stptr->scope == Local ) {
+    printf( "\tsw $10, -%d($fp)\n", inst->dest->val.stptr->fp_offset );
+  } else {
+    printf( "\tsw $10, %s # save value to global %s\n",
+	    inst->dest->val.stptr->name, inst->dest->val.stptr->name );
+  }
 }
 
 static void mips_unary( instr *inst )
