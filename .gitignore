@@ -2,6 +2,6 @@
 compile
 *~
 TAGS
-lex.yy.c 
+lex.yy.c
 y.tab.*
 y.output

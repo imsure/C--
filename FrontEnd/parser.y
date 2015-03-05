@@ -21,14 +21,13 @@
   extern void printSyntaxTree(tnode *t, int n, int depth);
   extern void DumpSymTabLocal();
   extern void DumpSymTabGlobal();
-  extern three_addr_code *code_gen( tnode *t );
-  extern instr *newenter( symtabnode *func );
-  extern instr *newleave( symtabnode *func );
-  extern instr *newfunclabel( const char *funcname );
-  extern void tac2mips( tnode *t, int stack_bytes );
+  extern TAC_seq *code_gen( tnode *t );
+  extern TAC *enter_func( symtabnode *func );
+  extern TAC *newfunclabel( const char *funcname );
+  //  extern void tac2mips( tnode *t, int stack_bytes );
   extern void print_code( tnode *t );
-  extern int compute_fp_offset();
-  extern void compute_formal_index( symtabnode *func );
+  //  extern int compute_fp_offset();
+  //  extern void compute_formal_index( symtabnode *func );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -112,26 +111,26 @@ prog
       DumpSymTabGlobal();
       DumpSymTabLocal();
 #endif
-      instr *func_label = newfunclabel( $3 );
-      instr *enter_func = newenter( currFun );
-      instr *leave_func = newleave( currFun );
-      currfnbodyTree->code = code_gen( currfnbodyTree );
-      func_label->next = enter_func;
-      enter_func->next = currfnbodyTree->code->start;
-      currfnbodyTree->code->start = func_label;
-      currfnbodyTree->code->end->next = leave_func;
-      currfnbodyTree->code->end = leave_func;
-      //printf( "Three Address Code:\n\n" );
-      //print_code( currfnbodyTree );
+      TAC *func_label = newfunclabel( $3 ); // TAC for function label
+      TAC *enter = enter_func( currFun ); // TAC for entering function
+      
+      currfnbodyTree->tac_seq = code_gen( currfnbodyTree ); // TAC sequence for function body
+      
+      func_label->next = enter;
+      enter->prev = func_label;
 
-      int stack_frame_size = compute_fp_offset();
-      compute_formal_index( currFun );
-      mips_data_section();
-      //      printf( "stack frame size = %d\n", stack_frame_size );
-      //      printf( "\nMIPS:\n\n" );
-      tac2mips( currfnbodyTree, stack_frame_size );
-      //DumpSymTabGlobal();
-      //DumpSymTabLocal();
+      enter->next = currfnbodyTree->tac_seq->start;
+      currfnbodyTree->tac_seq->start->prev = enter;
+      
+      currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
+      printf( "Three Address Code:\n\n" );
+      print_code( currfnbodyTree );
+
+      /* int stack_frame_size = compute_fp_offset(); */
+      /* compute_formal_index( currFun ); */
+      /* mips_data_section(); */
+      /* tac2mips( currfnbodyTree, stack_frame_size ); */
+
       CleanupFnInfo(); 
     }
   | /* epsilon */

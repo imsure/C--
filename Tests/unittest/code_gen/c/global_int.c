@@ -7,5 +7,6 @@ void main(void)
 {
   x = 31459;
   print_int(x);
+  print_int(x+5);
   print_string("\n");
 }

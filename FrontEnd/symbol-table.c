@@ -13,7 +13,15 @@ extern char *fnName;
 extern llistptr lptr;
 extern bool is_extern;
 extern symtabnode *currFun;
-extern int tmp_counter;
+
+int tmpvar_counter = 0; // counter for the tmp variables
+                        // (exclude those holding array addresses).
+int tmpaddr_counter = 0; // counter for the tmp variables holding array addresses
+int tmpstr_counter = 0; // counter for the tmp variables holding a string constant
+
+#define TMP_VAR_PREFIX "_tvar"
+#define TMP_ADDR_PREFIX "_taddr"
+#define TMP_STR_PREFIX "_tstr"
 
 #define HASHTBLSZ 256
 
@@ -247,36 +255,85 @@ symtabnode *SymTabRecordFunInfo(bool isProto)
   return func;
 }
 
-symtabnode *newtmp()
+/**
+ * Create a new or return an unused tmp variable for holding
+ * intermediate computed value.
+ * It returns the symbol table entry to the tmp variable.
+ *
+ * Note that this function only applies tmp variable stored in the
+ * local symbol table that does not represent an array address. For tmp
+ * variable holding an array address, use newtmp_addr().
+ */
+symtabnode *newtmp_var()
 {
   int hval;
   char *name;
   symtabnode *sptr;
   int sc = Local;
 
+  /* name for the tmp variable */
   name = (char *) zalloc( 10 );
-  sprintf( name, "t%d", tmp_counter++ );
+  sprintf( name, "%s%d", TMP_VAR_PREFIX, tmpvar_counter++ );
 
+  /* Check if tmp variable 'name' already exists */
   sptr = SymTabLookup(name, sc);
-  CASSERT(sptr == NULL, ("multiple declarations of %s", name));
 
-  if (sptr != NULL) return sptr;
+  if (sptr != NULL) {
+    return sptr; // reuse it
+  } else { // create a new tmp
+    hval = hash(name);
+  
+    sptr = (symtabnode *) zalloc(sizeof(symtabnode));
+    sptr->name = name;
+    sptr->scope = sc;
+    sptr->type = t_Tmp_Var;
+  
+    sptr->next = SymTab[sc][hval];
+    SymTab[sc][hval] = sptr;
 
-  hval = hash(name);
-  
-  sptr = (symtabnode *) zalloc(sizeof(symtabnode));
-  sptr->name = name;
-  sptr->scope = sc;
-  sptr->type = t_Tmp;
-  sptr->is_addr = false;
-  
-  sptr->next = SymTab[sc][hval];
-  SymTab[sc][hval] = sptr;
-  
-  return sptr;
+    return sptr;
+  }
 }
 
-symtabnode *newstrcon( const char *str )
+/**
+ * Create a new tmp variable for holding an array address.
+ * It returns the symbol table entry to the tmp variable.
+ */
+symtabnode *newtmp_addr()
+{
+  int hval;
+  char *name;
+  symtabnode *sptr;
+  int sc = Local;
+
+  /* name for the tmp variable */
+  name = (char *) zalloc( 10 );
+  sprintf( name, "%s%d", TMP_ADDR_PREFIX, tmpaddr_counter++ );
+
+  /* Check if tmp variable 'name' already exists */
+  sptr = SymTabLookup(name, sc);
+
+  if (sptr != NULL) {
+    return sptr; 
+  } else { // create a new tmp
+    hval = hash(name);
+  
+    sptr = (symtabnode *) zalloc(sizeof(symtabnode));
+    sptr->name = name;
+    sptr->scope = sc;
+    sptr->type = t_Tmp_Addr;
+  
+    sptr->next = SymTab[sc][hval];
+    SymTab[sc][hval] = sptr;
+
+    return sptr;
+  }
+}
+
+/**
+ * Create a global symbol table entry for a string constant.
+ */
+symtabnode *newtmp_strcon( const char *str )
 {
   int hval;
   char *name;
@@ -284,7 +341,7 @@ symtabnode *newstrcon( const char *str )
   int sc = Global;
 
   name = (char *) zalloc( 5 );
-  sprintf( name, "t%d", tmp_counter++ );
+  sprintf( name, "%s%d", TMP_STR_PREFIX, tmpstr_counter++ );
 
   sptr = SymTabLookup(name, sc);
   CASSERT(sptr == NULL, ("multiple declarations of %s", name));
@@ -296,9 +353,7 @@ symtabnode *newstrcon( const char *str )
   sptr = (symtabnode *) zalloc(sizeof(symtabnode));
   sptr->name = name;
   sptr->scope = sc;
-  sptr->type = t_Tmp;
-  sptr->is_addr = false;
-  sptr->is_strcon = true;
+  sptr->type = t_Tmp_Str;
   sptr->strcon = (char *) zalloc( strlen(str) + 1 );
   sprintf( sptr->strcon, "%s", str );
   
@@ -317,7 +372,7 @@ void mips_data_section()
 
   for (i = 0; i < HASHTBLSZ; i++) {
     for (stptr = SymTab[Global][i]; stptr != NULL; stptr = stptr->next) {
-      if ( stptr->type == t_Tmp && stptr->to_mips != true ) {
+      if ( stptr->type == t_Tmp_Str && stptr->to_mips != true ) {
 	printf( "%s:\t.asciiz \"%s\"\n", stptr->name, stptr->strcon );
 	printf( "\t.align 2\n" );
 	stptr->to_mips = true;
@@ -379,16 +434,16 @@ void printType(symtabnode *stptr)
   symtabnode *formals;
   switch (stptr->type) {
   case t_Char:
-    printf("C(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
+    printf("C(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
-  case t_Int:  printf("I(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
+  case t_Int:  printf("I(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
   case t_Array:
     switch(stptr->elt_type) {
-    case t_Char: printf("C[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->index); break;
-    case t_Int: printf("I[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->index); break;
+    case t_Char: printf("C[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->formal_index); break;
+    case t_Int: printf("I[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->formal_index); break;
     default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
     }
     break;
@@ -413,8 +468,8 @@ void printType(symtabnode *stptr)
     default: printf("??%d", stptr->ret_type);
     }
     break;
-  case t_Tmp:
-    printf("Tmp(offset=%d, index=%d)", stptr->fp_offset, stptr->index);
+  case t_Tmp_Var:
+    printf("Tmp(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
     break;
   case t_None:
     printf("-");
@@ -446,11 +501,11 @@ void compute_formal_index( symtabnode *func )
   formal = func->formals;
 
   while ( formal != NULL ) {
-    formal->index = num_formals--;
+    formal->formal_index = num_formals--;
     for (i = 0; i < HASHTBLSZ; i++) {
       for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
 	if ( stptr->formal && strcmp(stptr->name, formal->name) == 0 ) { 
-	  stptr->index = formal->index;
+	  stptr->formal_index = formal->formal_index;
 	}
       }
     }
@@ -474,7 +529,7 @@ int compute_fp_offset()
 	offset += 4; // enforce 4 bytes alignment
 	stptr->fp_offset = offset;
 	break;
-      case t_Tmp:
+      case t_Tmp_Var:
       case t_Int:
 	offset += 4;
 	stptr->fp_offset = offset;

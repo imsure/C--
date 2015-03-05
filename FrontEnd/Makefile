@@ -1,6 +1,6 @@
 CC = gcc
-#CFLAGS = -g -Wall -DDEBUG
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -DDEBUG
+#CFLAGS = -g -Wall
 
 DEST = compile
 
@@ -14,8 +14,7 @@ CFILES = error.c \
         syntax-tree.c \
 	util.c\
 	y.tab.c\
-	three-address-code.c\
-	tac2mips.c
+	three-address-code.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -25,8 +24,7 @@ OFILES = error.o \
         syntax-tree.o \
 	util.o \
 	y.tab.o \
-	three-address-code.o \
-	tac2mips.o
+	three-address-code.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -44,7 +42,7 @@ syntax-tree.o : global.h syntax-tree.h syntax-tree.c
 
 three-address-code.o : global.h three-address-code.c
 
-tac2mips.o : global.h tac2mips.c
+#tac2mips.o : global.h tac2mips.c
 
 util.o : global.h util.h util.c
 

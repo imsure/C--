@@ -96,7 +96,9 @@ tnode *stList_Head(tnode *t);
 /* returns the syntax tree at the tail of the list for a STnodeList node. */
 tnode *stList_Rest(tnode *t);
 
-symtabnode *newtmp();
+symtabnode *newtmp_var();
+symtabnode *newtmp_addr();
+symtabnode *newtmp_strcon();
 
 symtabnode *newstrcon( const char *str );
 

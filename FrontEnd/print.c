@@ -291,33 +291,61 @@ static bool is_binop( SyntaxNodeType op )
   }
 }
 
-static void print_operands( instr *inst  )
+static void print_operands( TAC *tac )
 {
-  if ( inst->operand1 != NULL ) {
-    switch (inst->operand1->atype) {
+  if ( tac->operand1 != NULL ) {
+    switch (tac->operand1->atype) {
     case AT_Charcon:
     case AT_Intcon:
-      printf( "%d ", inst->operand1->val.iconst );
+      printf( "%d ", tac->operand1->val.iconst );
       break;
     case AT_StRef:
-      printf( "%s ", inst->operand1->val.stptr->name );
+      if ( tac->operand1->val.stptr->type == t_Tmp_Addr ) { // array reference
+	switch( tac->operand1->val.stptr->elt_type ) {
+	case t_Char:
+	  printf( "*%s(char) ", tac->operand1->val.stptr->name );
+	  break;
+	case t_Int:
+	  printf( "*%s(int) ", tac->operand1->val.stptr->name );
+	  break;
+   	}
+      } else {
+	printf( "%s ", tac->operand1->val.stptr->name );
+      }
       break;
-    case AT_Stringcon:
-      printf( "\"%s\" ", inst->operand1->val.stptr->strcon );
+    default:
+      fprintf( stderr, "Invalid address type: %d for operand1!\n",
+	       tac->operand1->atype);
       break;
     }
   }
 
-  if ( is_binop(inst->op) )
-    printBinop( inst->op );
+  if ( is_binop(tac->optype) )
+    printBinop( tac->optype );
 
-  if ( inst->operand2 != NULL ) {
-    switch (inst->operand2->atype) {
+  if ( tac->operand2 != NULL ) {
+    switch (tac->operand2->atype) {
+    case AT_Charcon:
     case AT_Intcon:
-      printf( " %d ", inst->operand2->val.iconst );
+      printf( " %d ", tac->operand2->val.iconst );
       break;
     case AT_StRef:
-      printf( " %s", inst->operand2->val.stptr->name );
+      if ( tac->operand2->val.stptr->type == t_Tmp_Addr ) { // array reference
+	switch( tac->operand1->val.stptr->elt_type ) {
+	case t_Char:
+	  printf( "*%s(char) ", tac->operand1->val.stptr->name );
+	  break;
+	case t_Int:
+	  printf( "*%s(int) ", tac->operand1->val.stptr->name );
+	  break;
+   	}
+      } else {
+	printf( " %s", tac->operand2->val.stptr->name );
+      }
+      break;
+    default:
+      fprintf( stderr, "Invalid address type: %d for operand2!\n",
+	       tac->operand2->atype);
       break;
     }
   }
@@ -325,27 +353,28 @@ static void print_operands( instr *inst  )
 
 void print_code( tnode *t )
 {
-  instr *inst;
+  TAC *tac;
 
-  for (inst = t->code->start; inst != NULL; inst = inst->next) {
-    if ( inst->is_empty ) {
+  for (tac = t->tac_seq->start; tac != NULL; tac = tac->next) {
+    if ( tac->optype == Noop ) { // tac for int or char variables,
+                                 // just ignore and continue.
       continue;
     }
-    switch ( inst->op ) {
+    switch ( tac->optype ) {
     case Plus:
     case BinaryMinus:
     case Mult:
     case Div:
-      printf( "\t%s = ", inst->dest->val.stptr->name ); 
-      print_operands( inst );
+      printf( "\t%s = ", tac->dest->val.stptr->name ); 
+      print_operands( tac );
       break;
     case UnaryMinus:
-      printf( "\t%s = -", inst->dest->val.stptr->name );
-      print_operands( inst );
+      printf( "\t%s = -", tac->dest->val.stptr->name );
+      print_operands( tac );
       break;
     case Assg:
-      printf( "\t%s = ", inst->dest->val.stptr->name ); 
-      print_operands( inst );
+      printf( "\t%s = ", tac->dest->val.stptr->name ); 
+      print_operands( tac );
       break;
     case Equals:
     case Neq:
@@ -356,43 +385,46 @@ void print_code( tnode *t )
     case LogicalAnd:
     case LogicalOr:
       printf( "\tif ( " ); 
-      print_operands( inst );
-      printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
+      print_operands( tac );
+      printf( " ) goto %s", tac->dest->val.label );
       break;
     case LogicalNot:
-      printf( "\tif ( !" ); 
-      print_operands( inst );
-      printf( " ) goto %s", inst->dest->val.goto_label->dest->val.label );
+      printf( "\tif ( !" );
+      print_operands( tac );
+      printf( " ) goto %s", tac->dest->val.label );
       break;
     case Label: // label instruction
-      printf( "%s:", inst->dest->val.label );
+      printf( "%s:", tac->dest->val.label );
       break;
     case Goto: // goto instruction
-      printf( "\tgoto %s", inst->dest->val.goto_label->dest->val.label );
+      printf( "\tgoto %s", tac->dest->val.label );
       break;
     case Return:
       printf( "\tReturn " );
-      print_operands( inst );
+      print_operands( tac );
       break;
     case Param:
       printf( "\tParam " );
-      print_operands( inst );
+      print_operands( tac );
       break;
     case Call:
       printf( "\tCall " );
-      print_operands( inst );
+      print_operands( tac );
       break;
     case Retrieve:
       printf( "\tRetrieve " );
-      print_operands( inst );
+      print_operands( tac );
       break;
     case Enter:
       printf( "\tEnter " );
-      print_operands( inst );
+      print_operands( tac );
       break;
-    case Leave:
-      printf( "\tLeave " );
-      print_operands( inst );
+    case Stringcon: // code for string constant, handled specially.
+      printf( "\t%s = \"%s\"", tac->dest->val.stptr->name,
+	      tac->dest->val.stptr->strcon );
+      break;
+    default:
+      fprintf( stderr, "Invalid TAC opertion type: %d\n", tac->optype );
       break;
     }
     putchar( '\n' );

@@ -9,78 +9,93 @@
 
 #include "symbol-table.h"
 
+/**
+ * type for syntax tree node.
+ * Note that we are reusing this enum for TAC operation type, so
+ * only commented fields are valid TAC operation types. And those
+ * TAC operation types appended after STnodeList are also not
+ * valid syntax tree node type.
+ */
 typedef enum SyntaxNodeType {
   Error,
-  Intcon,
-  Charcon,
-  Stringcon,
+  Intcon, 
+  Charcon, 
+  Stringcon, // operation type of three address code (for string constant only)
   Var,
   ArraySubscript,
-  Plus,
-  UnaryMinus,
-  BinaryMinus,
-  Mult,
-  Div,
-  Equals,
-  Neq,
-  Leq,
-  Lt,
-  Geq,
-  Gt,
-  LogicalAnd,
-  LogicalOr,
-  LogicalNot,
+  Plus, // operation type of three address code
+  UnaryMinus, // operation type of three address code
+  BinaryMinus, // operation type of three address code
+  Mult, // operation type of three address code
+  Div, // operation type of three address code
+  Equals, // operation type of three address code
+  Neq, // operation type of three address code
+  Leq, // operation type of three address code
+  Lt, // operation type of three address code
+  Geq, // operation type of three address code
+  Gt, // operation type of three address code
+  LogicalAnd, // operation type of three address code
+  LogicalOr, // operation type of three address code
+  LogicalNot, // operation type of three address code
   FunCall,
-  Assg,
-  Return,
+  Assg, // operation type of three address code
+  Return, // operation type of three address code
   For,
   While,
   If,
   STnodeList,
-  Goto, // added for operation type of three address code
-  Label, // added for operation type of three address code
-  Param, // added for operation type of three address code
-  Call, // added for operation type of three address code
-  Retrieve, // added for operation type of three address code
-  Enter, // added for operation type of three address code
-  Leave, // added for operation type of three address code
+  Goto, // operation type of three address code
+  Label, // operation type of three address code
+  Param, // operation type of three address code
+  Call, // operation type of three address code
+  Retrieve, // operation type of three address code
+  Enter, //  operation type of three address code
   Noop // added for operation type of three address code
 } SyntaxNodeType;
 
+/**
+ * Type of address for TAC.
+ */
 typedef enum addrtype {
   AT_Intcon, // integer constant
   AT_Charcon, // char constant
   AT_Stringcon, // string constant
   AT_StRef, // symbol table reference
   AT_Label, // label
-  AT_Noop // no operation
+  AT_Noop // no operation, for int and char variables only
 } addrtype;
 
-struct instr;
-
+/**
+ * Represents an address in TAC (three address code).
+ */
 typedef struct address {
-  enum addrtype atype;
+  enum addrtype atype; // type of the address
   union {
-    int iconst;
-    char *strconst;
-    char label[ 50 ]; // name of the label
-    symtabnode *stptr;
-    struct instr *goto_label;
+    int iconst; // integer constant value if the
+                // address is a char or int constant.
+    char *label; // name of the label if the address is a label
+                      // can be either a compiler generated label or a function name.
+    symtabnode *stptr; // symbol table entry if the address is a variable(local, tmp, global)
   } val;
 } address;
 
-typedef struct instr {
-  bool is_empty;
-  SyntaxNodeType op;
-  struct address *dest, *operand1, *operand2;
-  struct instr *prev;
-  struct instr *next;
-} instr;
+/**
+ * Represents a single TAC instruction.
+ */
+typedef struct three_address_code {
+  SyntaxNodeType optype; // type of operation
+  struct address *dest, *operand1, *operand2; // three addresses
+  struct three_address_code *prev; // previous instruction
+  struct three_address_code *next; // next instruction
+} TAC;
 
-typedef struct three_addr_code {
-  struct instr *start;
-  struct instr *end;
-} three_addr_code;
+/**
+ * Represents a sequence of TAC from 'start' to 'end'.
+ */
+typedef struct TAC_sequence {
+  struct three_address_code *start;
+  struct three_address_code *end;
+} TAC_seq;
 
 
 struct stref {  // symbol table reference: subscripted expr or function call
@@ -111,7 +126,7 @@ typedef struct treenode {
 
   symtabnode *place; // symbol table location where the value of the expression
                      // will be kept at runtime.
-  three_addr_code *code;
+  TAC_seq *tac_seq; // sequence of TAC for the syntax tree node.
 } tnode, *tnptr;
 
 tnode *mkConstNode(SyntaxNodeType ntype, int etype, int n);

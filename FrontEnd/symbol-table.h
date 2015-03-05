@@ -12,7 +12,7 @@
 
 typedef struct stblnode {
   char *name;
-  char *strcon; // if a string constant value
+  char *strcon; // string constant value, on used when type==t_Tmp_Str
   int scope;
   bool formal;             /* true if formal, false o/2 */
   int type;                /* the type of the symbol */
@@ -23,11 +23,10 @@ typedef struct stblnode {
   int fn_proto_state;      /* status of prototype definitions for a function */
   bool is_extern;          /* whether or not an ID was declared as an extern */
   struct stblnode *next;
-  int fp_offset; // offset to frame pointer for local variables and tmps.
-  bool is_addr; // indicate if the entry represent an array address
-  bool is_strcon; // indicate if the entry is for a string constant
-  bool to_mips;
-  int index; // index number for formal argument
+  int fp_offset; // offset to frame pointer, only applies to local variables and tmps (type=t_Tmp_Var).
+  bool to_mips; // indicate whether the global variables or tmps (type=t_Tmp_Strcon) has been
+                // converted to MIPS .data section.
+  int formal_index; // index number for formal argument, 1 to n from left to right.
 } symtabnode;
 
 /*********************************************************************
