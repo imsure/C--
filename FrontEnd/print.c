@@ -296,6 +296,8 @@ static void print_operands( TAC *tac )
   if ( tac->operand1 != NULL ) {
     switch (tac->operand1->atype) {
     case AT_Charcon:
+      printf( "'%c' ", tac->operand1->val.iconst );
+      break;
     case AT_Intcon:
       printf( "%d ", tac->operand1->val.iconst );
       break;
@@ -326,6 +328,8 @@ static void print_operands( TAC *tac )
   if ( tac->operand2 != NULL ) {
     switch (tac->operand2->atype) {
     case AT_Charcon:
+      printf( "'%c' ", tac->operand1->val.iconst );
+      break;
     case AT_Intcon:
       printf( " %d ", tac->operand2->val.iconst );
       break;
