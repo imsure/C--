@@ -526,22 +526,26 @@ static TAC_seq *code_gen_ifelse( tnode *t )
   TAC *L_then, *L_else, *L_after, *tac_goto_after;
   tnode *tnode_else;
 
+  /* Create labels first. */
   L_then = newlabel(); // label for 'then' statement
-
   tnode_else = stIf_Else( t ); 
   if ( tnode_else != NULL ) {
     L_else = newlabel(); // label for 'else' statement.
   }
-
   L_after = newlabel(); // label for the 'after' statement.
 
-  /* Generating code for binary relation 'test' statement. */
+  /* Then Generating code for binary relation 'test' statement. */
   if ( tnode_else != NULL ) {
     tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_else );
   } else {
     tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_after );
   }
 
+  /* Then generating code for then and else statements.
+     This should come after generating code for 'test' statement
+     to void potential bug due to tmp reuse. (code in then/else statment
+     may reuse some tmp variable which is still needed by code in
+     the 'test' statement.) */
   tacseq_then = code_gen( stIf_Then(t) ); // code for 'then' statement
   if ( tnode_else != NULL ) {
     tacseq_else = code_gen( tnode_else ); // code for 'else' statement.
