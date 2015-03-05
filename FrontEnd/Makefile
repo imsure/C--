@@ -14,7 +14,7 @@ CFILES = error.c \
         syntax-tree.c \
 	util.c\
 	y.tab.c\
-	three-address-code.c
+	TAC_generator.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -24,7 +24,7 @@ OFILES = error.o \
         syntax-tree.o \
 	util.o \
 	y.tab.o \
-	three-address-code.o
+	TAC_generator.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -40,7 +40,7 @@ symbol-table.o : global.h symbol-table.h symbol-table.c
 
 syntax-tree.o : global.h syntax-tree.h syntax-tree.c
 
-three-address-code.o : global.h three-address-code.c
+TAC_generator.o : global.h TAC_generator.c
 
 #tac2mips.o : global.h tac2mips.c
 
