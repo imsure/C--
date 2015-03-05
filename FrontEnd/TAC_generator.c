@@ -202,7 +202,7 @@ static TAC_seq *code_gen_expr( tnode *t )
   operand1->atype = AT_StRef;
   operand1->val.stptr = stBinop_Op1(t)->place;
   if ( operand1->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -211,7 +211,7 @@ static TAC_seq *code_gen_expr( tnode *t )
   operand2->atype = AT_StRef;
   operand2->val.stptr = stBinop_Op2(t)->place;
   if ( operand2->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -255,7 +255,7 @@ static TAC_seq *code_gen_unaryminus( tnode *t )
   operand1->atype = AT_StRef;
   operand1->val.stptr = stUnop_Op(t)->place;
   if ( operand1->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -304,7 +304,7 @@ static TAC_seq *code_gen_assg( tnode *t )
   operand1->atype = AT_StRef; // RHS must be symbol table entry
   operand1->val.stptr = stAssg_Rhs(t)->place;
   if ( operand1->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -363,7 +363,7 @@ static TAC_seq *code_gen_arrayref( tnode *t )
   operand1->atype = AT_StRef;
   operand1->val.stptr = stArraySubscript_Subscript(t)->place;
   if ( operand1->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -397,7 +397,7 @@ static TAC_seq *code_gen_arrayref( tnode *t )
   operand2->atype = AT_StRef;
   operand2->val.stptr = tmp_offset; // operand2 is the offset
   if ( operand2->val.stptr->type == t_Tmp_Var ) {
-    /* if a tmp variable with type of t_Tmp_Var appears on the LHS,
+    /* if a tmp variable with type of t_Tmp_Var appears on the RHS,
        this means we can reuse it. So decrement counter by 1. */
     --tmpvar_counter;
   }
@@ -527,12 +527,10 @@ static TAC_seq *code_gen_ifelse( tnode *t )
   tnode *tnode_else;
 
   L_then = newlabel(); // label for 'then' statement
-  tacseq_then = code_gen( stIf_Then(t) ); // code for 'then' statement
 
-  L_else = newlabel(); // label for 'else' statement.
   tnode_else = stIf_Else( t ); 
   if ( tnode_else != NULL ) {
-    tacseq_else = code_gen( tnode_else ); // code for 'else' statement.
+    L_else = newlabel(); // label for 'else' statement.
   }
 
   L_after = newlabel(); // label for the 'after' statement.
@@ -542,6 +540,11 @@ static TAC_seq *code_gen_ifelse( tnode *t )
     tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_else );
   } else {
     tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_after );
+  }
+
+  tacseq_then = code_gen( stIf_Then(t) ); // code for 'then' statement
+  if ( tnode_else != NULL ) {
+    tacseq_else = code_gen( tnode_else ); // code for 'else' statement.
   }
 
   t->tac_seq = (TAC_seq *) zalloc( sizeof(TAC_seq) );
