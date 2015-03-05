@@ -25,7 +25,7 @@
   extern TAC *enter_func( symtabnode *func );
   extern TAC *newfunclabel( const char *funcname );
   //  extern void tac2mips( tnode *t, int stack_bytes );
-  extern void print_code( tnode *t );
+  extern void print_TAC_seq( tnode *t, bool reverse );
   //  extern int compute_fp_offset();
   //  extern void compute_formal_index( symtabnode *func );
 
@@ -124,7 +124,10 @@ prog
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
       printf( "Three Address Code:\n\n" );
-      print_code( currfnbodyTree );
+      print_TAC_seq( currfnbodyTree, false );
+
+      printf( "\nReversed Three Address Code:\n\n" );
+      print_TAC_seq( currfnbodyTree, true );
 
       /* int stack_frame_size = compute_fp_offset(); */
       /* compute_formal_index( currFun ); */

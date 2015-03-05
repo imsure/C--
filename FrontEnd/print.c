@@ -351,13 +351,22 @@ static void print_operands( TAC *tac )
   }
 }
 
-void print_code( tnode *t )
+/**
+ * Print TAC sequence for the syntax tree node 't'.
+ */
+void print_TAC_seq( tnode *t, bool reverse )
 {
   TAC *tac;
 
-  for (tac = t->tac_seq->start; tac != NULL; tac = tac->next) {
-    if ( tac->optype == Noop ) { // tac for int or char variables,
-                                 // just ignore and continue.
+  if ( reverse == true ) {
+    tac = t->tac_seq->end;
+  } else {
+    tac = t->tac_seq->start;
+  }
+
+  for (; tac != NULL;
+       tac = (reverse == false)? tac->next : tac->prev) {
+    if ( tac->optype == Noop ) { // ignore TAC for int or char variables,
       continue;
     }
     switch ( tac->optype ) {

@@ -15,7 +15,7 @@
 
 #define LABEL_PREFIX "_L"
 
-extern void print_code( tnode *t );
+extern void print_TAC_seq( tnode *t, bool reverse );
 
 extern int tmpvar_counter; // for tmp variable reuse purpose
 int label_counter = 0; // counter for the labels.
