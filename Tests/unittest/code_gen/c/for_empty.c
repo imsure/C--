@@ -6,9 +6,7 @@ void main( void )
   int A[10];
   int n;
 
-  n = 1;
-  for ( ; ;  ) {
-    A[n] = n;
+  for ( ; ; ) {
   } 
 
   n = 1;

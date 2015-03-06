@@ -761,10 +761,42 @@ static TAC_seq *code_gen_for( tnode *t )
   L_eval = newlabel();
   L_after = newlabel();
 
-  tacseq_init = code_gen( stFor_Init(t) );
-  tacseq_test = code_gen_bool( stFor_Test(t), L_top, L_after );
-  tacseq_body = code_gen( stFor_Body(t) );
-  tacseq_update = code_gen( stFor_Update(t) );
+  if ( stFor_Init(t) == NULL ) { // if init part is empty, simply pad an empty TAC
+    tacseq_init = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    tacseq_init->start = newTAC( Noop, NULL, NULL, NULL );
+    tacseq_init->end = tacseq_init->start;
+  } else {
+    tacseq_init = code_gen( stFor_Init(t) );
+  }
+
+  if ( stFor_Test(t) == NULL ) { // unconditional jump to L_top
+    tacseq_test = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    /* Indicate operation type is Noop. */
+    optype = Goto;
+    operand1 = NULL;
+    operand2 = NULL;
+    dest = L_top->dest;
+    tacseq_test->start = newTAC( optype, operand1, operand2, dest );
+    tacseq_test->end = tacseq_test->start;
+  } else {
+    tacseq_test = code_gen_bool( stFor_Test(t), L_top, L_after );
+  }
+
+  if ( stFor_Body(t) == NULL ) { // if body part is empty, simply pad an empty TAC
+    tacseq_body = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    tacseq_body->start = newTAC( Noop, NULL, NULL, NULL );
+    tacseq_body->end = tacseq_body->start;
+  } else {
+    tacseq_body = code_gen( stFor_Body(t) );
+  }
+
+  if ( stFor_Update(t) == NULL ) { // if update part is empty, simply pad an empty TAC
+    tacseq_update = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    tacseq_update->start = newTAC( Noop, NULL, NULL, NULL );
+    tacseq_update->end = tacseq_update->start;
+  } else {
+    tacseq_update = code_gen( stFor_Update(t) );
+  }
 
   /* Instruction for the unconditional jump to L_eval. */
   optype = Goto;
