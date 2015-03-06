@@ -516,85 +516,177 @@ static TAC_seq *code_gen_bool( tnode *t, TAC *L_then, TAC *L_else )
 }
 
 /**
- * Generate code for syntax tree node 't' that represents a 'if' statement.
+ * Generate code for ifelse statement in the case when if part
+ * and else are both not empty.
  */
-static TAC_seq *code_gen_ifelse( tnode *t )
+static TAC_seq *code_gen_ifelse1( tnode *t, tnode *tnode_if, tnode *tnode_else )
 {
   address *dest, *operand1, *operand2;
   SyntaxNodeType optype;
   TAC_seq *tacseq_then, *tacseq_else, *tacseq_test;
   TAC *L_then, *L_else, *L_after, *tac_goto_after;
-  tnode *tnode_else;
 
   /* Create labels first. */
   L_then = newlabel(); // label for 'then' statement
-  tnode_else = stIf_Else( t ); 
-  if ( tnode_else != NULL ) {
-    L_else = newlabel(); // label for 'else' statement.
-  }
+  L_else = newlabel(); // label for 'else' statement.
   L_after = newlabel(); // label for the 'after' statement.
 
   /* Then Generating code for binary relation 'test' statement. */
-  if ( tnode_else != NULL ) {
-    tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_else );
-  } else {
-    tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_after );
-  }
+  tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_else );
 
   /* Then generating code for then and else statements.
      This should come after generating code for 'test' statement
      to void potential bug due to tmp reuse. (code in then/else statment
      may reuse some tmp variable which is still needed by code in
      the 'test' statement.) */
-  tacseq_then = code_gen( stIf_Then(t) ); // code for 'then' statement
-  if ( tnode_else != NULL ) {
-    tacseq_else = code_gen( tnode_else ); // code for 'else' statement.
-  }
+  tacseq_then = code_gen( tnode_if ); // code for 'then' statement
+  tacseq_else = code_gen( tnode_else ); // code for 'else' statement.
 
   t->tac_seq = (TAC_seq *) zalloc( sizeof(TAC_seq) );
-  if ( tnode_else != NULL ) { /* Instruction for jumping to 'after' label. */
-    optype = Goto;
-    operand1 = NULL;
-    operand2 = NULL;
-    dest = L_after->dest;
   
-    tac_goto_after = newTAC( optype, operand1, operand2, dest );
+  /* Instruction for jumping to 'after' label. */
+  optype = Goto;
+  operand1 = NULL;
+  operand2 = NULL;
+  dest = L_after->dest;
+  
+  tac_goto_after = newTAC( optype, operand1, operand2, dest );
 
-    /* Glue pieces together:
-       tacseq_test || L_then || tacseq_then || tac_goto_after
-       || L_else || tacseq_else || L_after */
-    tacseq_test->end->next = L_then;
-    L_then->prev = tacseq_test->end;
+  /* Glue pieces together:
+     tacseq_test || L_then || tacseq_then || tac_goto_after
+     || L_else || tacseq_else || L_after */
+  tacseq_test->end->next = L_then;
+  L_then->prev = tacseq_test->end;
     
-    L_then->next = tacseq_then->start;
-    tacseq_then->start->prev = L_then;
+  L_then->next = tacseq_then->start;
+  tacseq_then->start->prev = L_then;
 
-    tacseq_then->end->next = tac_goto_after;
-    tac_goto_after->prev = tacseq_then->end;
+  tacseq_then->end->next = tac_goto_after;
+  tac_goto_after->prev = tacseq_then->end;
 
-    tac_goto_after->next = L_else;
-    L_else->prev = tac_goto_after;
-    L_else->next = tacseq_else->start;
-    tacseq_else->start->prev = L_else;
+  tac_goto_after->next = L_else;
+  L_else->prev = tac_goto_after;
+  L_else->next = tacseq_else->start;
+  tacseq_else->start->prev = L_else;
 
-    tacseq_else->end->next = L_after;
-    L_after->prev = tacseq_else->end;
-  } else { // else part is empty
-    /* Glue pieces together:
-       tacseq_test || L_then || tacseq_then || L_after */
-    tacseq_test->end->next = L_then;
-    L_then->prev = tacseq_test->end;
+  tacseq_else->end->next = L_after;
+  L_after->prev = tacseq_else->end;
     
-    L_then->next = tacseq_then->start;
-    tacseq_then->start->prev = L_then;
-
-    tacseq_then->end->next = L_after;
-    L_after->prev = tacseq_then->end;
-  }
   t->tac_seq->start = tacseq_test->start;
   t->tac_seq->end = L_after;
 
   return t->tac_seq;
+}
+
+/**
+ * Generate code for ifelse statement in the case when if part
+ * is not empty but else part is empty.
+ */
+static TAC_seq *code_gen_ifelse2( tnode *t, tnode *tnode_if )
+{
+  TAC_seq *tacseq_then, *tacseq_test;
+  TAC *L_then, *L_after;
+
+  /* Create labels first. */
+  L_then = newlabel(); // label for 'then' statement
+  L_after = newlabel(); // label for the 'after' statement.
+
+  /* Then Generating code for binary relation 'test' statement. */
+  tacseq_test = code_gen_bool( stIf_Test(t), L_then, L_after );
+
+  /* Then generating code for then and else statements.
+     This should come after generating code for 'test' statement
+     to void potential bug due to tmp reuse. (code in then/else statment
+     may reuse some tmp variable which is still needed by code in
+     the 'test' statement.) */
+  tacseq_then = code_gen( tnode_if ); // code for 'then' statement
+
+  t->tac_seq = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+  /* Glue pieces together:
+     tacseq_test || L_then || tacseq_then || L_after */
+  tacseq_test->end->next = L_then;
+  L_then->prev = tacseq_test->end;
+    
+  L_then->next = tacseq_then->start;
+  tacseq_then->start->prev = L_then;
+
+  tacseq_then->end->next = L_after;
+  L_after->prev = tacseq_then->end;
+
+  t->tac_seq->start = tacseq_test->start;
+  t->tac_seq->end = L_after;
+
+  return t->tac_seq;
+}
+
+/**
+ * Generate code for ifelse statement in the case when if part
+ * is empty but else part is not empty.
+ */
+static TAC_seq *code_gen_ifelse3( tnode *t, tnode *tnode_else )
+{
+  TAC_seq *tacseq_else, *tacseq_test;
+  TAC *L_else, *L_after;
+
+  /* Create labels first. */
+  L_else = newlabel(); // label for the 'else' statement.
+  L_after = newlabel(); // label for the 'after' statement.
+
+  /* Then Generating code for binary relation 'test' statement.
+     if true, goto L_after since if part is empty, otherwise goto else part. */
+  tacseq_test = code_gen_bool( stIf_Test(t), L_after, L_else );
+
+  /* Then generating code for then and else statements.
+     This should come after generating code for 'test' statement
+     to void potential bug due to tmp reuse. (code in then/else statment
+     may reuse some tmp variable which is still needed by code in
+     the 'test' statement.) */
+  tacseq_else = code_gen( tnode_else ); // code for 'then' statement
+
+  t->tac_seq = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+  /* Glue pieces together:
+     tacseq_test || L_else || tacseq_else || L_after */
+  tacseq_test->end->next = L_else;
+  L_else->prev = tacseq_test->end;
+  
+  L_else->next = tacseq_else->start;
+  tacseq_else->start->prev = L_else;
+
+  tacseq_else->end->next = L_after;
+  L_after->prev = tacseq_else->end;
+  
+  t->tac_seq->start = tacseq_test->start;
+  t->tac_seq->end = L_after;
+
+  return t->tac_seq;
+}
+
+/**
+ * Generate code for syntax tree node 't' that represents a 'if' statement.
+ */
+static TAC_seq *code_gen_ifelse( tnode *t )
+{
+  tnode *tnode_else, *tnode_if;
+
+  tnode_if = stIf_Then( t );
+  tnode_else = stIf_Else( t );
+
+  /*
+   * Generate code based on NULLless of tnode_if and tnode_else.
+   */
+  if ( tnode_if != NULL && tnode_else != NULL ) { // both not empty
+    return code_gen_ifelse1( t, tnode_if, tnode_else );
+  } else if ( tnode_if != NULL && tnode_else == NULL ) { // else is empty
+    return code_gen_ifelse2( t, tnode_if );
+  } else if ( tnode_if == NULL && tnode_else != NULL ) { // if is empty
+    return code_gen_ifelse3( t, tnode_else );
+  } else { // both empty, return a noop TAC since it is doing nothing.
+    t->tac_seq = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    /* Indicate operation type is Noop. */
+    t->tac_seq->start = newTAC( Noop, NULL, NULL, NULL );
+    t->tac_seq->end = t->tac_seq->start;
+    return t->tac_seq;
+  }
 }
 
 /**

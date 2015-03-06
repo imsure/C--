@@ -1,5 +1,5 @@
 /**
- * If only, no else or else is empty.
+ * If part is empty, else is not.
  */
 void main( void )
 {
@@ -7,8 +7,9 @@ void main( void )
 
   n = 5;
   if ( n > 10 ) {
-    n = n - 10;
-  } else {}
+  } else {
+    n = 1 + n;
+  }
 
   n = n * n;
 }
