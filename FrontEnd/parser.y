@@ -123,11 +123,11 @@ prog
       currfnbodyTree->tac_seq->start->prev = enter;
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
-      printf( "Three Address Code:\n\n" );
       print_TAC_seq( currfnbodyTree, false );
+      putchar( '\n' );
 
-      printf( "\nReversed Three Address Code:\n\n" );
-      print_TAC_seq( currfnbodyTree, true );
+      //printf( "\nReversed Three Address Code:\n\n" );
+      //print_TAC_seq( currfnbodyTree, true );
 
       /* int stack_frame_size = compute_fp_offset(); */
       /* compute_formal_index( currFun ); */

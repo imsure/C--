@@ -3,10 +3,13 @@
  */
 void main( void )
 {
-  int A[10];
+  char A[10];
   int n;
 
-  for ( ; ; ) {
+  n = 1;
+  for ( ; n <= 10; ) {
+    A[n] = n;
+    n = n+1;
   } 
 
   n = 1;

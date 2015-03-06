@@ -337,10 +337,10 @@ static void print_operands( TAC *tac )
       if ( tac->operand2->val.stptr->type == t_Tmp_Addr ) { // array reference
 	switch( tac->operand1->val.stptr->elt_type ) {
 	case t_Char:
-	  printf( "*%s(char) ", tac->operand1->val.stptr->name );
+	  printf( " *%s(char) ", tac->operand1->val.stptr->name );
 	  break;
 	case t_Int:
-	  printf( "*%s(int) ", tac->operand1->val.stptr->name );
+	  printf( " *%s(int) ", tac->operand1->val.stptr->name );
 	  break;
    	}
       } else {
@@ -386,7 +386,19 @@ void print_TAC_seq( tnode *t, bool reverse )
       print_operands( tac );
       break;
     case Assg:
-      printf( "\t%s = ", tac->dest->val.stptr->name ); 
+      if ( tac->dest->val.stptr->type == t_Tmp_Addr ) { // array reference
+	switch( tac->dest->val.stptr->elt_type ) {
+	case t_Char:
+	  printf( "\t*%s(char) = ", tac->dest->val.stptr->name );
+	  break;
+	case t_Int:
+	  printf( "\t*%s(int) = ", tac->dest->val.stptr->name );
+	  break;
+   	}
+      } else {
+	printf( "\t%s = ", tac->dest->val.stptr->name );
+      }
+      
       print_operands( tac );
       break;
     case Equals:
