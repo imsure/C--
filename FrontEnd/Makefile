@@ -1,6 +1,6 @@
 CC = gcc
-#CFLAGS = -g -Wall -DDEBUG
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -DDEBUG
+#CFLAGS = -g -Wall
 
 DEST = compile
 

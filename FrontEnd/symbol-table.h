@@ -23,10 +23,9 @@ typedef struct stblnode {
   int fn_proto_state;      /* status of prototype definitions for a function */
   bool is_extern;          /* whether or not an ID was declared as an extern */
   struct stblnode *next;
-  int fp_offset; // offset to frame pointer, only applies to local variables and tmps (type=t_Tmp_Var).
+  int offset2fp; // offset to frame pointer, only applies to local variables and tmps (type=t_Tmp_Var).
   bool to_mips; // indicate whether the global variables or tmps (type=t_Tmp_Strcon) has been
                 // converted to MIPS .data section.
-  int formal_index; // index number for formal argument, 1 to n from left to right.
 } symtabnode;
 
 /*********************************************************************

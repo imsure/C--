@@ -83,14 +83,18 @@ TAC *newfunclabel( const char *funcname )
  * Return a TAC instruction for entering a function is pointed
  * by symbol table entry 'func'.
  */
-TAC *enter_func( symtabnode *func )
+TAC *enter_func( symtabnode *func, int stack_size )
 {
   TAC *quad = (TAC *) zalloc( sizeof(TAC) );
   quad->optype = Enter;
+  /* operand1 holds symbol table entry for the entered function. */
   quad->operand1 = (address *) zalloc( sizeof(address) );
   quad->operand1->atype = AT_StRef;
   quad->operand1->val.stptr = func;
-  quad->operand2 = NULL;
+  /* operand2 holds the size of the stack needs to be allocated for the function. */
+  quad->operand2 = (address *) zalloc( sizeof(address) );
+  quad->operand2->atype = AT_Intcon;
+  quad->operand2->val.iconst = stack_size;
   quad->dest = NULL;
   quad->next = NULL;
 

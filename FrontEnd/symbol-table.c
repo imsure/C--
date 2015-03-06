@@ -433,17 +433,17 @@ void printType(symtabnode *stptr)
 {
   symtabnode *formals;
   switch (stptr->type) {
-  case t_Char:
-    printf("C(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
+  case t_Char: 
+    printf("C(offset2fp=%d)", stptr->offset2fp);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
-  case t_Int:  printf("I(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
+  case t_Int:  printf("I(offset2fp=%d)", stptr->offset2fp);
     CASSERT(stptr->elt_type == t_None, ("<?!>"));
     break;
   case t_Array:
     switch(stptr->elt_type) {
-    case t_Char: printf("C[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->formal_index); break;
-    case t_Int: printf("I[%d](offset=%d, index=%d)", stptr->num_elts, stptr->fp_offset, stptr->formal_index); break;
+    case t_Char: printf("C[%d](offset2fp=%d)", stptr->num_elts, stptr->offset2fp); break;
+    case t_Int: printf("I[%d](offset2fp=%d)", stptr->num_elts, stptr->offset2fp); break;
     default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
     }
     break;
@@ -469,7 +469,10 @@ void printType(symtabnode *stptr)
     }
     break;
   case t_Tmp_Var:
-    printf("Tmp(offset=%d, index=%d)", stptr->fp_offset, stptr->formal_index);
+    printf("Tmp_Var(offset2fp=%d)", stptr->offset2fp);
+    break;
+  case t_Tmp_Addr:
+    printf("Tmp_Addr(offset2fp=%d)", stptr->offset2fp);
     break;
   case t_None:
     printf("-");
@@ -488,24 +491,40 @@ void printSTNode(symtabnode *stptr)
   printf("\n");
 }
 
-void compute_formal_index( symtabnode *func )
+/**
+ * Compute offset to $fp for each actual parameters to
+ * be passed to the function whose symbol table entry is 'func'.
+ *
+ * Since we are passing parameters from left to right:
+ *
+ * param a_1
+ * param a_2
+ * ...
+ * param a_n
+ *
+ * So a1 would appear farest to the $fp for callee, and an would be
+ * the cloest to $fp among all parameters. So the offset for a_n is 1
+ * and offset for a_1 is n.
+ */
+void offset2fp_formals( symtabnode *func )
 {
   int i, num_formals = 0;
   symtabnode *formal, *stptr;
-  formal = func->formals;
+  
+  formal = func->formals; // a list of formals for the function.
 
   while ( formal != NULL ) {
     ++num_formals;
     formal = formal->next;
   }
-  formal = func->formals;
+  formal = func->formals; // reset pointer
 
   while ( formal != NULL ) {
-    formal->formal_index = num_formals--;
+    formal->offset2fp = num_formals--;
     for (i = 0; i < HASHTBLSZ; i++) {
       for (stptr = SymTab[Local][i]; stptr != NULL; stptr = stptr->next) {
 	if ( stptr->formal && strcmp(stptr->name, formal->name) == 0 ) { 
-	  stptr->formal_index = formal->formal_index;
+	  stptr->offset2fp = formal->offset2fp;
 	}
       }
     }
@@ -514,7 +533,12 @@ void compute_formal_index( symtabnode *func )
   }
 }
 
-int compute_fp_offset()
+/**
+ * Compute offset to $fp for local variables/tmps.
+ * It returns the offset of the last local variable, which is also
+ * the stack size to be allocated.
+ */
+int offset2fp_locals()
 {
   int i, offset = 0, num_chars;
   symtabnode *stptr;
@@ -527,12 +551,12 @@ int compute_fp_offset()
       switch (stptr->type) {
       case t_Char:
 	offset += 4; // enforce 4 bytes alignment
-	stptr->fp_offset = offset;
+	stptr->offset2fp = offset;
 	break;
       case t_Tmp_Var:
       case t_Int:
 	offset += 4;
-	stptr->fp_offset = offset;
+	stptr->offset2fp = offset;
 	break;
       case t_Array:
 	switch(stptr->elt_type) {
@@ -546,11 +570,11 @@ int compute_fp_offset()
 	  case 3: num_chars += 1; break;
 	  }
 	  offset += num_chars;
-	  stptr->fp_offset = offset;
+	  stptr->offset2fp = offset;
 	  break;
 	case t_Int:
 	  offset += stptr->num_elts * 4;
-	  stptr->fp_offset = offset;
+	  stptr->offset2fp = offset;
 	  break;
 	default: printf("%d?[%d]", stptr->elt_type, stptr->num_elts);
 	}

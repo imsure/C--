@@ -22,12 +22,12 @@
   extern void DumpSymTabLocal();
   extern void DumpSymTabGlobal();
   extern TAC_seq *code_gen( tnode *t );
-  extern TAC *enter_func( symtabnode *func );
+  extern TAC *enter_func( symtabnode *func, int stack_size );
   extern TAC *newfunclabel( const char *funcname );
   //  extern void tac2mips( tnode *t, int stack_bytes );
   extern void print_TAC_seq( tnode *t, bool reverse );
-  //  extern int compute_fp_offset();
-  //  extern void compute_formal_index( symtabnode *func );
+  extern int offset2fp_locals();
+  extern void offset2fp_formals( symtabnode *func );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -111,11 +111,19 @@ prog
       DumpSymTabGlobal();
       DumpSymTabLocal();
 #endif
+      /* TAC sequence for function body */
+      currfnbodyTree->tac_seq = code_gen( currfnbodyTree );
+
+      /* Assign stack position (as offset to $fp) to local variables
+	 and return the size of the stack frame for the current function. */
+      int stack_frame_size = offset2fp_locals();
+      /* Assign stack position (as offset to $fp) to formal parameters
+	 passed to the current function by its caller. */
+      offset2fp_formals( currFun );
+
       TAC *func_label = newfunclabel( $3 ); // TAC for function label
-      TAC *enter = enter_func( currFun ); // TAC for entering function
-      
-      currfnbodyTree->tac_seq = code_gen( currfnbodyTree ); // TAC sequence for function body
-      
+      TAC *enter = enter_func( currFun, stack_frame_size ); // TAC for entering function
+
       func_label->next = enter;
       enter->prev = func_label;
 
@@ -129,8 +137,11 @@ prog
       //printf( "\nReversed Three Address Code:\n\n" );
       //print_TAC_seq( currfnbodyTree, true );
 
-      /* int stack_frame_size = compute_fp_offset(); */
-      /* compute_formal_index( currFun ); */
+#ifdef DEBUG
+      printf( "stack_frame_size = %d\n", stack_frame_size );
+      DumpSymTabLocal();
+#endif
+      
       /* mips_data_section(); */
       /* tac2mips( currfnbodyTree, stack_frame_size ); */
 
