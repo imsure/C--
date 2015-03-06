@@ -704,7 +704,16 @@ static TAC_seq *code_gen_while( tnode *t )
   L_after = newlabel();
 
   tacseq_test = code_gen_bool( stWhile_Test(t), L_top, L_after );
-  tacseq_body = code_gen( stWhile_Body(t) );
+  
+  /* Corner case: body is empty. Just let L_top falls to L_eval. */
+  if ( stWhile_Body(t) == NULL ) { 
+    tacseq_body = (TAC_seq *) zalloc( sizeof(TAC_seq) );
+    /* Indicate operation type is Noop. */
+    tacseq_body->start = newTAC( Noop, NULL, NULL, NULL );
+    tacseq_body->end = tacseq_body->start;
+  } else {
+    tacseq_body = code_gen( stWhile_Body(t) );
+  }
 
   /* Instruction for the unconditional jump to L_eval. */
   optype = Goto;
