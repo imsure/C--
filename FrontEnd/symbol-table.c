@@ -557,6 +557,7 @@ int offset2fp_locals()
 	stptr->offset2fp = offset;
 	break;
       case t_Tmp_Var:
+      case t_Tmp_Addr:
       case t_Int:
 	offset += 4;
 	stptr->offset2fp = offset;

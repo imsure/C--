@@ -123,10 +123,10 @@ static void load_local_var_to_reg( symtabnode *stptr, int reg_num )
 	    reg_num+1, stptr->offset2fp, stptr->name );
     /* Load value of array element referenced by the address stored in $(reg_num+1). */
     if ( stptr->elt_type == t_Int ) {
-      printf( "\tlw $%d, (%d) # Load value of the int array element pointed by %s.\n",
+      printf( "\tlw $%d, ($%d) # Load value of the int array element pointed by %s.\n",
 	      reg_num, reg_num+1, stptr->name );
     } else {
-      printf( "\tlb $%d, (%d) # Load value of the char array element pointed by %s.\n",
+      printf( "\tlb $%d, ($%d) # Load value of the char array element pointed by %s.\n",
 	      reg_num, reg_num+1, stptr->name );
     }
     break;
@@ -182,11 +182,15 @@ static void load_formal_to_reg( symtabnode *stptr, int reg_num )
 static void load_operand_to_reg( address *operand, int reg_num )
 {
   symtabnode *stptr;
-  
-  if ( operand->atype != AT_StRef ) {
-    fprintf( stderr, "Invalid AT_Type %d, operand must be a sb entry!\n",
-	     operand->atype );
-    exit( -1 );
+
+  /* A speical case where an operand is a constant except assigning
+     a constant a tmp variable which is handled in tac2mips_assg().
+     This is when we calculate the offset of an array element:
+     "_tvar0 = i * 4" for A[i]. */
+  if ( operand->atype == AT_Intcon ) {
+    printf( "\tli $%d, %d # Load size of array element for calculating its offset.\n",
+	    reg_num, operand->val.iconst );
+    return; // do not continue
   }
 
   /* For operand appeared in arithmetic operations, it must be
@@ -260,12 +264,14 @@ static void store_value_to_formal( symtabnode *stptr, int reg_num )
 
 /**
  * Store the value in the register $(reg_num) to local/tmp variable
- * pointed by symbol table entry 'stptr'.
+ * pointed by symbol table entry 'stptr' in tac->dest->val.stptr.
  *
  * Note that 'stptr' with type t_Array is not valid here!
  */
-static void store_value_to_local( symtabnode *stptr, int reg_num )
+static void store_value_to_local( TAC *tac, int reg_num )
 {
+  symtabnode *stptr = tac->dest->val.stptr;
+
   switch ( stptr->type ) {
   case t_Int: // local int variable
     printf( "\tsw $%d, -%d($fp) # Store to local int %s.\n",
@@ -280,16 +286,24 @@ static void store_value_to_local( symtabnode *stptr, int reg_num )
 	    reg_num, stptr->offset2fp, stptr->name );
     break;
   case t_Tmp_Addr: // local tmp address (reference to an array element)
-    /* Load address into $(reg_num+1) first. */
-    printf( "\tlw $%d, -%d($fp) # Load tmp address %s.\n",
-	    reg_num+1, stptr->offset2fp, stptr->name );
-    /* Load value of array element referenced by the address stored in $(reg_num+1). */
-    if ( stptr->elt_type == t_Int ) {
-      printf( "\tsw $%d, (%d) # Store value pointed by %s to int array element.\n",
-	      reg_num, reg_num+1, stptr->name );
-    } else {
-      printf( "\tsb $%d, (%d) # Store value pointed by %s to char array element.\n",
-	      reg_num, reg_num+1, stptr->name );
+    if ( tac->optype == Assg ) {
+      /* Whenever assignment a value to a t_Tmp_Addr, we mean assigning
+	 the value to the array element it points to. */
+          /* Load address into $(reg_num+1) first. */
+      printf( "\tlw $%d, -%d($fp) # Load tmp address %s.\n",
+	      reg_num+1, stptr->offset2fp, stptr->name );
+      /* Load value of array element referenced by the address stored in $(reg_num+1). */
+      if ( stptr->elt_type == t_Int ) {
+	printf( "\tsw $%d, ($%d) # Store value pointed by %s to int array element.\n",
+		reg_num, reg_num+1, stptr->name );
+      } else {
+	printf( "\tsb $%d, ($%d) # Store value pointed by %s to char array element.\n",
+		reg_num, reg_num+1, stptr->name );
+      }
+    } else { // when it appears in arithmetic operation, like t_addr0 = A + 8
+             // we just want to assign a value to t_Tmp_Addr, the value is an address.
+      printf( "\tsw $%d, -%d($fp) # Store address to tmp address %s.\n",
+	      reg_num, stptr->offset2fp, stptr->name );
     }
     break;
   default:
@@ -304,15 +318,17 @@ static void store_value_to_local( symtabnode *stptr, int reg_num )
 /**
  * Store the value in register $(reg_num) to address 'dest' in 'tac'.
  */
-static void store_value_to_dest( address *dest, int reg_num )
+static void store_value_to_dest( TAC *tac, int reg_num )
 {
+  address *dest = tac->dest;
+  
   if ( dest->val.stptr->scope == Global ) { // global varible
     store_value_to_global( dest->val.stptr, reg_num );
   } else { // local scope
     if ( dest->val.stptr->formal == true ) {
       store_value_to_formal( dest->val.stptr, reg_num );
     } else {
-      store_value_to_local( dest->val.stptr, reg_num );
+      store_value_to_local( tac, reg_num );
     }
   }
 }
@@ -377,7 +393,7 @@ static void tac2mips_binary_arith( TAC *tac )
   }
 
   /* step4: Store the value in $10 back to dest. */
-  store_value_to_dest( tac->dest, REG_10 );
+  store_value_to_dest( tac, REG_10 );
 }
 
 /**
@@ -394,7 +410,7 @@ static void tac2mips_unary_minus( TAC *tac )
   printf( "\tneg $10, $8\n" );
 
   /* step3: Store the value in $10 back to dest. */
-  store_value_to_dest( tac->dest, REG_10 );
+  store_value_to_dest( tac, REG_10 );
 }
 
 /**
@@ -461,7 +477,7 @@ static void tac2mips_assg( TAC *tac )
   load_rhs_to_reg( tac->operand1, REG_8 );
 
   /* step2: Store value in $8 to dest. */
-  store_value_to_dest( tac->dest, REG_8 );
+  store_value_to_dest( tac, REG_8 );
 }
 
 /**
@@ -586,6 +602,7 @@ void tac2mips( tnode *t )
       tac2mips_call( tac );
       break;
     case Retrieve:
+      //      tac2mips_retrieve( tac );
       break;
     case Enter:
       tac2mips_enterfunc( tac );

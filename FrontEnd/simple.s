@@ -17,61 +17,21 @@ _tstr0:	.asciiz "\n"
 	.align 2
 _tstr1:	.asciiz "\n"
 	.align 2
-_tstr2:	.asciiz "\n"
-	.align 2
-_tstr3:	.asciiz "\n"
-	.align 2
-u:	.space 1
-	.align 2
 x:	.space 4
 y:	.space 1
 	.align 2
-z:	.space 4
 	.text
 main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $fp, 4($sp) # Save old $fp on stack
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
-	la $sp, -8($sp) # Allocate stack frame for locals/tmps
-	li $8, 345 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	sw $8, x # Store to global int x.
-	li $8, 10 # Load int constant shorter than 16-bits
+	la $sp, -4($sp) # Allocate stack frame for locals/tmps
+	li $8, 81 # Load char constant.
 	sw $8, -4($fp) # Store to tmp variable _tvar0.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
 	sb $8, y # Store to global char y.
-	lw $8, x # Load global int x.
-	lb $9, y # Load global char y.
-	sub $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
+	lb $8, y # Load global char y.
 	sw $8, x # Store to global int x.
-	li $8, 2 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	neg $10, $8
-	sw $10, -8($fp) # Store to tmp variable _tvar1.
-	lw $8, -8($fp) # Load tmp variable _tvar1.
-	sb $8, y # Store to global char y.
-	lw $8, x # Load global int x.
-	lb $9, y # Load global char y.
-	add $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	sw $8, x # Store to global int x.
-	lw $8, x # Load global int x.
-	lb $9, y # Load global char y.
-	div $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	sw $8, z # Store to global int z.
-	lw $8, z # Load global int z.
-	lb $9, y # Load global char y.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	sb $8, u # Store to global char u.
 	lw $8, x # Load global int x.
 	la $sp, -4($sp) # Allocate stack space for parameter x.
 	sw $8, 0($sp) # Push the parameter value.
@@ -89,26 +49,6 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	la $sp, 4($sp) # Pop parameters off the stack.
 	la $8, _tstr1 # Load string const address _tstr1.
 	la $sp, -4($sp) # Allocate stack space for parameter _tstr1.
-	sw $8, 0($sp) # Push the parameter value.
-	jal print_string
-	la $sp, 4($sp) # Pop parameters off the stack.
-	lw $8, z # Load global int z.
-	la $sp, -4($sp) # Allocate stack space for parameter z.
-	sw $8, 0($sp) # Push the parameter value.
-	jal print_int
-	la $sp, 4($sp) # Pop parameters off the stack.
-	la $8, _tstr2 # Load string const address _tstr2.
-	la $sp, -4($sp) # Allocate stack space for parameter _tstr2.
-	sw $8, 0($sp) # Push the parameter value.
-	jal print_string
-	la $sp, 4($sp) # Pop parameters off the stack.
-	lb $8, u # Load global char u.
-	la $sp, -4($sp) # Allocate stack space for parameter u.
-	sw $8, 0($sp) # Push the parameter value.
-	jal print_int
-	la $sp, 4($sp) # Pop parameters off the stack.
-	la $8, _tstr3 # Load string const address _tstr3.
-	la $sp, -4($sp) # Allocate stack space for parameter _tstr3.
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
