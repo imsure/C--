@@ -30,6 +30,7 @@
   extern void offset2fp_formals( symtabnode *func );
   extern void output_mips_data_section();
   extern void tac2mips( tnode *t, int ret_type );
+  extern void peephole_o1( TAC_seq *tacseq );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -134,7 +135,8 @@ prog
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
 
-      /* */
+      /* Carray out peephole optimization. */
+      peephole_o1( currfnbodyTree->tac_seq );
 
       print_TAC_seq( currfnbodyTree, false );
       putchar( '\n' );

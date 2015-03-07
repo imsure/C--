@@ -52,7 +52,7 @@ static void collapse_constant_assg( TAC_seq *tacseq )
       /* Then identify the next TAC. */
       tac_next = tac->next;
       if ( tac_next != NULL && tac_next->optype == Assg ) {
-	if ( tac_next->operand1.atype == AT_StRef &&
+	if ( tac_next->operand1->atype == AT_StRef &&
 	     strcmp(tac_next->operand1->val.stptr->name,
 		    tac->dest->val.stptr->name) == 0 ) { // names must match
 	  /* Modify 'tac_next' to get rid of 'tac' which is redundant.

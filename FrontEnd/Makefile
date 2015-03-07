@@ -15,7 +15,8 @@ CFILES = error.c \
 	util.c\
 	y.tab.c\
 	TAC_generator.c\
-	MIPS_generator.c
+	MIPS_generator.c\
+	peephole_o1.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -26,7 +27,8 @@ OFILES = error.o \
 	util.o \
 	y.tab.o \
 	TAC_generator.o\
-	MIPS_generator.o
+	MIPS_generator.o\
+	peephole_o1.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -43,6 +45,8 @@ symbol-table.o : global.h symbol-table.h symbol-table.c
 syntax-tree.o : global.h syntax-tree.h syntax-tree.c
 
 TAC_generator.o : global.h TAC_generator.c
+
+peephole_o1.o : global.h peephole_o1.c
 
 #tac2mips.o : global.h tac2mips.c
 MIPS_generator.o : global.h MIPS_generator.c
