@@ -551,6 +551,16 @@ static void tac2mips_call( TAC *tac )
 	  tac->operand2->val.iconst * 4 );
 }
 
+static void tac2mips_retrieve( TAC *tac )
+{
+  /* In TAC generator, we always create a tmp varible
+     to hold the return value. */
+  if ( tac->operand1 != NULL ) { // non void return
+    printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n",
+	    REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name );
+  }
+}
+
 /**
  * Translate TACs to MIPS assembly.
  */
@@ -602,7 +612,7 @@ void tac2mips( tnode *t )
       tac2mips_call( tac );
       break;
     case Retrieve:
-      //      tac2mips_retrieve( tac );
+      tac2mips_retrieve( tac );
       break;
     case Enter:
       tac2mips_enterfunc( tac );
