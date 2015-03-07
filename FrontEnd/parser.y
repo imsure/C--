@@ -28,6 +28,8 @@
   extern void print_TAC_seq( tnode *t, bool reverse );
   extern int offset2fp_locals();
   extern void offset2fp_formals( symtabnode *func );
+  extern void output_mips_data_section();
+  extern void tac2mips( tnode *t );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -131,8 +133,8 @@ prog
       currfnbodyTree->tac_seq->start->prev = enter;
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
-      print_TAC_seq( currfnbodyTree, false );
-      putchar( '\n' );
+      //print_TAC_seq( currfnbodyTree, false );
+      //putchar( '\n' );
 
       //printf( "\nReversed Three Address Code:\n\n" );
       //print_TAC_seq( currfnbodyTree, true );
@@ -142,8 +144,8 @@ prog
       DumpSymTabLocal();
 #endif
       
-      /* mips_data_section(); */
-      /* tac2mips( currfnbodyTree, stack_frame_size ); */
+      output_mips_data_section();
+      tac2mips( currfnbodyTree );
 
       CleanupFnInfo(); 
     }

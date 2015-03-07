@@ -13,7 +13,7 @@ void main(void)
   x = 345;
   y = 10;
   x = x-y;
-  y = -2;
+  y = 2;
   x = x+y;
   z = x/y;
   u = z*y;

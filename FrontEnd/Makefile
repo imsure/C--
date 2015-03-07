@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall -DDEBUG
-#CFLAGS = -g -Wall
+#CFLAGS = -g -Wall -DDEBUG
+CFLAGS = -g -Wall
 
 DEST = compile
 
@@ -14,7 +14,8 @@ CFILES = error.c \
         syntax-tree.c \
 	util.c\
 	y.tab.c\
-	TAC_generator.c
+	TAC_generator.c\
+	MIPS_generator.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -24,7 +25,8 @@ OFILES = error.o \
         syntax-tree.o \
 	util.o \
 	y.tab.o \
-	TAC_generator.o
+	TAC_generator.o\
+	MIPS_generator.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -43,6 +45,7 @@ syntax-tree.o : global.h syntax-tree.h syntax-tree.c
 TAC_generator.o : global.h TAC_generator.c
 
 #tac2mips.o : global.h tac2mips.c
+MIPS_generator.o : global.h MIPS_generator.c
 
 util.o : global.h util.h util.c
 

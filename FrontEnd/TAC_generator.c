@@ -102,7 +102,8 @@ TAC *enter_func( symtabnode *func, int stack_size )
 }
 
 /**
- * Generate code for string constant.
+ * Generate code for string constant. The string constant
+ * can be only passed (by address) to a function as a parameter.
  */
 static TAC_seq *code_gen_strcon( tnode *t )
 {

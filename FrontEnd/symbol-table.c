@@ -363,7 +363,10 @@ symtabnode *newtmp_strcon( const char *str )
   return sptr;
 }
 
-void mips_data_section()
+/**
+ * Map global data into mips data section.
+ */
+void output_mips_data_section()
 {
   int i;
   symtabnode *stptr;
