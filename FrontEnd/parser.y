@@ -133,6 +133,9 @@ prog
       currfnbodyTree->tac_seq->start->prev = enter;
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
+
+      /* */
+
       print_TAC_seq( currfnbodyTree, false );
       putchar( '\n' );
 
@@ -144,8 +147,8 @@ prog
       DumpSymTabLocal();
 #endif
       
-      output_mips_data_section();
-      tac2mips( currfnbodyTree, currFun->ret_type );
+      //output_mips_data_section();
+      //tac2mips( currfnbodyTree, currFun->ret_type );
 
       CleanupFnInfo(); 
     }
