@@ -1,8 +1,7 @@
 f:
 	Enter f  24 
 	_tvar0 = 1 
-	if ( n <= _tvar0 ) goto _L0
-	goto _L1
+	if ( n > _tvar0 ) goto _L1
 _L0:
 	_tvar1 = 1 
 	Return _tvar1 
@@ -26,8 +25,7 @@ _L2:
 g:
 	Enter g  24 
 	_tvar5 = 1 
-	if ( n <= _tvar5 ) goto _L3
-	goto _L4
+	if ( n > _tvar5 ) goto _L4
 _L3:
 	_tvar6 = 1 
 	Return _tvar6 

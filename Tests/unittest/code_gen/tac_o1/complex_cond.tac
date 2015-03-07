@@ -10,17 +10,13 @@ main:
 	h = 8 
 	i = 9 
 	j = 10 
-	if ( a <= b ) goto _L6
-	goto _L1
+	if ( a > b ) goto _L1
 _L6:
-	if ( b <= c ) goto _L5
-	goto _L1
+	if ( b > c ) goto _L1
 _L5:
-	if ( c <= d ) goto _L4
-	goto _L1
+	if ( c > d ) goto _L1
 _L4:
-	if ( d <= e ) goto _L3
-	goto _L1
+	if ( d > e ) goto _L1
 _L3:
 	if ( e > f ) goto _L1
 	goto _L10

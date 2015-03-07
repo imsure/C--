@@ -46,8 +46,7 @@ _L3:	lw $8, -36($fp) # Load local int i.
 	sw $8, -44($fp) # Store to local int k.
 	lw $8, -44($fp) # Load local int k.
 	lw $9, -36($fp) # Load local int i.
-	bgt $8, $9, _L6
-	j _L7
+	ble $8, $9, _L7
 	.text
 _L6:	li $8, 0 # Load int constant shorter than 16-bits
 	sw $8, -28($fp) # Store to local int a.
@@ -67,8 +66,7 @@ _L8:	lw $8, -28($fp) # Load local int a.
 	sw $8, -32($fp) # Store to local int b.
 	lw $8, -32($fp) # Load local int b.
 	lw $9, -40($fp) # Load local int j.
-	bgt $8, $9, _L11
-	j _L12
+	ble $8, $9, _L12
 	.text
 _L11:	lw $8, -4($fp) # Load local int res.
 	lw $9, -32($fp) # Load local int b.

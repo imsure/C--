@@ -6,26 +6,20 @@ main:
 	d = 4 
 	e = 5 
 	f = 6 
-	if ( a < b ) goto _L0
-	goto _L1
+	if ( a >= b ) goto _L1
 _L0:
-	if ( b >= c ) goto _L3
-	goto _L4
+	if ( b < c ) goto _L4
 _L3:
-	if ( c < d ) goto _L6
-	goto _L7
+	if ( c >= d ) goto _L7
 _L6:
 	if ( d == e ) goto _L10
 	goto _L9
 _L9:
-	if ( e < f ) goto _L12
-	goto _L13
+	if ( e >= f ) goto _L13
 _L12:
-	if ( g < f ) goto _L15
-	goto _L16
+	if ( g >= f ) goto _L16
 _L15:
-	if ( g < a ) goto _L18
-	goto _L19
+	if ( g >= a ) goto _L19
 _L18:
 	res = 1111 
 	goto _L20

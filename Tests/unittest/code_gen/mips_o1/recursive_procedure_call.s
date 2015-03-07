@@ -34,8 +34,7 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	lw $9, -12($fp) # Load tmp address _taddr0.
 	lb $8, ($9) # Load value of the char array element pointed by _taddr0.
 	lw $9, -4($fp) # Load tmp variable _tvar0.
-	beq $8, $9, _L0
-	j _L1
+	bne $8, $9, _L1
 	.text
 _L0:	la $sp, 0($fp) # Move stack pointer back to $fp.
 	lw $ra, 0($sp) # Restore return address.

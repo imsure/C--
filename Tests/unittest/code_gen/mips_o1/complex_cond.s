@@ -55,23 +55,19 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, _j # Store to global int j.
 	lw $8, _a # Load global int a.
 	lw $9, _b # Load global int b.
-	ble $8, $9, _L6
-	j _L1
+	bgt $8, $9, _L1
 	.text
 _L6:	lw $8, _b # Load global int b.
 	lw $9, _c # Load global int c.
-	ble $8, $9, _L5
-	j _L1
+	bgt $8, $9, _L1
 	.text
 _L5:	lw $8, _c # Load global int c.
 	lw $9, _d # Load global int d.
-	ble $8, $9, _L4
-	j _L1
+	bgt $8, $9, _L1
 	.text
 _L4:	lw $8, _d # Load global int d.
 	lw $9, _e # Load global int e.
-	ble $8, $9, _L3
-	j _L1
+	bgt $8, $9, _L1
 	.text
 _L3:	lw $8, _e # Load global int e.
 	lw $9, _f # Load global int f.

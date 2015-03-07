@@ -33,8 +33,7 @@ _sum:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	lw $9, -20($fp) # Load tmp address _taddr0.
 	lb $8, ($9) # Load value of the char array element pointed by _taddr0.
 	lw $9, -4($fp) # Load tmp variable _tvar0.
-	beq $8, $9, _L0
-	j _L1
+	bne $8, $9, _L1
 	.text
 _L0:	li $8, 0 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.

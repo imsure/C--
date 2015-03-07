@@ -3,8 +3,7 @@ sum:
 	_tvar0 = i * 1 
 	_taddr0 = x + _tvar0
 	_tvar0 = 0 
-	if ( *_taddr0(char) == _tvar0 ) goto _L0
-	goto _L1
+	if ( *_taddr0(char) != _tvar0 ) goto _L1
 _L0:
 	_tvar1 = 0 
 	Return _tvar1 

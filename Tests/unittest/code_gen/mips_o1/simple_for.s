@@ -90,8 +90,7 @@ _L6:	lw $8, -4($fp) # Load local int res.
 	sw $8, -16($fp) # Store to tmp variable _tvar2.
 	lw $8, -24($fp) # Load local int i.
 	lw $9, -16($fp) # Load tmp variable _tvar2.
-	bgt $8, $9, _L9
-	j _L10
+	ble $8, $9, _L10
 	.text
 _L9:	lw $8, -4($fp) # Load local int res.
 	la $sp, -4($sp) # Allocate stack space for parameter res.

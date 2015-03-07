@@ -107,8 +107,7 @@ _L4:	li $8, 5 # Load int constant shorter than 16-bits
 	lw $8, ($9) # Load value of the int array element pointed by _taddr1.
 	lw $10, -20($fp) # Load tmp address _taddr2.
 	lw $9, ($10) # Load value of the int array element pointed by _taddr2.
-	ble $8, $9, _L7
-	j _L3
+	bgt $8, $9, _L3
 	.text
 _L7:	li $8, 4 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.
@@ -142,8 +141,7 @@ _L7:	li $8, 4 # Load int constant shorter than 16-bits
 	lw $8, ($9) # Load value of the int array element pointed by _taddr3.
 	lw $10, -28($fp) # Load tmp address _taddr4.
 	lw $9, ($10) # Load value of the int array element pointed by _taddr4.
-	ble $8, $9, _L6
-	j _L3
+	bgt $8, $9, _L3
 	.text
 _L6:	li $8, 2 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.

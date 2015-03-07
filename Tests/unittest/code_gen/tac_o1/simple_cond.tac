@@ -2,8 +2,7 @@ main:
 	Enter main  32 
 	_tvar0 = 1 
 	_tvar1 = 0 
-	if ( _tvar0 > _tvar1 ) goto _L0
-	goto _L1
+	if ( _tvar0 <= _tvar1 ) goto _L1
 _L0:
 	res1 = 1111 
 	goto _L2
@@ -14,8 +13,7 @@ _L2:
 	_tvar2 = 1 
 	_tvar3 = -_tvar2 
 	y = _tvar3 
-	if ( x > y ) goto _L3
-	goto _L4
+	if ( x <= y ) goto _L4
 _L3:
 	res2 = 3333 
 	goto _L5

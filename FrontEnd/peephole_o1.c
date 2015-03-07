@@ -75,7 +75,95 @@ static void collapse_constant_assg( TAC_seq *tacseq )
   }
 }
 
+/**
+ * Check whether the given 'optype' is a relational operation.
+ */
+static bool is_relational( SyntaxNodeType optype )
+{
+  switch ( optype ) {
+  case Equals:
+  case Neq:
+  case Leq:
+  case Lt:
+  case Geq:
+  case Gt:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * Return the reverse of the relational operation 'optype'.
+ */
+static SyntaxNodeType reverse_relational_optype( SyntaxNodeType optype )
+{
+  switch ( optype ) {
+  case Equals:
+    return Neq;
+  case Neq:
+    return Equals;
+  case Leq:
+    return Gt;
+  case Lt:
+    return Geq;
+  case Geq:
+    return Lt;
+  case Gt:
+    return Leq;
+  default:
+    return Error;
+  }  
+}
+
+/**
+ * Peephole optimization: transform sequence of conditional jumps.
+ *
+ * TAC:
+ *     if x > y goto L1
+ *     goto L2
+ * L1:
+ *     ...
+ *
+ * can be optimized as:
+ *     if x <= y goto L2
+ * L1:
+ *     ...
+ *
+ * to reduce a goto statement.
+ *
+ * So given a TAC sequence, we traverse it forward, identify
+ * the pattern.
+ */
+static void transform_cond_jump( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  TAC *tac_next, *tac_next_next;
+
+  /* Forward traversing */
+  while ( tac != NULL ) {
+    if ( is_relational(tac->optype) == true ) {
+      tac_next_next = tac->next->next; // should be a label
+      if ( strcmp(tac->dest->val.label, tac_next_next->dest->val.label) == 0 ) {
+	/* A match found */
+	tac_next = tac->next;
+	tac->dest = tac_next->dest; // change goto destination
+	tac->optype = reverse_relational_optype( tac->optype ); // reverse optype
+
+	tac->next = tac_next_next; // chain tac and tac_next_next
+	tac_next_next->prev = tac; // chain tac and tac_next_next
+
+	free( tac_next ); // free redudant goto instruction
+	tac = tac->next->next; // two step forward
+	continue;
+      }
+    }
+    tac = tac->next;
+  }  
+}
+
 void peephole_o1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
+  transform_cond_jump( tacseq );
 }

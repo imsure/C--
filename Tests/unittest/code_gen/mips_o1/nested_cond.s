@@ -44,18 +44,15 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, _f # Store to global int f.
 	lw $8, _a # Load global int a.
 	lw $9, _b # Load global int b.
-	blt $8, $9, _L0
-	j _L1
+	bge $8, $9, _L1
 	.text
 _L0:	lw $8, _b # Load global int b.
 	lw $9, _c # Load global int c.
-	bge $8, $9, _L3
-	j _L4
+	blt $8, $9, _L4
 	.text
 _L3:	lw $8, _c # Load global int c.
 	lw $9, _d # Load global int d.
-	blt $8, $9, _L6
-	j _L7
+	bge $8, $9, _L7
 	.text
 _L6:	lw $8, _d # Load global int d.
 	lw $9, _e # Load global int e.
@@ -64,18 +61,15 @@ _L6:	lw $8, _d # Load global int d.
 	.text
 _L9:	lw $8, _e # Load global int e.
 	lw $9, _f # Load global int f.
-	blt $8, $9, _L12
-	j _L13
+	bge $8, $9, _L13
 	.text
 _L12:	lw $8, _g # Load global int g.
 	lw $9, _f # Load global int f.
-	blt $8, $9, _L15
-	j _L16
+	bge $8, $9, _L16
 	.text
 _L15:	lw $8, _g # Load global int g.
 	lw $9, _a # Load global int a.
-	blt $8, $9, _L18
-	j _L19
+	bge $8, $9, _L19
 	.text
 _L18:	li $8, 1111 # Load int constant shorter than 16-bits
 	sw $8, _res # Store to global int res.

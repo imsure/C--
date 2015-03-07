@@ -22,8 +22,7 @@ main:
 	Param _tvar4 
 	Call id  1 
 	Retrieve _tvar3 
-	if ( _tvar0 > _tvar3 ) goto _L0
-	goto _L1
+	if ( _tvar0 <= _tvar3 ) goto _L1
 _L0:
 	x = 321 
 _L1:

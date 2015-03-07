@@ -1,8 +1,7 @@
 f:
 	Enter f  16 
 	_tvar0 = 0 
-	if ( u == _tvar0 ) goto _L0
-	goto _L1
+	if ( u != _tvar0 ) goto _L1
 _L0:
 	_tvar1 = 1 
 	Return _tvar1 

@@ -25,8 +25,7 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, -4($fp) # Store to tmp variable _tvar0.
 	lw $8, 8($fp) # Load int formal u.
 	lw $9, -4($fp) # Load tmp variable _tvar0.
-	beq $8, $9, _L0
-	j _L1
+	bne $8, $9, _L1
 	.text
 _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.

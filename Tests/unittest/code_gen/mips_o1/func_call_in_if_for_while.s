@@ -75,8 +75,7 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $2, -16($fp) # Store returned value to tmp variable _tvar3.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
 	lw $9, -16($fp) # Load tmp variable _tvar3.
-	bgt $8, $9, _L0
-	j _L1
+	ble $8, $9, _L1
 	.text
 _L0:	li $8, 321 # Load int constant shorter than 16-bits
 	sw $8, -48($fp) # Store to local int x.

@@ -3,8 +3,7 @@ f:
 	_tvar0 = n * 1 
 	_taddr0 = s + _tvar0
 	_tvar0 = 0 
-	if ( *_taddr0(char) == _tvar0 ) goto _L0
-	goto _L1
+	if ( *_taddr0(char) != _tvar0 ) goto _L1
 _L0:
 	Return 
 	goto _L2

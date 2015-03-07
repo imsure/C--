@@ -33,8 +33,7 @@ _L6:
 	_tvar2 = res + i
 	res = _tvar2 
 	_tvar2 = 10 
-	if ( i > _tvar2 ) goto _L9
-	goto _L10
+	if ( i <= _tvar2 ) goto _L10
 _L9:
 	Param res 
 	Call print_int  1 

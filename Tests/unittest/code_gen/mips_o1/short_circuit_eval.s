@@ -58,13 +58,11 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, _val # Store to global int val.
 	lw $8, -24($fp) # Load local int x.
 	lw $9, -28($fp) # Load local int y.
-	blt $8, $9, _L3
-	j _L1
+	bge $8, $9, _L1
 	.text
 _L3:	lw $8, -28($fp) # Load local int y.
 	lw $9, -32($fp) # Load local int z.
-	bgt $8, $9, _L2
-	j _L1
+	ble $8, $9, _L1
 	.text
 _L2:	lw $8, -24($fp) # Load local int x.
 	la $sp, -4($sp) # Allocate stack space for parameter x.
@@ -74,8 +72,7 @@ _L2:	lw $8, -24($fp) # Load local int x.
 	sw $2, -4($fp) # Store returned value to tmp variable _tvar0.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
 	lw $9, -32($fp) # Load local int z.
-	blt $8, $9, _L0
-	j _L1
+	bge $8, $9, _L1
 	.text
 _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.
@@ -90,8 +87,7 @@ _L1:	li $8, 0 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar1.
 	lw $8, _flag # Load global int flag.
 	lw $9, -8($fp) # Load tmp variable _tvar1.
-	blt $8, $9, _L4
-	j _L5
+	bge $8, $9, _L5
 	.text
 _L4:	li $8, 4321 # Load int constant shorter than 16-bits
 	sw $8, _val # Store to global int val.
@@ -114,8 +110,7 @@ _L8:	lw $8, -24($fp) # Load local int x.
 	sw $2, -12($fp) # Store returned value to tmp variable _tvar2.
 	lw $8, -12($fp) # Load tmp variable _tvar2.
 	lw $9, -32($fp) # Load local int z.
-	blt $8, $9, _L6
-	j _L7
+	bge $8, $9, _L7
 	.text
 _L6:	li $8, 1 # Load int constant shorter than 16-bits
 	sw $8, -16($fp) # Store to tmp variable _tvar3.
@@ -130,8 +125,7 @@ _L7:	li $8, 0 # Load int constant shorter than 16-bits
 	sw $8, -16($fp) # Store to tmp variable _tvar3.
 	lw $8, _flag # Load global int flag.
 	lw $9, -16($fp) # Load tmp variable _tvar3.
-	blt $8, $9, _L10
-	j _L11
+	bge $8, $9, _L11
 	.text
 _L10:	li $8, 4321 # Load int constant shorter than 16-bits
 	sw $8, _val # Store to global int val.

@@ -11,8 +11,7 @@ _L3:
 	_tvar3 = 2 
 	_tvar2 = _tvar2 / _tvar3
 	k = _tvar2 
-	if ( k > i ) goto _L6
-	goto _L7
+	if ( k <= i ) goto _L7
 _L6:
 	a = 0 
 	goto _L9
@@ -21,8 +20,7 @@ _L8:
 	_tvar4 = 2 
 	_tvar3 = _tvar3 / _tvar4
 	b = _tvar3 
-	if ( b > j ) goto _L11
-	goto _L12
+	if ( b <= j ) goto _L12
 _L11:
 	_tvar3 = res + b
 	res = _tvar3 

@@ -31,8 +31,7 @@ _L4:
 	_tvar1 = i / _tvar1
 	_tvar1 = _tvar1 * 4 
 	_taddr2 = x + _tvar1
-	if ( *_taddr1(int) <= *_taddr1(int)  ) goto _L7
-	goto _L3
+	if ( *_taddr1(int) > *_taddr1(int)  ) goto _L3
 _L7:
 	_tvar1 = 4 
 	_tvar1 = i / _tvar1
@@ -42,8 +41,7 @@ _L7:
 	_tvar1 = i / _tvar1
 	_tvar1 = _tvar1 * 4 
 	_taddr4 = x + _tvar1
-	if ( *_taddr3(int) <= *_taddr3(int)  ) goto _L6
-	goto _L3
+	if ( *_taddr3(int) > *_taddr3(int)  ) goto _L3
 _L6:
 	_tvar1 = 2 
 	_tvar1 = i / _tvar1

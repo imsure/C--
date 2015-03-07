@@ -12,25 +12,21 @@ main:
 	z = 5 
 	flag = 1 
 	val = 1234 
-	if ( x < y ) goto _L3
-	goto _L1
+	if ( x >= y ) goto _L1
 _L3:
-	if ( y > z ) goto _L2
-	goto _L1
+	if ( y <= z ) goto _L1
 _L2:
 	Param x 
 	Call side_effect  1 
 	Retrieve _tvar0 
-	if ( _tvar0 < z ) goto _L0
-	goto _L1
+	if ( _tvar0 >= z ) goto _L1
 _L0:
 	_tvar1 = 1 
 	_tvar1 = x - _tvar1
 	x = _tvar1 
 _L1:
 	_tvar1 = 0 
-	if ( flag < _tvar1 ) goto _L4
-	goto _L5
+	if ( flag >= _tvar1 ) goto _L5
 _L4:
 	val = 4321 
 _L5:
@@ -43,16 +39,14 @@ _L8:
 	Param x 
 	Call side_effect  1 
 	Retrieve _tvar2 
-	if ( _tvar2 < z ) goto _L6
-	goto _L7
+	if ( _tvar2 >= z ) goto _L7
 _L6:
 	_tvar3 = 1 
 	_tvar3 = x - _tvar3
 	x = _tvar3 
 _L7:
 	_tvar3 = 0 
-	if ( flag < _tvar3 ) goto _L10
-	goto _L11
+	if ( flag >= _tvar3 ) goto _L11
 _L10:
 	val = 4321 
 _L11:
