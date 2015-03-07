@@ -60,24 +60,24 @@ static void load_global_var_to_reg( symtabnode *stptr, int reg_num )
   /* Check each possible target this symbol table entry could point to. */
   switch ( stptr->type ) {
   case t_Int: // global int
-    printf( "\tlw $%d, %s # Load global int %s.\n",
+    printf( "\tlw $%d, _%s # Load global int %s.\n",
 	    reg_num, stptr->name, stptr->name );
     break;
   case t_Char: // global char
-    printf( "\tlb $%d, %s # Load global char %s.\n",
+    printf( "\tlb $%d, _%s # Load global char %s.\n",
 	    reg_num, stptr->name, stptr->name );
     break;
   case t_Array: // global array ( its address )
     if ( stptr->elt_type == t_Int ) {
-      printf( "\tla $%d, %s # Load address of global int array %s.\n",
+      printf( "\tla $%d, _%s # Load address of global int array %s.\n",
 	      reg_num, stptr->name, stptr->name );
     } else {
-      printf( "\tla $%d, %s # Load address of global char array %s.\n",
+      printf( "\tla $%d, _%s # Load address of global char array %s.\n",
 	      reg_num, stptr->name, stptr->name );
     }
     break;
   case t_Tmp_Str: // string constant
-    printf( "\tla $%d, %s # Load string const address %s.\n",
+    printf( "\tla $%d, _%s # Load string const address %s.\n",
 	    reg_num, stptr->name, stptr->name );
     break;
   default: // other types are not valid!
@@ -220,11 +220,11 @@ static void store_value_to_global( symtabnode *stptr, int reg_num )
   /* Check each possible target this symbol table entry could point to. */
   switch ( stptr->type ) {
   case t_Int: // global int
-    printf( "\tsw $%d, %s # Store to global int %s.\n",
+    printf( "\tsw $%d, _%s # Store to global int %s.\n",
 	    reg_num, stptr->name, stptr->name );
     break;
   case t_Char: // global char
-    printf( "\tsb $%d, %s # Store to global char %s.\n",
+    printf( "\tsb $%d, _%s # Store to global char %s.\n",
 	    reg_num, stptr->name, stptr->name );
     break;
   default:
@@ -546,7 +546,14 @@ static void tac2mips_param( TAC *tac )
  */
 static void tac2mips_call( TAC *tac )
 {
-  printf( "\tjal %s\n", tac->operand1->val.stptr->name );
+  /* No _prefix for these three function. */
+  if ( strcmp(tac->operand1->val.stptr->name, "print_int") == 0 ||
+       strcmp(tac->operand1->val.stptr->name, "print_string") == 0 ||
+       strcmp(tac->operand1->val.stptr->name, "main") == 0 ) {
+    printf( "\tjal %s\n", tac->operand1->val.stptr->name );
+  } else {
+    printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
+  }
   printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
 	  tac->operand2->val.iconst * 4 );
 }
@@ -637,7 +644,20 @@ void tac2mips( tnode *t )
       break;
     case Label:
       printf( "\t.text\n" );
-      printf( "%s:", tac->dest->val.label );
+      if ( tac->operand1 != NULL ) { // means that it is a function label.
+	/* add a prefix _ to avoid potential name conflicting with
+	   MIPS reserved keywords.*/
+	  /* No _prefix for these three function. */
+	if ( strcmp(tac->dest->val.label, "print_int") == 0 ||
+	     strcmp(tac->dest->val.label, "print_string") == 0 ||
+	     strcmp(tac->dest->val.label, "main") == 0 ) {
+	  printf( "%s:", tac->dest->val.label );
+	} else {
+	  printf( "_%s:", tac->dest->val.label );
+	}
+      } else {
+	printf( "%s:", tac->dest->val.label );
+      }
       break;
     case Goto:
       printf( "\tj %s\n", tac->dest->val.label );

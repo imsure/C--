@@ -63,17 +63,22 @@ TAC *newlabel()
 
 /**
  * Return a TAC instruction for function labels.
+ * Note that we deliberately store the label in both dest and operand1
+ * to distinguish function labels and compiler generated labels.
  */
 TAC *newfunclabel( const char *funcname )
 {
   TAC *quad = (TAC *) zalloc( sizeof(TAC) );
   quad->optype = Label;
+  quad->operand1 = (address *) zalloc( sizeof(address) );
+  quad->operand1->atype = AT_Label;
+  quad->operand1->val.label = (char *) zalloc( strlen(funcname) + 1 );
+  sprintf( quad->operand1->val.label, "%s", funcname );
+  quad->operand2 = NULL;
   quad->dest = (address *) zalloc( sizeof(address) );
   quad->dest->atype = AT_Label;
   quad->dest->val.label = (char *) zalloc( strlen(funcname) + 1 );
   sprintf( quad->dest->val.label, "%s", funcname );
-  quad->operand1 = NULL;
-  quad->operand2 = NULL;
   quad->next = NULL;
 
   return quad;
