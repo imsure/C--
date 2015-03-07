@@ -503,13 +503,18 @@ static void tac2mips_enterfunc( TAC *tac )
  * 'tac' in the form of: "return operand1"
  * where operand1 is a symbol table entry pointing to the value
  * to be returned.
+ *
+ * 'ret_type' is the type for the return value. It can only be one of:
+ * 1. t_Int: int value
+ * 2. t_Char: char value
+ * 3. t_None: no return value (void).
  */
 static void tac2mips_return( TAC *tac, int ret_type )
 {
   if ( tac->operand1 != NULL ) { // non void return type.
     /* Load the return value into $v0. */
     load_operand_to_reg( tac->operand1, REG_V0 );
-    if ( ret_type == t_Char ) {
+    if ( ret_type == t_Char ) { // convert int --> char
       printf( "\tsw $%d, -4($fp)\n", REG_V0 );
       printf( "\tlb $%d, -4($fp)\n", REG_V0 );
     }
@@ -615,7 +620,8 @@ static void tac2mips_binary_cond( TAC *tac )
 }
 
 /**
- * Translate TACs to MIPS assembly.
+ * Translate TACs to MIPS assembly for the syntax tree node 't' which
+ * represents a function body with the return type as 'ret_type'.
  */
 void tac2mips( tnode *t, int ret_type )
 {
