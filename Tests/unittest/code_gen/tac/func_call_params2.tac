@@ -27,7 +27,7 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
 	la $sp, -4($sp) # Allocate stack frame for locals/tmps
-	lw $8, 12($fp) # Load int formal d.
+	lb $8, 12($fp) # Load char formal d.
 	lw $9, 8($fp) # Load int formal e.
 	mul $10, $8, $9
 	sw $10, -4($fp) # Store to tmp variable _tvar0.
@@ -35,7 +35,7 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	lw $9, -4($fp) # Load tmp variable _tvar0.
 	add $10, $8, $9
 	sw $10, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, 20($fp) # Load int formal b.
+	lb $8, 20($fp) # Load char formal b.
 	lw $9, -4($fp) # Load tmp variable _tvar0.
 	mul $10, $8, $9
 	sw $10, -4($fp) # Store to tmp variable _tvar0.
@@ -50,7 +50,11 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	la $sp, 8($sp) # Restore stack pointer.
 	jr $ra # jump back to the return address.
 main:
-	Enter main  28 
+	Enter main  36 
+	_tvar1 = 'a' 
+	y = _tvar1 
+	_tvar1 = 'b' 
+	z = _tvar1 
 	_tvar2 = 1 
 	_tvar3 = 2 
 	_tvar4 = 3 
@@ -65,9 +69,9 @@ main:
 	Retrieve _tvar1 
 	x = _tvar1 
 	Param x 
+	Param y 
 	Param x 
-	Param x 
-	Param x 
+	Param z 
 	Param x 
 	Call f  5 
 	Retrieve _tvar6 
@@ -87,7 +91,15 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $fp, 4($sp) # Save old $fp on stack
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
-	la $sp, -28($sp) # Allocate stack frame for locals/tmps
+	la $sp, -36($sp) # Allocate stack frame for locals/tmps
+	li $8, 97 # Load char constant.
+	sw $8, -4($fp) # Store to tmp variable _tvar1.
+	lw $8, -4($fp) # Load tmp variable _tvar1.
+	sb $8, -32($fp) # Store to local char y.
+	li $8, 98 # Load char constant.
+	sw $8, -4($fp) # Store to tmp variable _tvar1.
+	lw $8, -4($fp) # Load tmp variable _tvar1.
+	sb $8, -36($fp) # Store to local char z.
 	li $8, 1 # Load int constant shorter than 16-bits
 	sw $8, -8($fp) # Store to tmp variable _tvar2.
 	li $8, 2 # Load int constant shorter than 16-bits
@@ -121,14 +133,14 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	lw $8, -28($fp) # Load local int x.
 	la $sp, -4($sp) # Allocate stack space for parameter x.
 	sw $8, 0($sp) # Push the parameter value.
-	lw $8, -28($fp) # Load local int x.
-	la $sp, -4($sp) # Allocate stack space for parameter x.
+	lb $8, -32($fp) # Load local char y.
+	la $sp, -4($sp) # Allocate stack space for parameter y.
 	sw $8, 0($sp) # Push the parameter value.
 	lw $8, -28($fp) # Load local int x.
 	la $sp, -4($sp) # Allocate stack space for parameter x.
 	sw $8, 0($sp) # Push the parameter value.
-	lw $8, -28($fp) # Load local int x.
-	la $sp, -4($sp) # Allocate stack space for parameter x.
+	lb $8, -36($fp) # Load local char z.
+	la $sp, -4($sp) # Allocate stack space for parameter z.
 	sw $8, 0($sp) # Push the parameter value.
 	lw $8, -28($fp) # Load local int x.
 	la $sp, -4($sp) # Allocate stack space for parameter x.
