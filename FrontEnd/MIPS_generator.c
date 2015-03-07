@@ -551,6 +551,11 @@ static void tac2mips_call( TAC *tac )
 	  tac->operand2->val.iconst * 4 );
 }
 
+/**
+ * Generate mips assembly for retrieving the returned value from
+ * a function given 'tac' in the form of "retrieve operand1' if
+ * if that function's return type is non void.
+ */
 static void tac2mips_retrieve( TAC *tac )
 {
   /* In TAC generator, we always create a tmp varible
@@ -558,6 +563,43 @@ static void tac2mips_retrieve( TAC *tac )
   if ( tac->operand1 != NULL ) { // non void return
     printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n",
 	    REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name );
+  }
+}
+
+/**
+ * Generate mips assembly for binary relational operation given
+ * 'tac' in the form of "if operand1 op operand2 goto dest(label)".
+ */
+static void tac2mips_binary_cond( TAC *tac )
+{
+  /* step1: load the value of operand1 into $8. */
+  load_operand_to_reg( tac->operand1, REG_8 );
+
+  /* step2: load the value of operand1 into $9. */
+  load_operand_to_reg( tac->operand2, REG_9 );
+
+  switch ( tac->optype ) {
+  case Equals:
+    printf( "\tbeq $8, $9, %s\n", tac->dest->val.label );
+    break;
+  case Neq:
+    printf( "\tbne $8, $9, %s\n", tac->dest->val.label );
+    break;
+  case Leq:
+    printf( "\tble $8, $9, %s\n", tac->dest->val.label );
+    break;
+  case Lt:
+    printf( "\tblt $8, $9, %s\n", tac->dest->val.label );
+    break;
+  case Geq:
+    printf( "\tbge $8, $9, %s\n", tac->dest->val.label );
+    break;
+  case Gt:
+    printf( "\tbgt $8, $9, %s\n", tac->dest->val.label );
+    break;
+  default:
+    fprintf( stderr, "Invalid conditional test type: %d\n", tac->optype );
+    exit( -1 );
   }
 }
 
@@ -591,16 +633,14 @@ void tac2mips( tnode *t )
     case Lt:
     case Geq:
     case Gt:
-    case LogicalAnd:
-    case LogicalOr:
-      break;
-    case LogicalNot:
+      tac2mips_binary_cond( tac );
       break;
     case Label:
       printf( "\t.text\n" );
       printf( "%s:", tac->dest->val.label );
       break;
     case Goto:
+      printf( "\tj %s\n", tac->dest->val.label );
       break;
     case Return:
       tac2mips_return( tac );

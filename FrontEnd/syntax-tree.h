@@ -34,9 +34,9 @@ typedef enum SyntaxNodeType {
   Lt, // operation type of three address code
   Geq, // operation type of three address code
   Gt, // operation type of three address code
-  LogicalAnd, // operation type of three address code
-  LogicalOr, // operation type of three address code
-  LogicalNot, // operation type of three address code
+  LogicalAnd,
+  LogicalOr,
+  LogicalNot, 
   FunCall,
   Assg, // operation type of three address code
   Return, // operation type of three address code
