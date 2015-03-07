@@ -133,8 +133,8 @@ prog
       currfnbodyTree->tac_seq->start->prev = enter;
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
-      //print_TAC_seq( currfnbodyTree, false );
-      //putchar( '\n' );
+      print_TAC_seq( currfnbodyTree, false );
+      putchar( '\n' );
 
       //printf( "\nReversed Three Address Code:\n\n" );
       //print_TAC_seq( currfnbodyTree, true );
