@@ -32,7 +32,7 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $fp, 4($sp) # Save old $fp on stack
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
-	la $sp, -4($sp) # Allocate stack frame for locals/tmps
+	la $sp, -8($sp) # Allocate stack frame for locals/tmps
 	li $8, 345 # Load int constant shorter than 16-bits
 	sw $8, -4($fp) # Store to tmp variable _tvar0.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
@@ -50,6 +50,9 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	li $8, 2 # Load int constant shorter than 16-bits
 	sw $8, -4($fp) # Store to tmp variable _tvar0.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
+	neg $10, $8
+	sw $10, -8($fp) # Store to tmp variable _tvar1.
+	lw $8, -8($fp) # Load tmp variable _tvar1.
 	sb $8, y # Store to global char y.
 	lw $8, x # Load global int x.
 	lb $9, y # Load global char y.

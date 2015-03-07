@@ -348,7 +348,7 @@ static void store_value_to_dest( address *dest, int reg_num )
  * in TAC generator, we always assign int/char constant to a tmp variable
  * first.
  */
-static void tac2mips_arith( TAC *tac )
+static void tac2mips_binary_arith( TAC *tac )
 {
   /* step1: Load the value of operand1 into register $8. */
   load_operand_to_reg( tac->operand1, REG_8 );
@@ -377,6 +377,23 @@ static void tac2mips_arith( TAC *tac )
   }
 
   /* step4: Store the value in $10 back to dest. */
+  store_value_to_dest( tac->dest, REG_10 );
+}
+
+/**
+ * Generate mips assembly for unary minus operations:
+ * given 'tac' in the form:
+ * dest = -operand1
+ */
+static void tac2mips_unary_minus( TAC *tac )
+{
+  /* step1: Load the value of operand1 into register $8. */
+  load_operand_to_reg( tac->operand1, REG_8 );
+
+  /* step2: Carry out computation with the result going to register $10. */
+  printf( "\tneg $10, $8\n" );
+
+  /* step3: Store the value in $10 back to dest. */
   store_value_to_dest( tac->dest, REG_10 );
 }
 
@@ -534,9 +551,10 @@ void tac2mips( tnode *t )
     case BinaryMinus:
     case Mult:
     case Div:
-      tac2mips_arith( tac );
+      tac2mips_binary_arith( tac );
       break;
     case UnaryMinus:
+      tac2mips_unary_minus( tac );
       break;
     case Assg:
       tac2mips_assg( tac );
