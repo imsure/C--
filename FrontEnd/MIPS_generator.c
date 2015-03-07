@@ -504,11 +504,15 @@ static void tac2mips_enterfunc( TAC *tac )
  * where operand1 is a symbol table entry pointing to the value
  * to be returned.
  */
-static void tac2mips_return( TAC *tac )
+static void tac2mips_return( TAC *tac, int ret_type )
 {
   if ( tac->operand1 != NULL ) { // non void return type.
     /* Load the return value into $v0. */
     load_operand_to_reg( tac->operand1, REG_V0 );
+    if ( ret_type == t_Char ) {
+      printf( "\tsw $%d, -4($fp)\n", REG_V0 );
+      printf( "\tlb $%d, -4($fp)\n", REG_V0 );
+    }
   }
 
   /* Common routinue for returning from within a function. */
@@ -613,7 +617,7 @@ static void tac2mips_binary_cond( TAC *tac )
 /**
  * Translate TACs to MIPS assembly.
  */
-void tac2mips( tnode *t )
+void tac2mips( tnode *t, int ret_type )
 {
   TAC *tac;
 
@@ -663,7 +667,7 @@ void tac2mips( tnode *t )
       printf( "\tj %s\n", tac->dest->val.label );
       break;
     case Return:
-      tac2mips_return( tac );
+      tac2mips_return( tac, ret_type );
       break;
     case Param:
       tac2mips_param( tac );

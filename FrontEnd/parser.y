@@ -29,7 +29,7 @@
   extern int offset2fp_locals();
   extern void offset2fp_formals( symtabnode *func );
   extern void output_mips_data_section();
-  extern void tac2mips( tnode *t );
+  extern void tac2mips( tnode *t, int ret_type );
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -145,7 +145,7 @@ prog
 #endif
       
       output_mips_data_section();
-      tac2mips( currfnbodyTree );
+      tac2mips( currfnbodyTree, currFun->ret_type );
 
       CleanupFnInfo(); 
     }
