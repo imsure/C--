@@ -31,6 +31,8 @@
   extern void output_mips_data_section();
   extern void tac2mips( tnode *t, int ret_type );
   extern void peephole_o1( TAC_seq *tacseq );
+  extern bool tac_only;
+  extern bool perform_O1;
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -136,10 +138,14 @@ prog
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
 
       /* Carray out peephole optimization. */
-      peephole_o1( currfnbodyTree->tac_seq );
+      if ( perform_O1 == true ) {
+	peephole_o1( currfnbodyTree->tac_seq );
+      }
 
-      print_TAC_seq( currfnbodyTree, false );
-      putchar( '\n' );
+      if ( tac_only == true ) { // output TACs to stdout
+	  print_TAC_seq( currfnbodyTree, false );
+	  putchar( '\n' );
+      }
 
       //printf( "\nReversed Three Address Code:\n\n" );
       //print_TAC_seq( currfnbodyTree, true );
@@ -148,9 +154,13 @@ prog
       printf( "stack_frame_size = %d\n", stack_frame_size );
       DumpSymTabLocal();
 #endif
-      
-      //output_mips_data_section();
-      //tac2mips( currfnbodyTree, currFun->ret_type );
+
+      if ( tac_only == false ) { // output MIPS assembly to stdout
+	output_mips_data_section();
+	putchar( '\n' );
+	tac2mips( currfnbodyTree, currFun->ret_type );
+	putchar( '\n' );
+      }
 
       CleanupFnInfo(); 
     }

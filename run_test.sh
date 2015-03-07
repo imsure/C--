@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Run all the test cases.
+## Run all the test cases without optimization.
 
 compiler_path=./FrontEnd
 test_path=./Tests/codegen_tests_from_professor
