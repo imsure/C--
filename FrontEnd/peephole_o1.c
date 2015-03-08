@@ -22,6 +22,8 @@ typedef struct Label_List {
   struct Label_List *next_label;
 } label_list;
 
+label_list *lhead;
+
 /**
  * Peephole optimization: collapse constant assignment.
  *
@@ -350,6 +352,8 @@ static void collapse_jump_chain( TAC_seq *tacseq )
     }
     tac = tac->next;
   }
+
+  lhead = llist_head; // for constructing basic block
 }
 
 void peephole_o1( TAC_seq *tacseq )

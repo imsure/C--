@@ -781,7 +781,7 @@ static TAC_seq *code_gen_for( tnode *t )
 
   if ( stFor_Test(t) == NULL ) { // unconditional jump to L_top
     tacseq_test = (TAC_seq *) zalloc( sizeof(TAC_seq) );
-    /* Indicate operation type is Noop. */
+    /* Directly jump to the body. */
     optype = Goto;
     operand1 = NULL;
     operand2 = NULL;

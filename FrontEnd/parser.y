@@ -31,6 +31,7 @@
   extern void output_mips_data_section();
   extern void tac2mips( tnode *t, int ret_type );
   extern void peephole_o1( TAC_seq *tacseq );
+  extern void construct_basic_block( TAC_seq *tacseq );
   extern bool tac_only;
   extern bool perform_O1;
 
@@ -140,6 +141,7 @@ prog
       /* Carray out peephole optimization. */
       if ( perform_O1 == true ) {
 	peephole_o1( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
       }
 
       if ( tac_only == true ) { // output TACs to stdout
