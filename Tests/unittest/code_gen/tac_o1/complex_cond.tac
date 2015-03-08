@@ -19,19 +19,14 @@ _L4:
 	if ( d > e ) goto _L1
 _L3:
 	if ( e > f ) goto _L1
-	goto _L10
 _L10:
 	if ( f > g ) goto _L1
-	goto _L9
 _L9:
 	if ( g > h ) goto _L1
-	goto _L8
 _L8:
 	if ( h > i ) goto _L1
-	goto _L7
 _L7:
 	if ( i > j ) goto _L1
-	goto _L0
 _L0:
 	res = 1111 
 	goto _L2

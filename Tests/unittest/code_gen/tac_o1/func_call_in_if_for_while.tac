@@ -47,7 +47,6 @@ _L3:
 	Retrieve _tvar7 
 	_tvar10 = 0 
 	if ( _tvar7 > _tvar10 ) goto _L2
-	goto _L4
 _L4:
 	_tvar12 = 0 
 	Param _tvar12 
@@ -74,7 +73,6 @@ _L6:
 	Retrieve _tvar12 
 	_tvar14 = 6 
 	if ( _tvar12 < _tvar14 ) goto _L5
-	goto _L7
 _L7:
 	Param x 
 	Call print_int  1 

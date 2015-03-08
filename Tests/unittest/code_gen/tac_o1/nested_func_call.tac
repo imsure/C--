@@ -48,7 +48,6 @@ _L0:
 _L1:
 	_tvar1 = 0 
 	if ( i > _tvar1 ) goto _L0
-	goto _L2
 _L2:
 	Param f 
 	Call print_int  1 

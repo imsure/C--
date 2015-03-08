@@ -41,13 +41,13 @@ def performance():
         print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('with-O1', v2[0], v2[1],
                                                                v2[2], v2[3], v2[4]) )
 
-        total_cmp = round( (float(v[0]) - float(v2[0])) / float(v[0]), 2 )
-        read_cmp = round( (float(v[1]) - float(v2[1])) / float(v[1]), 2 )
-        write_cmp = round((float(v[2]) - float(v2[2])) / float(v[2]), 2 )
-        branch_cmp = round((float(v[3]) - float(v2[3])) / float(v[3]), 2 )
-        other_cmp = round((float(v[4]) - float(v2[4])) / float(v[4]), 2 )
-        print( '{0:14} {1:1.0%} {2:12.0%} {3:6.0%} {4:6.0%} {5:10.0%}'.format('Dropped by', total_cmp, read_cmp,
-                                                                              write_cmp, branch_cmp, other_cmp) )
+        total_cmp = int(v[0]) - int(v2[0])
+        read_cmp = int(v[1]) - int(v2[1])
+        write_cmp = int(v[2]) - int(v2[2])
+        branch_cmp = int(v[3]) - int(v2[3])
+        other_cmp = int(v[4]) - int(v2[4])
+        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('# Dropped', str(total_cmp), str(read_cmp),
+                                                               str(write_cmp), str(branch_cmp), str(other_cmp)) )
         
         print( '\n' )
 

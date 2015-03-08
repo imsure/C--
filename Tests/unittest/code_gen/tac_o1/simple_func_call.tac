@@ -19,7 +19,6 @@ _L0:
 _L1:
 	_tvar0 = 0 
 	if ( n > _tvar0 ) goto _L0
-	goto _L2
 _L2:
 	Param f 
 	Call print_int  1 

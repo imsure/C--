@@ -13,7 +13,6 @@ _L3:
 	if ( c >= d ) goto _L7
 _L6:
 	if ( d == e ) goto _L10
-	goto _L9
 _L9:
 	if ( e >= f ) goto _L13
 _L12:

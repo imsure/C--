@@ -17,7 +17,6 @@ _L1:
 	_taddr0 = a + _tvar0
 	_tvar0 = 0 
 	if ( *_taddr0(char) > _tvar0 ) goto _L0
-	goto _L2
 _L2:
 	_tvar1 = i * 1 
 	_taddr3 = b + _tvar1
@@ -42,7 +41,6 @@ _L4:
 	_taddr4 = b + _tvar1
 	_tvar1 = 0 
 	if ( *_taddr4(char) > _tvar1 ) goto _L3
-	goto _L5
 _L5:
 	Return sum 
 

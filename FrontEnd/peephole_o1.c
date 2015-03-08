@@ -218,9 +218,52 @@ static void transform_array_ref( TAC_seq *tacseq )
   }  
 }
 
+/**
+ * Peephole optimization: get rid of redundant jump.
+ *
+ * TAC:
+ *     goto L1
+ * L1:
+ *     ...
+ *
+ * can be optimized as:
+ * L1:
+ *     ...
+ *
+ * to get rid of a redundant goto statement.
+ *
+ * So given a TAC sequence, we traverse it forward, identify
+ * the pattern.
+ */
+static void delete_redundant_jump( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  TAC *tac_next, *tac_prev;
+
+   while ( tac != NULL ) {
+     if ( tac->optype == Goto ) {
+       /* Check if the next TAC is a label. */
+       tac_next = tac->next;
+       if ( tac_next->optype == Label &&
+	    strcmp(tac->dest->val.label, tac_next->dest->val.label) == 0 ) {
+	 /* A matched pattern found */
+	 tac_prev = tac->prev;
+	 tac_prev->next = tac_next;
+	 tac_next->prev = tac_prev;
+
+	 free( tac );
+	 tac = tac_next->next; // 2 step forward
+	 continue;
+       }
+     }
+     tac = tac->next;
+   }
+}
+
 void peephole_o1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
   transform_cond_jump( tacseq );
   transform_array_ref( tacseq );
+  delete_redundant_jump( tacseq );
 }

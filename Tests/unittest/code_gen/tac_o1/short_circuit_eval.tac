@@ -31,10 +31,8 @@ _L4:
 	val = 4321 
 _L5:
 	if ( x < y ) goto _L6
-	goto _L9
 _L9:
 	if ( y > z ) goto _L6
-	goto _L8
 _L8:
 	Param x 
 	Call side_effect  1 

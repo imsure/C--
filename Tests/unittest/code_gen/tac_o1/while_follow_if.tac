@@ -14,7 +14,6 @@ _L2:
 _L3:
 	_tvar1 = 0 
 	if ( x > _tvar1 ) goto _L2
-	goto _L4
 _L4:
 	Param x 
 	Call print_int  1 

@@ -11,7 +11,6 @@ _L0:
 	i = _tvar0 
 _L1:
 	if ( i < n ) goto _L0
-	goto _L2
 _L2:
 	Return n 
 
@@ -33,7 +32,6 @@ _L3:
 _L4:
 	_tvar0 = 0 
 	if ( n >= _tvar0 ) goto _L3
-	goto _L5
 _L5:
 	Return c 
 
