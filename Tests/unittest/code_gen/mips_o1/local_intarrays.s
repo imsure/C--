@@ -32,92 +32,50 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
 	la $sp, -136($sp) # Allocate stack frame for locals/tmps
-	li $8, 4 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 16 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -92($fp) # Store address to tmp address _taddr0.
 	li $8, 1111 # Load int constant shorter than 16-bits
 	lw $9, -92($fp) # Load tmp address _taddr0.
 	sw $8, ($9) # Store value pointed by _taddr0 to int array element.
-	li $8, 5 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 20 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -96($fp) # Store address to tmp address _taddr1.
 	li $8, 2222 # Load int constant shorter than 16-bits
 	lw $9, -96($fp) # Load tmp address _taddr1.
 	sw $8, ($9) # Store value pointed by _taddr1 to int array element.
-	li $8, 6 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 24 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -100($fp) # Store address to tmp address _taddr2.
 	li $8, 3333 # Load int constant shorter than 16-bits
 	lw $9, -100($fp) # Load tmp address _taddr2.
 	sw $8, ($9) # Store value pointed by _taddr2 to int array element.
-	li $8, 7 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 28 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -104($fp) # Store address to tmp address _taddr3.
 	li $8, 4444 # Load int constant shorter than 16-bits
 	lw $9, -104($fp) # Load tmp address _taddr3.
 	sw $8, ($9) # Store value pointed by _taddr3 to int array element.
-	li $8, 8 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 32 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -108($fp) # Store address to tmp address _taddr4.
 	li $8, 5555 # Load int constant shorter than 16-bits
 	lw $9, -108($fp) # Load tmp address _taddr4.
 	sw $8, ($9) # Store value pointed by _taddr4 to int array element.
-	li $8, 9 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 36 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -112($fp) # Store address to tmp address _taddr5.
 	li $8, 6666 # Load int constant shorter than 16-bits
 	lw $9, -112($fp) # Load tmp address _taddr5.
 	sw $8, ($9) # Store value pointed by _taddr5 to int array element.
-	li $8, 4 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 16 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -116($fp) # Store address to tmp address _taddr6.
 	lw $9, -116($fp) # Load tmp address _taddr6.
@@ -133,14 +91,8 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
-	li $8, 5 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 20 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -120($fp) # Store address to tmp address _taddr7.
 	lw $9, -120($fp) # Load tmp address _taddr7.
@@ -156,14 +108,8 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
-	li $8, 6 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -48($fp) # Load address of local int array x.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 24 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -124($fp) # Store address to tmp address _taddr8.
 	lw $9, -124($fp) # Load tmp address _taddr8.
@@ -179,14 +125,8 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
-	li $8, 7 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 28 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -128($fp) # Store address to tmp address _taddr9.
 	lw $9, -128($fp) # Load tmp address _taddr9.
@@ -202,14 +142,8 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
-	li $8, 8 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 32 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -132($fp) # Store address to tmp address _taddr10.
 	lw $9, -132($fp) # Load tmp address _taddr10.
@@ -225,14 +159,8 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $8, 0($sp) # Push the parameter value.
 	jal print_string
 	la $sp, 4($sp) # Pop parameters off the stack.
-	li $8, 9 # Load int constant shorter than 16-bits
-	sw $8, -4($fp) # Store to tmp variable _tvar0.
-	lw $8, -4($fp) # Load tmp variable _tvar0.
-	li $9, 4 # Load size of array element for calculating its offset.
-	mul $10, $8, $9
-	sw $10, -4($fp) # Store to tmp variable _tvar0.
 	la $8, -88($fp) # Load address of local int array y.
-	lw $9, -4($fp) # Load tmp variable _tvar0.
+	li $9, 36 # Load size of array element for calculating its offset.
 	add $10, $8, $9
 	sw $10, -136($fp) # Store address to tmp address _taddr11.
 	lw $9, -136($fp) # Load tmp address _taddr11.
