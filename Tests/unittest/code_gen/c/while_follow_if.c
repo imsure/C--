@@ -15,6 +15,7 @@ void main(void)
   while (x > 0) {
     x = x-1;
   }
+
   print_int(x);
   print_string("\n");
 }

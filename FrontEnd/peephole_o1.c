@@ -15,6 +15,14 @@
 #include "syntax-tree.h"
 
 /**
+ * Linked list of compiler generated labels.
+ */
+typedef struct Label_List {
+  TAC *mylabel;
+  struct Label_List *next_label;
+} label_list;
+
+/**
  * Peephole optimization: collapse constant assignment.
  *
  * For exmaple:
@@ -260,10 +268,95 @@ static void delete_redundant_jump( TAC_seq *tacseq )
    }
 }
 
+static TAC *lookup_dest( TAC *start_tac, label_list *llist_head )
+{
+  label_list *llist_run = llist_head->next_label;
+  TAC *tac_next;
+  
+  while ( llist_run != NULL ) {
+    if ( strcmp(llist_run->mylabel->dest->val.label,
+		start_tac->dest->val.label) == 0 ) {
+      tac_next = llist_run->mylabel->next;
+      while ( tac_next->optype == Noop ) {
+	tac_next = tac_next->next; // skip Noop TAC.
+      }
+      if ( tac_next->optype == Goto ) { // pattern found
+	return lookup_dest( tac_next, llist_head );
+      }
+      break;
+    }
+    llist_run = llist_run->next_label;
+  }
+  return start_tac;
+}
+
+/**
+ * Peephole optimization: collapse jump chain.
+ *
+ * For exmaple:
+ *     goto L1 
+ *     ...
+ * L1:
+ *     goto L2
+ *     ...
+ * L2:
+ *     goto L3
+ *     ...
+ * L3:
+ *     _tvar0 = 5 
+ *
+ * translated as:
+ *     goto L3 
+ *     ...
+ * L1:
+ *     goto L2
+ *     ...
+ * L2:
+ *     goto L3
+ *     ...
+ * L3:
+ *     _tvar0 = 5 
+ *
+ * so that let the first goto directly jump to its final destination
+ * without going through a chain of jumps.
+ *
+ */
+static void collapse_jump_chain( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  TAC *tac_dest;
+  label_list *llist_head, *llist_run;
+
+  llist_head = (label_list *) zalloc( sizeof(label_list) );
+  llist_run = llist_head;
+
+  /* Collect all compiler generated label instructions. */
+  while ( tac != NULL ) {
+    if ( tac->optype == Label && tac->operand1 == NULL ) { // omit function labels
+      llist_run->next_label = (label_list *) zalloc( sizeof(label_list) );
+      llist_run->next_label->mylabel = tac;
+      llist_run = llist_run->next_label;
+    }
+    tac = tac->next;
+  }
+
+  tac = tacseq->start; // reset to the beginning
+  while ( tac != NULL ) {
+    if ( tac->optype == Goto || is_relational(tac->optype) == true ) {
+      tac_dest = lookup_dest( tac, llist_head );
+      if ( tac != tac_dest ) { // update goto dest
+	tac->dest = tac_dest->dest;
+      }
+    }
+    tac = tac->next;
+  }
+}
+
 void peephole_o1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
   transform_cond_jump( tacseq );
   transform_array_ref( tacseq );
   delete_redundant_jump( tacseq );
+  collapse_jump_chain( tacseq );
 }

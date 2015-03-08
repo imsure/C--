@@ -1,0 +1,456 @@
+Test-case-1    instructions reads  writes branches   other   
+without-O1     18           3      2      2          11      
+with-O1        18           3      2      2          11      
+# Dropped      0            0      0      0          0       
+
+
+Test-case-10   instructions reads  writes branches   other   
+without-O1     42           7      5      6          24      
+with-O1        40           6      4      6          24      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-11   instructions reads  writes branches   other   
+without-O1     40           7      5      6          22      
+with-O1        38           6      4      6          22      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-12   instructions reads  writes branches   other   
+without-O1     92           15     11     14         52      
+with-O1        86           12     8      14         52      
+# Dropped      6            3      3      0          0       
+
+
+Test-case-13   instructions reads  writes branches   other   
+without-O1     86           15     11     14         46      
+with-O1        80           12     8      14         46      
+# Dropped      6            3      3      0          0       
+
+
+Test-case-14   instructions reads  writes branches   other   
+without-O1     42           7      5      6          24      
+with-O1        40           6      4      6          24      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-15   instructions reads  writes branches   other   
+without-O1     40           7      5      6          22      
+with-O1        38           6      4      6          22      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-16   instructions reads  writes branches   other   
+without-O1     40           7      6      6          21      
+with-O1        38           6      5      6          21      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-17   instructions reads  writes branches   other   
+without-O1     42           7      6      6          23      
+with-O1        40           6      5      6          23      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-18   instructions reads  writes branches   other   
+without-O1     64           11     8      10         35      
+with-O1        62           10     7      10         35      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-19   instructions reads  writes branches   other   
+without-O1     63           11     8      10         34      
+with-O1        61           10     7      10         34      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-2    instructions reads  writes branches   other   
+without-O1     42           7      6      6          23      
+with-O1        40           6      5      6          23      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-20   instructions reads  writes branches   other   
+without-O1     64           11     8      10         35      
+with-O1        62           10     7      10         35      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-21   instructions reads  writes branches   other   
+without-O1     65           11     8      10         36      
+with-O1        63           10     7      10         36      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-22   instructions reads  writes branches   other   
+without-O1     67           11     8      10         38      
+with-O1        65           10     7      10         38      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-23   instructions reads  writes branches   other   
+without-O1     65           11     8      10         36      
+with-O1        63           10     7      10         36      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-24   instructions reads  writes branches   other   
+without-O1     64           11     8      10         35      
+with-O1        62           10     7      10         35      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-25   instructions reads  writes branches   other   
+without-O1     62           11     8      10         33      
+with-O1        60           10     7      10         33      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-26   instructions reads  writes branches   other   
+without-O1     66           11     8      10         37      
+with-O1        64           10     7      10         37      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-27   instructions reads  writes branches   other   
+without-O1     64           11     8      10         35      
+with-O1        62           10     7      10         35      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-28   instructions reads  writes branches   other   
+without-O1     63           11     8      10         34      
+with-O1        61           10     7      10         34      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-29   instructions reads  writes branches   other   
+without-O1     61           11     8      10         32      
+with-O1        59           10     7      10         32      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-3    instructions reads  writes branches   other   
+without-O1     92           15     14     14         49      
+with-O1        86           12     11     14         49      
+# Dropped      6            3      3      0          0       
+
+
+Test-case-30   instructions reads  writes branches   other   
+without-O1     92           21     20     6          45      
+with-O1        66           12     11     6          37      
+# Dropped      26           9      9      0          8       
+
+
+Test-case-31   instructions reads  writes branches   other   
+without-O1     90           21     20     6          43      
+with-O1        64           12     11     6          35      
+# Dropped      26           9      9      0          8       
+
+
+Test-case-32   instructions reads  writes branches   other   
+without-O1     90           21     20     6          43      
+with-O1        64           12     11     6          35      
+# Dropped      26           9      9      0          8       
+
+
+Test-case-33   instructions reads  writes branches   other   
+without-O1     88           21     20     6          41      
+with-O1        62           12     11     6          33      
+# Dropped      26           9      9      0          8       
+
+
+Test-case-34   instructions reads  writes branches   other   
+without-O1     300          77     76     6          141     
+with-O1        214          45     44     6          119     
+# Dropped      86           32     32     0          22      
+
+
+Test-case-35   instructions reads  writes branches   other   
+without-O1     280          77     76     6          121     
+with-O1        194          45     44     6          99      
+# Dropped      86           32     32     0          22      
+
+
+Test-case-36   instructions reads  writes branches   other   
+without-O1     290          77     71     6          136     
+with-O1        204          45     39     6          114     
+# Dropped      86           32     32     0          22      
+
+
+Test-case-37   instructions reads  writes branches   other   
+without-O1     153          31     22     19         81      
+with-O1        149          29     20     19         81      
+# Dropped      4            2      2      0          0       
+
+
+Test-case-38   instructions reads  writes branches   other   
+without-O1     310          85     81     7          137     
+with-O1        194          43     39     7          105     
+# Dropped      116          42     42     0          32      
+
+
+Test-case-39   instructions reads  writes branches   other   
+without-O1     106          30     20     8          48      
+with-O1        100          27     17     8          48      
+# Dropped      6            3      3      0          0       
+
+
+Test-case-4    instructions reads  writes branches   other   
+without-O1     66           14     13     6          33      
+with-O1        52           9      8      6          29      
+# Dropped      14           5      5      0          4       
+
+
+Test-case-40   instructions reads  writes branches   other   
+without-O1     299          80     77     7          135     
+with-O1        189          40     37     7          105     
+# Dropped      110          40     40     0          30      
+
+
+Test-case-41   instructions reads  writes branches   other   
+without-O1     88           18     17     14         39      
+with-O1        82           15     14     14         39      
+# Dropped      6            3      3      0          0       
+
+
+Test-case-42   instructions reads  writes branches   other   
+without-O1     153          35     26     21         71      
+with-O1        126          24     15     16         71      
+# Dropped      27           11     11     5          0       
+
+
+Test-case-43   instructions reads  writes branches   other   
+without-O1     87           17     18     10         42      
+with-O1        72           10     11     9          42      
+# Dropped      15           7      7      1          0       
+
+
+Test-case-44   instructions reads  writes branches   other   
+without-O1     319          76     54     40         149     
+with-O1        316          75     53     39         149     
+# Dropped      3            1      1      1          0       
+
+
+Test-case-45   instructions reads  writes branches   other   
+without-O1     1049         295    208    73         473     
+with-O1        1040         293    206    68         473     
+# Dropped      9            2      2      5          0       
+
+
+Test-case-46   instructions reads  writes branches   other   
+without-O1     9859         2915   2068   732        4144    
+with-O1        9492         2792   1945   611        4144    
+# Dropped      367          123    123    121        0       
+
+
+Test-case-47   instructions reads  writes branches   other   
+without-O1     2243         818    562    261        602     
+with-O1        2156         805    549    200        602     
+# Dropped      87           13     13     61         0       
+
+
+Test-case-48   instructions reads  writes branches   other   
+without-O1     724          267    203    68         186     
+with-O1        703          263    199    55         186     
+# Dropped      21           4      4      13         0       
+
+
+Test-case-49   instructions reads  writes branches   other   
+without-O1     5332         2000   1469   379        1484    
+with-O1        5237         1968   1437   348        1484    
+# Dropped      95           32     32     31         0       
+
+
+Test-case-5    instructions reads  writes branches   other   
+without-O1     317          69     68     26         154     
+with-O1        233          39     38     26         130     
+# Dropped      84           30     30     0          24      
+
+
+Test-case-50   instructions reads  writes branches   other   
+without-O1     2243         818    562    261        602     
+with-O1        2156         805    549    200        602     
+# Dropped      87           13     13     61         0       
+
+
+Test-case-51   instructions reads  writes branches   other   
+without-O1     5332         2000   1469   379        1484    
+with-O1        5237         1968   1437   348        1484    
+# Dropped      95           32     32     31         0       
+
+
+Test-case-52   instructions reads  writes branches   other   
+without-O1     2243         818    562    261        602     
+with-O1        2156         805    549    200        602     
+# Dropped      87           13     13     61         0       
+
+
+Test-case-53   instructions reads  writes branches   other   
+without-O1     311          94     79     30         108     
+with-O1        306          92     77     29         108     
+# Dropped      5            2      2      1          0       
+
+
+Test-case-54   instructions reads  writes branches   other   
+without-O1     1375         402    387    100        486     
+with-O1        1370         400    385    99         486     
+# Dropped      5            2      2      1          0       
+
+
+Test-case-55   instructions reads  writes branches   other   
+without-O1     1305         367    352    100        486     
+with-O1        1300         365    350    99         486     
+# Dropped      5            2      2      1          0       
+
+
+Test-case-56   instructions reads  writes branches   other   
+without-O1     295          83     68     37         107     
+with-O1        288          83     68     30         107     
+# Dropped      7            0      0      7          0       
+
+
+Test-case-57   instructions reads  writes branches   other   
+without-O1     520          139    124    58         199     
+with-O1        513          139    124    51         199     
+# Dropped      7            0      0      7          0       
+
+
+Test-case-58   instructions reads  writes branches   other   
+without-O1     140          40     35     10         55      
+with-O1        140          40     35     10         55      
+# Dropped      0            0      0      0          0       
+
+
+Test-case-59   instructions reads  writes branches   other   
+without-O1     1574         419    400    162        593     
+with-O1        1567         417    398    159        593     
+# Dropped      7            2      2      3          0       
+
+
+Test-case-6    instructions reads  writes branches   other   
+without-O1     40           7      6      6          21      
+with-O1        38           6      5      6          21      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-60   instructions reads  writes branches   other   
+without-O1     141          35     31     12         63      
+with-O1        139          34     30     12         63      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-61   instructions reads  writes branches   other   
+without-O1     131          35     31     12         53      
+with-O1        129          34     30     12         53      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-62   instructions reads  writes branches   other   
+without-O1     106          25     23     10         48      
+with-O1        104          24     22     10         48      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-63   instructions reads  writes branches   other   
+without-O1     106          25     23     10         48      
+with-O1        104          24     22     10         48      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-64   instructions reads  writes branches   other   
+without-O1     75           17     16     8          34      
+with-O1        75           17     16     8          34      
+# Dropped      0            0      0      0          0       
+
+
+Test-case-65   instructions reads  writes branches   other   
+without-O1     264          84     71     17         92      
+with-O1        259          82     69     16         92      
+# Dropped      5            2      2      1          0       
+
+
+Test-case-66   instructions reads  writes branches   other   
+without-O1     639          247    167    36         189     
+with-O1        633          245    165    34         189     
+# Dropped      6            2      2      2          0       
+
+
+Test-case-67   instructions reads  writes branches   other   
+without-O1     1037         411    253    38         335     
+with-O1        1025         406    248    36         335     
+# Dropped      12           5      5      2          0       
+
+
+Test-case-68   instructions reads  writes branches   other   
+without-O1     671          226    158    53         234     
+with-O1        660          226    158    42         234     
+# Dropped      11           0      0      11         0       
+
+
+Test-case-69   instructions reads  writes branches   other   
+without-O1     314          87     72     30         125     
+with-O1        309          85     70     29         125     
+# Dropped      5            2      2      1          0       
+
+
+Test-case-7    instructions reads  writes branches   other   
+without-O1     132          23     22     22         65      
+with-O1        122          18     17     22         65      
+# Dropped      10           5      5      0          0       
+
+
+Test-case-70   instructions reads  writes branches   other   
+without-O1     1117         290    275    86         466     
+with-O1        1112         288    273    85         466     
+# Dropped      5            2      2      1          0       
+
+
+Test-case-71   instructions reads  writes branches   other   
+without-O1     389          101    88     45         155     
+with-O1        381          100    87     39         155     
+# Dropped      8            1      1      6          0       
+
+
+Test-case-72   instructions reads  writes branches   other   
+without-O1     689          224    155    53         257     
+with-O1        678          224    155    42         257     
+# Dropped      11           0      0      11         0       
+
+
+Test-case-73   instructions reads  writes branches   other   
+without-O1     713          216    185    43         269     
+with-O1        710          215    184    42         269     
+# Dropped      3            1      1      1          0       
+
+
+Test-case-74   instructions reads  writes branches   other   
+without-O1     712          216    185    43         268     
+with-O1        709          215    184    42         268     
+# Dropped      3            1      1      1          0       
+
+
+Test-case-75   instructions reads  writes branches   other   
+without-O1     105          27     21     14         43      
+with-O1        92           22     16     11         43      
+# Dropped      13           5      5      3          0       
+
+
+Test-case-76   instructions reads  writes branches   other   
+without-O1     43           7      6      6          24      
+with-O1        41           6      5      6          24      
+# Dropped      2            1      1      0          0       
+
+
+Test-case-8    instructions reads  writes branches   other   
+without-O1     64           14     13     6          31      
+with-O1        50           9      8      6          27      
+# Dropped      14           5      5      0          4       
+
+
+Test-case-9    instructions reads  writes branches   other   
+without-O1     299          69     68     26         136     
+with-O1        215          39     38     26         112     
+# Dropped      84           30     30     0          24      
+
+
