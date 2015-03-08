@@ -8,7 +8,7 @@ _L0:
 	_tvar1 = 1 + n
 	n = _tvar1 
 _L1:
-	_tvar1 = _tvar1 * _tvar1
+	_tvar1 = n * n
 	n = _tvar1 
 	Return 
 

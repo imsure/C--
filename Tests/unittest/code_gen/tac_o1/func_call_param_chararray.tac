@@ -13,7 +13,7 @@ _L0:
 	_tvar1 = i + 1 
 	i = _tvar1 
 _L1:
-	_tvar0 = _tvar1 * 1 
+	_tvar0 = i * 1 
 	_taddr0 = a + _tvar0
 	_tvar0 = 0 
 	if ( *_taddr0(char) > _tvar0 ) goto _L0
@@ -37,7 +37,7 @@ _L3:
 	_tvar2 = i + 1 
 	i = _tvar2 
 _L4:
-	_tvar1 = _tvar2 * 1 
+	_tvar1 = i * 1 
 	_taddr4 = b + _tvar1
 	_tvar1 = 0 
 	if ( *_taddr4(char) > _tvar1 ) goto _L3
