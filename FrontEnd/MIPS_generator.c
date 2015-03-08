@@ -187,9 +187,28 @@ static void load_operand_to_reg( address *operand, int reg_num )
      a constant a tmp variable which is handled in tac2mips_assg().
      This is when we calculate the offset of an array element:
      "_tvar0 = i * 4" for A[i]. */
-  if ( operand->atype == AT_Intcon ) {
-    printf( "\tli $%d, %d # Load size of array element for calculating its offset.\n",
-	    reg_num, operand->val.iconst );
+  /* Update: the above comment is not valid any more because
+     after copy propagation optimization, both int or char constant
+     could appear in operand1 or operand2. So adjust to handle this. */
+  if ( operand->atype == AT_Intcon || operand->atype == AT_Charcon ) {
+    switch ( operand->atype ) {
+    case AT_Charcon: // char constant
+      printf( "\tli $%d, %d # Load char constant.\n",
+	      reg_num, operand->val.iconst );
+      break;
+    case AT_Intcon: // int constant
+      if ( operand->val.iconst < MAX_16bits ) { // small int constant
+	printf( "\tli $%d, %d # Load int constant shorter than 16-bits\n",
+		reg_num, operand->val.iconst );
+      } else { // large int constant
+	printf( "\tlui $%d, %d # Load higher 16-bits\n",
+		reg_num, operand->val.iconst >> 16 );
+	printf( "\tori $%d, %d # Load lower 16-bits\n",
+		reg_num, operand->val.iconst & 0xffff );
+      }
+      break;
+    default: break;
+    }
     return; // do not continue
   }
 

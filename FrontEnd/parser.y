@@ -32,6 +32,7 @@
   extern void tac2mips( tnode *t, int ret_type );
   extern void peephole_o1( TAC_seq *tacseq );
   extern void construct_basic_block( TAC_seq *tacseq );
+  extern void copy_propagation();
   extern bool tac_only;
   extern bool perform_O1;
 
@@ -142,6 +143,7 @@ prog
       if ( perform_O1 == true ) {
 	peephole_o1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
+	copy_propagation();
       }
 
       if ( tac_only == true ) { // output TACs to stdout
