@@ -2,7 +2,7 @@ main:
 	Enter main  20 
 	x = 123 
 	_tvar0 = 123 
-	if ( x != _tvar0 ) goto _L1
+	if ( x != _tvar0 ) goto _L3
 _L0:
 	x = 321 
 _L1:

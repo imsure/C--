@@ -26,7 +26,7 @@ _L4:
 	if ( i < _tvar1 ) goto _L3
 _L5:
 	i = 0 
-	goto _L7
+	goto _L6
 _L6:
 	_tvar2 = res + i
 	res = _tvar2 
