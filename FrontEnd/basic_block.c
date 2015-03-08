@@ -240,7 +240,8 @@ void construct_basic_block( TAC_seq *tacseq )
   tac = tacseq->start->next;
   /* Collect all compiler generated label instructions. */
   while ( tac != NULL ) {
-    if ( tac->optype == Goto || is_relational(tac->optype) == true ) { // identify the last tac.
+    if ( tac->optype == Goto || is_relational(tac->optype) == true ||
+	 (tac->next != NULL)? tac->next->optype == Label : false ) { // identify the last tac.
       bbl_run->last_tac = tac;
       /* start next bbl */
       bbl_run->next = (bbl *) zalloc( sizeof(bbl) );
