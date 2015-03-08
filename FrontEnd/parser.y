@@ -145,10 +145,9 @@ prog
       if ( tac_only == true ) { // output TACs to stdout
 	  print_TAC_seq( currfnbodyTree, false );
 	  putchar( '\n' );
+	  //	  printf( "\nReversed Three Address Code:\n\n" );
+	  //	  print_TAC_seq( currfnbodyTree, true );
       }
-
-      //printf( "\nReversed Three Address Code:\n\n" );
-      //print_TAC_seq( currfnbodyTree, true );
 
 #ifdef DEBUG
       printf( "stack_frame_size = %d\n", stack_frame_size );

@@ -162,8 +162,65 @@ static void transform_cond_jump( TAC_seq *tacseq )
   }  
 }
 
+/**
+ * Peephole optimization: transform array reference that is in the
+ * form of A[2] where the index is a constant.
+ *
+ * TAC:
+ * _tvar0 = 2 
+ * _tvar0 = _tvar0 * 4 
+ * _taddr2 = A + _tvar0
+ *
+ * can be optimized as:
+ * _taddr2 = A + 8
+ * 
+ * to remove redudant calculation.
+ *
+ * So given a TAC sequence, we traverse it forward, identify
+ * the pattern.
+ */
+static void transform_array_ref( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  TAC *tac_next, *tac_next_next, *tac_prev;
+  int offset;
+
+  /* Forward traversing */
+  while ( tac != NULL ) {
+    /* First, identify if 'tac' is an assignemnt that
+       assigns a constant value to a tmp variable like "_tvar0 = 2" */
+    if ( tac->optype == Assg &&
+	 (tac->operand1->atype == AT_Intcon ||
+	  tac->operand1->atype == AT_Charcon) &&
+	 tac->dest->val.stptr->type == t_Tmp_Var ) { // if all true, we found one
+      /* Then check if the next next instruction is: _taddr2 = A + _tvar0. */
+      tac_next_next = tac->next->next;
+      if ( tac_next_next->optype == Plus &&
+	   tac_next_next->dest->val.stptr->type == t_Tmp_Addr ) {
+	/* A match found, directly calculate the offset of the array element. */
+	tac_next = tac->next; // tac_next must be: _tvar0 = _tvar0 * 4
+	offset = tac->operand1->val.iconst * tac_next->operand2->val.iconst;
+	tac_next_next->operand2->atype = AT_Intcon; // modify its operand2's type
+	tac_next_next->operand2->val.iconst = offset; // fill operand2's value
+
+	tac_prev = tac->prev;
+	tac_prev->next = tac_next_next;
+	tac_next_next->prev = tac_prev;
+
+	free( tac_next );
+	free( tac );
+
+	tac = tac_next_next->next; // 3 steps forward
+	continue;
+      }
+    }
+    tac = tac->next;
+  }  
+}
+
 void peephole_o1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
   transform_cond_jump( tacseq );
+  transform_array_ref( tacseq );
 }
