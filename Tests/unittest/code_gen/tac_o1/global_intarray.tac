@@ -1,12 +1,8 @@
 main:
 	Enter main  16 
-	_tvar0 = 7 
-	_tvar0 = _tvar0 * 4 
-	_taddr0 = x + _tvar0
+	_taddr0 = x + 28 
 	*_taddr0(int) = 3142 
-	_tvar0 = 7 
-	_tvar0 = _tvar0 * 4 
-	_taddr1 = x + _tvar0
+	_taddr1 = x + 28 
 	y = *_taddr1(int) 
 	Param y 
 	Call print_int  1 

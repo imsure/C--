@@ -1,19 +1,11 @@
 main:
 	Enter main  64 
-	_tvar0 = 7 
-	_tvar0 = _tvar0 * 4 
-	_taddr0 = y + _tvar0
+	_taddr0 = y + 28 
 	*_taddr0(int) = 1234 
-	_tvar0 = 0 
-	_tvar0 = _tvar0 * 4 
-	_taddr2 = x + _tvar0
-	_tvar0 = 7 
-	_tvar0 = _tvar0 * 4 
-	_taddr1 = y + _tvar0
+	_taddr2 = x + 0 
+	_taddr1 = y + 28 
 	*_taddr2(int) = *_taddr1(int) 
-	_tvar0 = 0 
-	_tvar0 = _tvar0 * 4 
-	_taddr3 = x + _tvar0
+	_taddr3 = x + 0 
 	u = *_taddr3(int) 
 	Param u 
 	Call print_int  1 
