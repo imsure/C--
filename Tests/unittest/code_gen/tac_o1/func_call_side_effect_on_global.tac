@@ -6,10 +6,10 @@ _L0:
 	_tvar1 = x * i
 	x = _tvar1 
 	_tvar1 = 2 
-	_tvar1 = _tvar1 * y
+	_tvar1 = 2 * y
 	y = _tvar1 
 	_tvar1 = 1 
-	_tvar1 = i - _tvar1
+	_tvar1 = i - 1 
 	i = _tvar1 
 _L1:
 	_tvar0 = 0 
@@ -25,7 +25,7 @@ main:
 	Call f  1 
 	Retrieve _tvar1 
 	a = _tvar1 
-	_tvar2 = a + x
+	_tvar2 = _tvar1 + x
 	x = _tvar2 
 	Param x 
 	Call print_int  1 

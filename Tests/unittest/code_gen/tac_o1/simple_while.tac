@@ -10,7 +10,7 @@ _L0:
 	Call print_string  1 
 	_tvar1 = i + i
 	_tvar2 = 1 
-	_tvar1 = _tvar1 + _tvar2
+	_tvar1 = _tvar1 + 1 
 	i = _tvar1 
 _L1:
 	_tvar0 = 100 

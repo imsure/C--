@@ -7,7 +7,7 @@ _L0:
 	_taddr0 = A + _tvar1
 	*_taddr0(char) = n 
 	_tvar1 = 1 
-	_tvar1 = n + _tvar1
+	_tvar1 = n + 1 
 	n = _tvar1 
 _L1:
 	_tvar0 = 10 

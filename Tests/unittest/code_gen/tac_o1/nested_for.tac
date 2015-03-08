@@ -13,25 +13,25 @@ _L6:
 	_tvar3 = i + j
 	_tvar3 = _tvar3 + k
 	_tvar4 = 3 
-	_tvar3 = _tvar3 / _tvar4
+	_tvar3 = _tvar3 / 3 
 	_tvar3 = res + _tvar3
 	res = _tvar3 
 	_tvar3 = 3 
-	_tvar3 = k + _tvar3
+	_tvar3 = k + 3 
 	k = _tvar3 
 _L7:
 	_tvar2 = 15 
 	if ( k < _tvar2 ) goto _L6
 _L8:
 	_tvar3 = 2 
-	_tvar3 = j + _tvar3
+	_tvar3 = j + 2 
 	j = _tvar3 
 _L4:
 	_tvar1 = 10 
 	if ( j < _tvar1 ) goto _L3
 _L5:
 	_tvar3 = 1 
-	_tvar3 = i + _tvar3
+	_tvar3 = i + 1 
 	i = _tvar3 
 _L1:
 	_tvar0 = 5 

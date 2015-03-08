@@ -10,7 +10,7 @@ _L1:
 	Param u 
 	Call incr  1 
 	_tvar3 = 1 
-	_tvar3 = u - _tvar3
+	_tvar3 = u - 1 
 	Param _tvar3 
 	Call f  1 
 	Retrieve _tvar2 
@@ -32,7 +32,7 @@ main:
 	Call f  1 
 	Retrieve _tvar4 
 	x = _tvar4 
-	_tvar5 = u + x
+	_tvar5 = u + _tvar4
 	x = _tvar5 
 	Param x 
 	Call print_int  1 

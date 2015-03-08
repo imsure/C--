@@ -10,10 +10,10 @@ _L0:
 _L1:
 	_tvar1 = n * 1 
 	_taddr1 = s + _tvar1
-	_tvar1 = u +
+	_tvar1 = u + *_taddr1(char) 
 	u = _tvar1 
 	_tvar1 = 1 
-	_tvar1 = n + _tvar1
+	_tvar1 = n + 1 
 	Param s 
 	Param _tvar1 
 	Call f  2 

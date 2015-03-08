@@ -7,7 +7,7 @@ _L0:
 	_tvar1 = res + i
 	res = _tvar1 
 	_tvar1 = 1 
-	_tvar1 = i + _tvar1
+	_tvar1 = i + 1 
 	i = _tvar1 
 _L1:
 	_tvar0 = 10 
@@ -19,7 +19,7 @@ _L3:
 	_tvar2 = res + i
 	res = _tvar2 
 	_tvar2 = 1 
-	_tvar2 = i + _tvar2
+	_tvar2 = i + 1 
 	i = _tvar2 
 _L4:
 	_tvar1 = 10 
@@ -41,7 +41,7 @@ _L9:
 	Return 
 _L10:
 	_tvar3 = 1 
-	_tvar3 = i + _tvar3
+	_tvar3 = i + 1 
 	i = _tvar3 
 _L7:
 	goto _L6

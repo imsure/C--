@@ -11,7 +11,7 @@ _L1:
 _L2:
 	x = 1 
 	_tvar2 = 1 
-	_tvar3 = -_tvar2 
+	_tvar3 = -1 
 	y = _tvar3 
 	if ( x <= y ) goto _L4
 _L3:

@@ -9,7 +9,7 @@ _L0:
 _L3:
 	_tvar2 = i + j
 	_tvar3 = 2 
-	_tvar2 = _tvar2 / _tvar3
+	_tvar2 = _tvar2 / 2 
 	k = _tvar2 
 	if ( k <= i ) goto _L7
 _L6:
@@ -18,7 +18,7 @@ _L6:
 _L8:
 	_tvar3 = a + k
 	_tvar4 = 2 
-	_tvar3 = _tvar3 / _tvar4
+	_tvar3 = _tvar3 / 2 
 	b = _tvar3 
 	if ( b <= j ) goto _L12
 _L11:
@@ -30,7 +30,7 @@ _L12:
 	res = _tvar3 
 _L13:
 	_tvar3 = 1 
-	_tvar3 = a + _tvar3
+	_tvar3 = a + 1 
 	a = _tvar3 
 _L9:
 	_tvar2 = 5 
@@ -38,14 +38,14 @@ _L9:
 _L10:
 _L7:
 	_tvar3 = 1 
-	_tvar3 = j + _tvar3
+	_tvar3 = j + 1 
 	j = _tvar3 
 _L4:
 	_tvar1 = 5 
 	if ( j < _tvar1 ) goto _L3
 _L5:
 	_tvar3 = 1 
-	_tvar3 = i + _tvar3
+	_tvar3 = i + 1 
 	i = _tvar3 
 _L1:
 	_tvar0 = 5 

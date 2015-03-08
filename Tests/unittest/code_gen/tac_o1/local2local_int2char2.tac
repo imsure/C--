@@ -1,7 +1,7 @@
 main:
 	Enter main  12 
 	x = 123456 
-	y = x 
+	y = 123456 
 	Param x 
 	Call print_int  1 
 	_tstr0 = "\n"

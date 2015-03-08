@@ -4,7 +4,7 @@ main:
 	y = 3 
 	z = 4 
 	_tvar0 = 'a' 
-	_tvar0 = _tvar0 * x
+	_tvar0 = 'a' * x
 	a = _tvar0 
 	_tvar0 = x + y
 	_tvar0 = a / _tvar0

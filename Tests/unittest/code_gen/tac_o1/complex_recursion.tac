@@ -8,12 +8,12 @@ _L0:
 	goto _L2
 _L1:
 	_tvar3 = 1 
-	_tvar3 = n - _tvar3
+	_tvar3 = n - 1 
 	Param _tvar3 
 	Call g  1 
 	Retrieve _tvar2 
 	_tvar5 = 2 
-	_tvar5 = n - _tvar5
+	_tvar5 = n - 2 
 	Param _tvar5 
 	Call f  1 
 	Retrieve _tvar4 
@@ -32,12 +32,12 @@ _L3:
 	goto _L5
 _L4:
 	_tvar8 = 1 
-	_tvar8 = n - _tvar8
+	_tvar8 = n - 1 
 	Param _tvar8 
 	Call f  1 
 	Retrieve _tvar7 
 	_tvar10 = 2 
-	_tvar10 = n - _tvar10
+	_tvar10 = n - 2 
 	Param _tvar10 
 	Call g  1 
 	Retrieve _tvar9 

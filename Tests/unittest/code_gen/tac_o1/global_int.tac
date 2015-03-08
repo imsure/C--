@@ -4,7 +4,7 @@ main:
 	Param x 
 	Call print_int  1 
 	_tvar0 = 5 
-	_tvar0 = x + _tvar0
+	_tvar0 = x + 5 
 	Param _tvar0 
 	Call print_int  1 
 	_tstr0 = "\n"

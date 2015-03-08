@@ -22,23 +22,23 @@ main:
 	*_taddr9(char) = 55 
 	_taddr10 = x + 0 
 	_taddr11 = y + 0 
-	_tvar0 = *_taddr10(int) + *_taddr10(int) 
+	_tvar0 = *_taddr10(int) + *_taddr11(char) 
 	u = _tvar0 
 	_taddr12 = x + 4 
-	_tvar0 = *_taddr12(int) + u
+	_tvar0 = *_taddr12(int) + _tvar0
 	u = _tvar0 
-	_tvar0 = u * 1 
+	_tvar0 = _tvar0 * 1 
 	_taddr13 = y + _tvar0
 	_taddr14 = x + 12 
-	_tvar0 = *_taddr13(char) * *_taddr13(char) 
+	_tvar0 = *_taddr13(char) * *_taddr14(int) 
 	u = _tvar0 
 	_taddr15 = x + 8 
-	_tvar0 = u /
+	_tvar0 = _tvar0 / *_taddr15(int) 
 	u = _tvar0 
-	_tvar0 = u * 1 
+	_tvar0 = _tvar0 * 1 
 	_taddr16 = y + _tvar0
 	_taddr17 = x + 0 
-	_tvar0 = *_taddr16(char) - *_taddr16(char) 
+	_tvar0 = *_taddr16(char) - *_taddr17(int) 
 	u = _tvar0 
 	Param u 
 	Call print_int  1 

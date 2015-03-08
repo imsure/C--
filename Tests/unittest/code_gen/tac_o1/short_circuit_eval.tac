@@ -1,7 +1,7 @@
 side_effect:
 	Enter side_effect  8 
 	_tvar0 = 1 
-	_tvar1 = -_tvar0 
+	_tvar1 = -1 
 	flag = _tvar1 
 	Return x 
 
@@ -22,7 +22,7 @@ _L2:
 	if ( _tvar0 >= z ) goto _L1
 _L0:
 	_tvar1 = 1 
-	_tvar1 = x - _tvar1
+	_tvar1 = x - 1 
 	x = _tvar1 
 _L1:
 	_tvar1 = 0 
@@ -40,7 +40,7 @@ _L8:
 	if ( _tvar2 >= z ) goto _L7
 _L6:
 	_tvar3 = 1 
-	_tvar3 = x - _tvar3
+	_tvar3 = x - 1 
 	x = _tvar3 
 _L7:
 	_tvar3 = 0 

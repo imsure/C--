@@ -8,7 +8,7 @@ _L1:
 	if ( n < _tvar0 ) goto _L0
 _L2:
 	_tvar1 = 4 
-	_tvar1 = _tvar1 - n
+	_tvar1 = 4 - n
 	n = _tvar1 
 	Return 
 

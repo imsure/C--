@@ -13,7 +13,7 @@ _L0:
 	Param n 
 	Call acc  1 
 	_tvar1 = 1 
-	_tvar1 = n - _tvar1
+	_tvar1 = n - 1 
 	n = _tvar1 
 _L1:
 	_tvar0 = 0 

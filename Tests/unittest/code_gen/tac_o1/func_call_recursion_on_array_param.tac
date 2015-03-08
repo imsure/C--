@@ -12,7 +12,7 @@ _L1:
 	_tvar2 = i * 1 
 	_taddr1 = x + _tvar2
 	_tvar3 = 1 
-	_tvar3 = i + _tvar3
+	_tvar3 = i + 1 
 	Param x 
 	Param _tvar3 
 	Call sum  2 

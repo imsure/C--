@@ -21,7 +21,7 @@ _L0:
 	Param _tvar3 
 	Call add  1 
 	_tvar4 = 5 
-	_tvar5 = -_tvar4 
+	_tvar5 = -5 
 	Param _tvar5 
 	Call add  1 
 	_tvar5 = 2 
@@ -30,7 +30,7 @@ _L0:
 	_tvar6 = f * y
 	f = _tvar6 
 	_tvar6 = 1 
-	_tvar6 = i - _tvar6
+	_tvar6 = i - 1 
 	i = _tvar6 
 _L1:
 	_tvar0 = 0 

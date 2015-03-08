@@ -30,10 +30,10 @@ _L1:
 	goto _L3
 _L2:
 	_tvar11 = 1 
-	_tvar11 = x - _tvar11
+	_tvar11 = x - 1 
 	x = _tvar11 
 	_tvar11 = 1 
-	_tvar11 = i - _tvar11
+	_tvar11 = i - 1 
 	i = _tvar11 
 _L3:
 	Param i 
@@ -56,13 +56,13 @@ _L4:
 	goto _L6
 _L5:
 	_tvar15 = 2 
-	_tvar15 = x + _tvar15
+	_tvar15 = x + 2 
 	x = _tvar15 
 	Param i 
 	Call id  1 
 	Retrieve _tvar15 
 	_tvar16 = 1 
-	_tvar15 = _tvar15 + _tvar16
+	_tvar15 = _tvar15 + 1 
 	i = _tvar15 
 _L6:
 	Param i 

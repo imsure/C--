@@ -5,10 +5,10 @@ main:
 	if ( n > _tvar0 ) goto _L1
 _L0:
 	_tvar1 = 1 
-	_tvar1 = _tvar1 + n
+	_tvar1 = 1 + n
 	n = _tvar1 
 _L1:
-	_tvar1 = n * n
+	_tvar1 = _tvar1 * _tvar1
 	n = _tvar1 
 	Return 
 

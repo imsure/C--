@@ -28,7 +28,7 @@ _L0:
 	Retrieve _tvar4 
 	c = _tvar4 
 	_tvar6 = 5 
-	_tvar7 = -_tvar6 
+	_tvar7 = -5 
 	Param c 
 	Param _tvar7 
 	Call add  2 
@@ -48,7 +48,7 @@ _L0:
 	_tvar8 = f * _tvar7
 	f = _tvar8 
 	_tvar8 = 1 
-	_tvar8 = i - _tvar8
+	_tvar8 = i - 1 
 	i = _tvar8 
 _L1:
 	_tvar1 = 0 

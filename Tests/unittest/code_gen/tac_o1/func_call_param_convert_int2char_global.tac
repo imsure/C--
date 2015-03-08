@@ -1,7 +1,7 @@
 f:
 	Enter f  4 
 	_tvar0 = 1 
-	_tvar0 = x + _tvar0
+	_tvar0 = x + 1 
 	Return _tvar0 
 
 main:
