@@ -328,19 +328,19 @@ static void print_operands( TAC *tac )
   if ( tac->operand2 != NULL ) {
     switch (tac->operand2->atype) {
     case AT_Charcon:
-      printf( "'%c' ", tac->operand1->val.iconst );
+      printf( "'%c' ", tac->operand2->val.iconst );
       break;
     case AT_Intcon:
       printf( " %d ", tac->operand2->val.iconst );
       break;
     case AT_StRef:
       if ( tac->operand2->val.stptr->type == t_Tmp_Addr ) { // array reference
-	switch( tac->operand1->val.stptr->elt_type ) {
+	switch( tac->operand2->val.stptr->elt_type ) {
 	case t_Char:
-	  printf( " *%s(char) ", tac->operand1->val.stptr->name );
+	  printf( " *%s(char) ", tac->operand2->val.stptr->name );
 	  break;
 	case t_Int:
-	  printf( " *%s(int) ", tac->operand1->val.stptr->name );
+	  printf( " *%s(int) ", tac->operand2->val.stptr->name );
 	  break;
    	}
       } else {
