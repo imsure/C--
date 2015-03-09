@@ -214,7 +214,7 @@ static void copy_propagation_bb( bbl *bb )
 
 void copy_propagation()
 {
-  bbl *bbl_run, *tmp;
+  bbl *bbl_run;
   
   bbl_run = bhead;
   while( bbl_run != NULL ) {
@@ -295,7 +295,6 @@ static void eliminate_dead_code( bbl *bb )
   TAC *tac = bb->first_tac;
   TAC *tac_prev, *tac_tmp;
   live_set *ls_head = (live_set *) zalloc( sizeof(live_set) );
-  live_set *ls_run;
 
   /* Fill live set with all local variables and t_Tmp_Var tmps. */
   while ( tac != bb->last_tac ) {
@@ -451,3 +450,40 @@ void construct_basic_block( TAC_seq *tacseq )
   bhead = bbl_head;  
 }
 
+static int calculate( SyntaxNodeType optype, int v1, int v2 )
+{
+  switch ( optype ) {
+  case Plus:
+    return v1+v2;
+  case BinaryMinus:
+    return v1-v2;
+  case Mult:
+    return v1*v2;
+  case Div:
+    return v1/v2;
+  default:
+    return 0;
+  }
+}
+
+void collapse_constant_arith( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  
+  while ( tac != NULL ) {
+    if ( is_arith_op(tac->optype) && tac->optype != UnaryMinus ) {
+      if ( (tac->operand1->atype == AT_Intcon || tac->operand1->atype == AT_Charcon) &&
+	   (tac->operand2->atype == AT_Intcon || tac->operand2->atype == AT_Charcon) ) {
+	//	printf( "Found a match: %s = %d op %d\n", tac->dest->val.stptr->name,
+	//		tac->operand1->val.iconst, tac->operand2->val.iconst );
+	/* pre-caculate the value. */
+	tac->operand1->val.iconst = calculate( tac->optype,
+					       tac->operand1->val.iconst,
+					       tac->operand2->val.iconst );
+	tac->optype = Assg; // change optype
+	tac->operand2 = NULL;
+      }
+    }
+    tac = tac->next;
+  }
+}
