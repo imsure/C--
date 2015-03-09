@@ -28,6 +28,14 @@ typedef struct basic_block_list {
 bbl *bhead; // header to the basic block list of the current function.
 
 /**
+ * A set of live variables (only for local variables. int/char/t_Tmp_Var).
+ */
+typedef struct live_set {
+  symtabnode *stptr;
+  struct live_set *next;
+} live_set;
+
+/**
  * A table containing copy pairs: lhs = rhs.
  * lhs_res could be: t_Int, t_Char, t_Tmp_Var or t_Tmp_Addr.
  * rhs_op could be: t_Int, t_Char, t_Tmp_Var. (we do not want
@@ -214,11 +222,190 @@ void copy_propagation()
     bbl_run = bbl_run->next;
   }
 
+  /* bbl_run = bhead; */
+  /* while( bbl_run != NULL ) { */
+  /*   tmp = bbl_run; */
+  /*   bbl_run = bbl_run->next; */
+  /*   free( tmp ); */
+  /* } */
+}
+
+static void insert_ls( live_set *ls_head, address *var )
+{
+  live_set *ls = ls_head;
+  while ( ls->next != NULL ) {
+    if ( var->val.stptr == ls->next->stptr ) {
+      /* var already exists in the set. */
+      return;
+    }
+    ls = ls->next;
+  }
+  ls->next = (live_set *) zalloc( sizeof(live_set) );
+  ls->next->stptr = var->val.stptr;
+}
+
+static bool is_valid_local( address *var )
+{
+  if ( var != NULL &&
+       var->atype == AT_StRef &&
+       var->val.stptr->scope == Local ) {
+    if ( var->val.stptr->type == t_Int ||
+	 var->val.stptr->type == t_Char ||
+	 var->val.stptr->type == t_Tmp_Var ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static bool is_in_liveset( address *var, live_set *ls_head )
+{
+  live_set *ls = ls_head;
+  while ( ls->next != NULL ) {
+    if ( var->val.stptr == ls->next->stptr ) {
+      /* var already exists in the set. */
+      return true;
+    }
+    ls = ls->next;
+  }
+  return false;
+}
+
+static void remove_from_liveset( address *var, live_set *ls_head )
+{
+  live_set *ls = ls_head->next;
+  live_set *ls_prev = ls_head;
+  live_set *tmp;
+  
+  while ( ls != NULL ) {
+    if ( ls->stptr == var->val.stptr ) {
+      ls_prev->next = ls->next;
+      tmp = ls;
+      ls = ls->next;
+      free( tmp ); // remove 
+      continue;
+    }
+    ls_prev = ls;
+    ls = ls->next;
+  }
+}
+
+static void eliminate_dead_code( bbl *bb )
+{
+  TAC *tac = bb->first_tac;
+  TAC *tac_prev, *tac_tmp;
+  live_set *ls_head = (live_set *) zalloc( sizeof(live_set) );
+  live_set *ls_run;
+
+  /* Fill live set with all local variables and t_Tmp_Var tmps. */
+  while ( tac != bb->last_tac ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
+      if ( is_valid_local(tac->dest) ) {
+	insert_ls( ls_head, tac->dest );
+      }
+      if ( is_valid_local(tac->operand1) ) {
+	insert_ls( ls_head, tac->operand1 );
+      }
+      if ( is_valid_local(tac->operand2) ) {
+	insert_ls( ls_head, tac->operand2 );
+      }
+    }
+    tac = tac->next;
+  }
+  /* Last tac could be an copy instruction to!!! */
+  if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
+    if ( is_valid_local(tac->dest) ) {
+      insert_ls( ls_head, tac->dest );
+    }
+    if ( is_valid_local(tac->operand1) ) {
+      insert_ls( ls_head, tac->operand1 );
+    }
+    if ( is_valid_local(tac->operand2) ) {
+      insert_ls( ls_head, tac->operand2 );
+    }
+  }
+
+  /* ls_run = ls_head->next; */
+  /* printf( "live set starts at: %s\n", bb->first_tac->dest->val.label ); */
+  /* while( ls_run != NULL ) { */
+  /*   printf("%s\n", ls_run->stptr->name); */
+  /*   ls_run = ls_run->next; */
+  /* } */
+
+  tac = bb->last_tac;
+  /* Traverse backwards. */
+  while ( tac != bb->first_tac ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
+      if ( is_valid_local(tac->dest) == true ) { // write dest, dead
+	if ( is_in_liveset(tac->dest, ls_head) == true ) {
+	  /* tac->dest is dead at this point. */
+	  remove_from_liveset( tac->dest, ls_head );
+	} else { // tac can be delete
+	  //	  printf( "Delete code: LHS=%s, symtab entry type=%d\n",
+	  //		  tac->dest->val.stptr->name, tac->dest->val.stptr->type );
+	  tac_prev = tac->prev;
+	  tac_prev->next = tac->next;
+	  tac->next->prev = tac_prev;
+	  tac_tmp = tac;
+	  tac = tac_prev;
+	  continue;
+	}
+      }
+      if ( is_valid_local(tac->operand1) ) { // read operand1, live
+	if ( is_in_liveset(tac->operand1, ls_head) == false ) {
+	  /* tac->dest is alive at this point. */
+	  insert_ls( ls_head, tac->operand1 );
+	}
+      }
+      if ( is_valid_local(tac->operand2) ) { // read operand2, live
+	if ( is_in_liveset(tac->operand2, ls_head) == false ) {
+	  /* tac->dest is alive at this point. */
+	  insert_ls( ls_head, tac->operand2 );
+	}
+      }
+    }
+    /* if ( tac->optype == Retrieve ) { // write to operand1 */
+    /*   if ( is_valid_local(tac->operand1) ) { // write operand1, dead */
+    /* 	if ( is_in_liveset(tac->operand1, ls_head) == true ) { */
+    /* 	  /\* tac->dest is dead at this point. *\/ */
+    /* 	  remove_from_liveset( tac->operand1, ls_head ); */
+    /* 	} else { // tac can be deleted */
+    /* 	  //	  printf( "Delete code: retrieve=%s, symtab entry type=%d\n", */
+    /* 	  //		  tac->operand1->val.stptr->name, tac->operand1->val.stptr->type ); */
+    /* 	  tac_prev = tac->prev; */
+    /* 	  tac_prev->next = tac->next; */
+    /* 	  tac->next->prev = tac_prev; */
+    /* 	  tac_tmp = tac; */
+    /* 	  tac = tac_prev; */
+    /* 	  continue; */
+    /* 	} */
+    /*   } */
+    /* } */
+    if ( tac->optype == Param ) { // read to operand1
+      if ( is_valid_local(tac->operand1) ) { // read operand1, alive
+	if ( is_in_liveset(tac->operand1, ls_head) == false ) {
+	  /* tac->dest is alive at this point. */
+	  insert_ls( ls_head, tac->operand1 );
+	}
+      }
+    }
+
+    tac = tac->prev;
+  }
+}
+
+/**
+ * Perform liveness analysis on basic block.
+ */
+void liveness_analysis()
+{
+  bbl *bbl_run;
+  
   bbl_run = bhead;
   while( bbl_run != NULL ) {
-    tmp = bbl_run;
+    eliminate_dead_code( bbl_run );
+    //    printf( "BBL starts: %s, ends: %d\n", bbl_run->first_tac->dest->val.label, bbl_run->last_tac->optype );
     bbl_run = bbl_run->next;
-    free( tmp );
   }
 }
 

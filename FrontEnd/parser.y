@@ -33,6 +33,7 @@
   extern void peephole_o1( TAC_seq *tacseq );
   extern void construct_basic_block( TAC_seq *tacseq );
   extern void copy_propagation();
+  extern void livness_analysis();
   extern bool tac_only;
   extern bool perform_O1;
 
@@ -144,6 +145,7 @@ prog
 	peephole_o1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
 	copy_propagation();
+	liveness_analysis();
       }
 
       if ( tac_only == true ) { // output TACs to stdout
