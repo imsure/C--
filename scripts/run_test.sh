@@ -2,8 +2,8 @@
 
 ## Run all the test cases without optimization.
 
-compiler_path=./FrontEnd
-test_path=./Tests/codegen_tests_from_professor
+compiler_path=../FrontEnd
+test_path=../Tests/codegen_tests_from_professor
 tmp_asm="tmp.s"
 tmp_output="output.txt"
 tmp_output2="output2.txt"

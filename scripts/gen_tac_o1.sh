@@ -3,7 +3,7 @@
 ## Generate TAC from c files with -O1 optimization.
 
 compiler_path=/Users/shuoyang/codebase/cs553/C--/FrontEnd
-cd ./Tests/unittest/code_gen/c
+cd ../Tests/unittest/code_gen/c
 
 for cfile in *.c
 do
