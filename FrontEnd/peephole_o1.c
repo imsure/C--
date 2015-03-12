@@ -63,12 +63,10 @@ static void collapse_constant_assg( TAC_seq *tacseq )
       tac_next = tac->next;
       if ( tac_next != NULL && tac_next->optype == Assg ) {
 	if ( tac_next->operand1->atype == AT_StRef &&
-	     strcmp(tac_next->operand1->val.stptr->name,
-		    tac->dest->val.stptr->name) == 0 ) { // names must match
+	     tac_next->operand1->val.stptr == tac->dest->val.stptr ) { // must point to the same symbol table entry
 	  /* Modify 'tac_next' to get rid of 'tac' which is redundant.
 	     Turn its operand1 into a constant. */
-	  tac_next->operand1->atype = tac->operand1->atype;
-	  tac_next->operand1->val.iconst = tac->operand1->val.iconst;
+	  tac_next->operand1 = tac->operand1;
 
 	  tac_prev = tac->prev; // in this case, tac->prev must not be NULL
 	  tac_prev->next = tac_next;
