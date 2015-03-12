@@ -86,7 +86,7 @@ static void collapse_constant_assg( TAC_seq *tacseq )
 /**
  * Check whether the given 'optype' is a relational operation.
  */
-static bool is_relational( SyntaxNodeType optype )
+static bool is_relational_op( SyntaxNodeType optype )
 {
   switch ( optype ) {
   case Equals:
@@ -150,7 +150,7 @@ static void transform_cond_jump( TAC_seq *tacseq )
 
   /* Forward traversing */
   while ( tac != NULL ) {
-    if ( is_relational(tac->optype) == true ) {
+    if ( is_relational_op(tac->optype) == true ) {
       tac_next_next = tac->next->next; // should be a label
       if ( strcmp(tac->dest->val.label, tac_next_next->dest->val.label) == 0 ) {
 	/* A match found */
@@ -187,7 +187,7 @@ static void transform_cond_jump( TAC_seq *tacseq )
  * So given a TAC sequence, we traverse it forward, identify
  * the pattern.
  */
-static void transform_array_ref( TAC_seq *tacseq )
+static void precompute_constant_arrayindex( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   TAC *tac_next, *tac_next_next, *tac_prev;
@@ -204,7 +204,8 @@ static void transform_array_ref( TAC_seq *tacseq )
       /* Then check if the next next instruction is: _taddr2 = A + _tvar0. */
       tac_next_next = tac->next->next;
       if ( tac_next_next->optype == Plus &&
-	   tac_next_next->dest->val.stptr->type == t_Tmp_Addr ) {
+	   tac_next_next->dest->val.stptr->type == t_Tmp_Addr &&
+	   tac_next_next->operand1->val.stptr->type == t_Array ) { // t_Array always appear as operand1
 	/* A match found, directly calculate the offset of the array element. */
 	tac_next = tac->next; // tac_next must be: _tvar0 = _tvar0 * 4
 	offset = tac->operand1->val.iconst * tac_next->operand2->val.iconst;
@@ -342,7 +343,7 @@ static void collapse_jump_chain( TAC_seq *tacseq )
 
   tac = tacseq->start; // reset to the beginning
   while ( tac != NULL ) {
-    if ( tac->optype == Goto || is_relational(tac->optype) == true ) {
+    if ( tac->optype == Goto || is_relational_op(tac->optype) == true ) {
       tac_dest = lookup_dest( tac, llist_head );
       if ( tac != tac_dest ) { // update goto dest
 	tac->dest = tac_dest->dest;
@@ -358,7 +359,7 @@ void peephole_o1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
   transform_cond_jump( tacseq );
-  transform_array_ref( tacseq );
+  precompute_constant_arrayindex( tacseq );
   delete_redundant_jump( tacseq );
   collapse_jump_chain( tacseq );
 }
