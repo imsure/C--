@@ -17,7 +17,8 @@ CFILES = error.c \
 	TAC_generator.c\
 	MIPS_generator.c\
 	peephole_o1.c\
-	basic_block.c
+	basic_block.c\
+	liveness_local.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -30,7 +31,8 @@ OFILES = error.o \
 	TAC_generator.o\
 	MIPS_generator.o\
 	peephole_o1.o\
-	basic_block.o
+	basic_block.o\
+	liveness_local.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -52,7 +54,8 @@ peephole_o1.o : global.h peephole_o1.c
 
 basic_block.o : global.h basic_block.c
 
-#tac2mips.o : global.h tac2mips.c
+liveness_local.o : global.h liveness_local.c
+
 MIPS_generator.o : global.h MIPS_generator.c
 
 util.o : global.h util.h util.c

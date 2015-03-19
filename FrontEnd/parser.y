@@ -30,11 +30,12 @@
   extern void offset2fp_formals( symtabnode *func );
   extern void output_mips_data_section();
   extern void tac2mips( tnode *t, int ret_type );
-  extern void peephole_o1( TAC_seq *tacseq );
+  extern void peephole_stage1( TAC_seq *tacseq );
+  extern void peephole_stage2( TAC_seq *tacseq );
+  extern void collect_labels( TAC_seq *tacseq );
   extern void construct_basic_block( TAC_seq *tacseq );
   extern void copy_propagation();
-  extern void liveness_analysis();
-  extern void collapse_constant_arith( TAC_seq *tacseq );
+  extern void liveness_local();
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -144,11 +145,17 @@ prog
 
       /* Carray out peephole optimization. */
       if ( perform_O1 == true ) {
-	peephole_o1( currfnbodyTree->tac_seq );
+	collect_labels( currfnbodyTree->tac_seq );
+
+	/* Attention: peephole stage1 optimization must be done before
+	   constructing basic blocks because the latter relies on the
+	   former to clean up some nesty if (...) goto ... statements,
+	   otherwise segmentation fault would occur! */
+	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
 	copy_propagation();
-	liveness_analysis();
-	collapse_constant_arith( currfnbodyTree->tac_seq );
+	liveness_local();
+	peephole_stage2( currfnbodyTree->tac_seq );
       }
 
       if ( tac_only == true ) { // output TACs to stdout

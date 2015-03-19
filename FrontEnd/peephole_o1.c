@@ -13,16 +13,9 @@
 #include "global.h"
 #include "protos.h"
 #include "syntax-tree.h"
+#include "basic_block.h"
 
-/**
- * Linked list of compiler generated labels.
- */
-typedef struct Label_List {
-  TAC *mylabel;
-  struct Label_List *next_label;
-} label_list;
-
-label_list *lhead;
+extern label_list *lhead;
 
 /**
  * Peephole optimization: collapse constant assignment.
@@ -269,6 +262,10 @@ static void delete_redundant_jump( TAC_seq *tacseq )
    }
 }
 
+/**
+ * Look up the final destination for the goto statement 'start_tac'
+ * given a list of compiler generated labels.
+ */
 static TAC *lookup_dest( TAC *start_tac, label_list *llist_head )
 {
   label_list *llist_run = llist_head->next_label;
@@ -326,20 +323,7 @@ static void collapse_jump_chain( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   TAC *tac_dest;
-  label_list *llist_head, *llist_run;
-
-  llist_head = (label_list *) zalloc( sizeof(label_list) );
-  llist_run = llist_head;
-
-  /* Collect all compiler generated label instructions. */
-  while ( tac != NULL ) {
-    if ( tac->optype == Label && tac->operand1 == NULL ) { // omit function labels
-      llist_run->next_label = (label_list *) zalloc( sizeof(label_list) );
-      llist_run->next_label->mylabel = tac;
-      llist_run = llist_run->next_label;
-    }
-    tac = tac->next;
-  }
+  label_list *llist_head = lhead;
 
   tac = tacseq->start; // reset to the beginning
   while ( tac != NULL ) {
@@ -351,15 +335,84 @@ static void collapse_jump_chain( TAC_seq *tacseq )
     }
     tac = tac->next;
   }
-
-  lhead = llist_head; // for constructing basic block
 }
 
-void peephole_o1( TAC_seq *tacseq )
+static int calculate( SyntaxNodeType optype, int v1, int v2 )
+{
+  switch ( optype ) {
+  case Plus:
+    return v1+v2;
+  case BinaryMinus:
+    return v1-v2;
+  case Mult:
+    return v1*v2;
+  case Div:
+    return v1/v2;
+  default:
+    return 0;
+  }
+}
+
+/**
+ * Check whether the given 'optype' is a arithmetic operation.
+ */
+static bool is_arith_op( SyntaxNodeType optype )
+{
+  switch ( optype ) {
+  case Plus:
+  case BinaryMinus:
+  case UnaryMinus:
+  case Mult:
+  case Div:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * Pre-calculate constant arithmetic like: x = 4 * 7 --> x = 28
+ */
+static void collapse_constant_arith( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  
+  while ( tac != NULL ) {
+    if ( is_arith_op(tac->optype) && tac->optype != UnaryMinus ) {
+      if ( (tac->operand1->atype == AT_Intcon || tac->operand1->atype == AT_Charcon) &&
+	   (tac->operand2->atype == AT_Intcon || tac->operand2->atype == AT_Charcon) ) {
+	/* pre-caculate the value. */
+	tac->operand1->val.iconst = calculate( tac->optype,
+					       tac->operand1->val.iconst,
+					       tac->operand2->val.iconst );
+	tac->optype = Assg; // change optype
+	tac->operand2 = NULL;
+      }
+    }
+    tac = tac->next;
+  }
+}
+
+/**
+ * Peephole optimization: stage 1.
+ * This is done before copy propagation and dead code elimination.
+ */
+void peephole_stage1( TAC_seq *tacseq )
 {
   collapse_constant_assg( tacseq );
   transform_cond_jump( tacseq );
   precompute_constant_arrayindex( tacseq );
   delete_redundant_jump( tacseq );
   collapse_jump_chain( tacseq );
+  collapse_constant_arith( tacseq );
 }
+
+/**
+ * Peephole optimization: stage 2.
+ * This is done after copy propagation and dead code elimination.
+ */
+void peephole_stage2( TAC_seq *tacseq )
+{
+  collapse_constant_arith( tacseq );
+}
+
