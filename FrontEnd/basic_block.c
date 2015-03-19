@@ -67,10 +67,7 @@ static bool is_relational( SyntaxNodeType optype )
 void construct_basic_block( TAC_seq *tacseq )
 {
   TAC *tac;
-  label_list *llist_run;
   bbl *bbl_head, *bbl_run;
-
-  llist_run = lhead;
 
   bbl_head = (bbl *) zalloc( sizeof(bbl) );
   bbl_head->first_tac = tacseq->start; // start is always a function label

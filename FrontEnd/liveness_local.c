@@ -186,6 +186,20 @@ static void copy_propagation_bb( bbl *bb )
   free_copytable( ct_head );
 }
 
+/**
+ * Perform copy propagation.
+ * Transform:
+ * t1 = z
+ * u = t1 + 1
+ *
+ * into:
+ * t1 = z
+ * u = z + 1
+ *
+ * This is done for further dead code elimination since
+ * copy propagation could produce many unused copy instructions
+ * which can be eliminated.
+ */
 void copy_propagation()
 {
   bbl *bbl_run;
@@ -298,13 +312,6 @@ static void eliminate_dead_code( bbl *bb )
     }
   }
 
-  /* ls_run = ls_head->next; */
-  /* printf( "live set starts at: %s\n", bb->first_tac->dest->val.label ); */
-  /* while( ls_run != NULL ) { */
-  /*   printf("%s\n", ls_run->stptr->name); */
-  /*   ls_run = ls_run->next; */
-  /* } */
-
   tac = bb->last_tac;
   /* Traverse backwards. */
   while ( tac != bb->first_tac ) {
@@ -314,8 +321,6 @@ static void eliminate_dead_code( bbl *bb )
 	  /* tac->dest is dead at this point. */
 	  remove_from_liveset( tac->dest, ls_head );
 	} else { // tac can be delete
-	  //	  printf( "Delete code: LHS=%s, symtab entry type=%d\n",
-	  //		  tac->dest->val.stptr->name, tac->dest->val.stptr->type );
 	  tac_prev = tac->prev;
 	  tac_prev->next = tac->next;
 	  tac->next->prev = tac_prev;
@@ -337,23 +342,6 @@ static void eliminate_dead_code( bbl *bb )
 	}
       }
     }
-    /* if ( tac->optype == Retrieve ) { // write to operand1 */
-    /*   if ( is_valid_local(tac->operand1) ) { // write operand1, dead */
-    /* 	if ( is_in_liveset(tac->operand1, ls_head) == true ) { */
-    /* 	  /\* tac->dest is dead at this point. *\/ */
-    /* 	  remove_from_liveset( tac->operand1, ls_head ); */
-    /* 	} else { // tac can be deleted */
-    /* 	  //	  printf( "Delete code: retrieve=%s, symtab entry type=%d\n", */
-    /* 	  //		  tac->operand1->val.stptr->name, tac->operand1->val.stptr->type ); */
-    /* 	  tac_prev = tac->prev; */
-    /* 	  tac_prev->next = tac->next; */
-    /* 	  tac->next->prev = tac_prev; */
-    /* 	  tac_tmp = tac; */
-    /* 	  tac = tac_prev; */
-    /* 	  continue; */
-    /* 	} */
-    /*   } */
-    /* } */
     if ( tac->optype == Param ) { // read to operand1
       if ( is_valid_local(tac->operand1) ) { // read operand1, alive
 	if ( is_in_liveset(tac->operand1, ls_head) == false ) {
@@ -368,7 +356,7 @@ static void eliminate_dead_code( bbl *bb )
 }
 
 /**
- * Perform liveness analysis on basic block.
+ * Perform liveness analysis on basic blocks.
  */
 void liveness_local()
 {
@@ -377,7 +365,6 @@ void liveness_local()
   bbl_run = bhead;
   while( bbl_run != NULL ) {
     eliminate_dead_code( bbl_run );
-    //    printf( "BBL starts: %s, ends: %d\n", bbl_run->first_tac->dest->val.label, bbl_run->last_tac->optype );
     bbl_run = bbl_run->next;
   }
 }
