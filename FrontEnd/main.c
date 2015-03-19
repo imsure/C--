@@ -1,5 +1,6 @@
 #include "global.h"
 #include "symbol-table.h"
+#include <unistd.h>
 
 extern int yydebug;
 extern int yyparse();
@@ -8,37 +9,56 @@ extern void spim_print_string();
 
 int status = 0;
 bool perform_O1 = false; // indicate whether perform -O1 optimization or not.
+bool perform_O2 = false; // indicate whether perform -O2 optimization or not.
 bool tac_only = false; // indicate whether output TAC files only
-bool output_mips = true;
+
+/**
+ * Print out help info.
+ */
+static void print_help()
+{
+}
 
 int main( int argc, char *argv[] )
 {
-  if ( argc > 1 ) {
-    /* Get the first argument */
-    if ( strcmp( argv[1], "-O1") == 0 ) {
-      perform_O1 = true;
-    } 
-    if ( argc > 2 ) {
-      if ( strcmp( argv[2], "-TAC") == 0 ) {
-	tac_only = true;
-	output_mips = false;
+  char c;
+  
+  /**
+   * Parsing command line arguments.
+   */
+  while ( (c = getopt(argc, argv, "O:T:Hh")) != -1 ) {
+    switch ( c ) {
+    case 'O':
+      if ( optarg != NULL ) {
+	switch ( optarg[0] ) {
+	case '1':
+	  perform_O1 = true; break;
+	case '2':
+	  perform_O2 = true; break;
+	default:
+	  break;
+	}
       }
-    } else { // only one argument
-      if ( strcmp( argv[1], "-TAC") == 0 ) {
+      break;
+    case 'T':
+      if ( strcmp(optarg, "AC") == 0 ) {
 	tac_only = true;
-	output_mips = false;
-      } else {
-	output_mips = true;
       }
+      break;
+    case 'H':
+    case 'h':
+      print_help();
+      exit( 0 );
+    default:
+      printf( "Invalid option: %c\n", c );
+      break;
     }
-  } else { // no args, print mips code
-    output_mips = true;
   }
 
   SymTabInit(Global);
   SymTabInit(Local);
 
-  if ( output_mips == true ) {
+  if ( tac_only == false ) {
     spim_print_int();
     spim_print_string();
   }
