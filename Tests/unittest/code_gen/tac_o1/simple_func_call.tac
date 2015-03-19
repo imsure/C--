@@ -13,7 +13,6 @@ _L0:
 	Retrieve _tvar1 
 	_tvar1 = _tvar1 * f
 	f = _tvar1 
-	_tvar1 = 1 
 	_tvar1 = n - 1 
 	n = _tvar1 
 _L1:

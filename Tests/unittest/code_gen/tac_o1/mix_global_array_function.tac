@@ -10,7 +10,6 @@ _L0:
 	_tvar1 = i * 4 
 	_taddr0 = x + _tvar1
 	*_taddr0(int) = i 
-	_tvar1 = 1 
 	_tvar1 = i + 1 
 	i = _tvar1 
 _L1:
@@ -38,34 +37,27 @@ _L2:
 	Retrieve _tvar1 
 	_tvar2 = _tvar1 * 4 
 	_taddr4 = x + _tvar2
-	res = *_taddr4(int) 
 	_tvar6 = 0 
 	Param _tvar6 
 	Call id  1 
 	Retrieve _tvar5 
-	_tvar7 = 1 
 	_tvar6 = _tvar5 + 1 
 	_tvar6 = _tvar6 * 4 
 	_taddr5 = x + _tvar6
-	_tvar6 = 1 
 	_tvar6 = *_taddr5(int) + 1 
 	Param _tvar6 
 	Call id  1 
 	Retrieve _tvar4 
-	_tvar7 = 1 
 	_tvar6 = _tvar4 + 1 
 	_tvar6 = _tvar6 * 4 
 	_taddr6 = x + _tvar6
-	_tvar6 = 1 
 	_tvar6 = *_taddr6(int) + 1 
 	Param _tvar6 
 	Call id  1 
 	Retrieve _tvar3 
-	_tvar7 = 1 
 	_tvar6 = _tvar3 + 1 
 	_tvar6 = _tvar6 * 4 
 	_taddr7 = x + _tvar6
-	_tvar6 = 1 
 	_tvar6 = *_taddr7(int) + 1 
 	Param _tvar6 
 	Call id  1 
@@ -74,36 +66,29 @@ _L2:
 	_tvar6 = _tvar2 + 1 
 	_tvar6 = _tvar6 * 4 
 	_taddr8 = x + _tvar6
-	_tvar2 = 1 
 	_tvar2 = *_taddr4(int) + 1 
 	*_taddr8(int) = _tvar2 
 	_tvar10 = 0 
 	Param _tvar10 
 	Call id  1 
 	Retrieve _tvar9 
-	_tvar11 = 1 
 	_tvar10 = _tvar9 + 1 
 	_tvar10 = _tvar10 * 4 
 	_taddr9 = x + _tvar10
-	_tvar10 = 1 
 	_tvar10 = *_taddr9(int) + 1 
 	Param _tvar10 
 	Call id  1 
 	Retrieve _tvar8 
-	_tvar11 = 1 
 	_tvar10 = _tvar8 + 1 
 	_tvar10 = _tvar10 * 4 
 	_taddr10 = x + _tvar10
-	_tvar10 = 1 
 	_tvar10 = *_taddr10(int) + 1 
 	Param _tvar10 
 	Call id  1 
 	Retrieve _tvar7 
-	_tvar11 = 1 
 	_tvar10 = _tvar7 + 1 
 	_tvar10 = _tvar10 * 4 
 	_taddr11 = x + _tvar10
-	_tvar10 = 1 
 	_tvar10 = *_taddr11(int) + 1 
 	Param _tvar10 
 	Call id  1 

@@ -20,7 +20,6 @@ main:
 	*_taddr8(int) = 4 
 	_taddr9 = y + 4 
 	*_taddr9(char) = 55 
-	_tvar0 = 2 
 	_taddr10 = x + 4 
 	_tvar0 = 2 * *_taddr10(int) 
 	_tvar1 = 1 

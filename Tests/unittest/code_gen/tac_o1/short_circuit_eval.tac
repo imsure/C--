@@ -21,7 +21,6 @@ _L2:
 	Retrieve _tvar0 
 	if ( _tvar0 >= z ) goto _L1
 _L0:
-	_tvar1 = 1 
 	_tvar1 = x - 1 
 	x = _tvar1 
 _L1:
@@ -39,7 +38,6 @@ _L8:
 	Retrieve _tvar2 
 	if ( _tvar2 >= z ) goto _L7
 _L6:
-	_tvar3 = 1 
 	_tvar3 = x - 1 
 	x = _tvar3 
 _L7:

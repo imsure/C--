@@ -8,7 +8,6 @@ _L0:
 _L1:
 	goto _L3
 _L2:
-	_tvar2 = 1 
 	_tvar2 = x - 1 
 	x = _tvar2 
 _L3:

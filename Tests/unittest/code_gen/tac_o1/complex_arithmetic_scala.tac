@@ -3,7 +3,6 @@ main:
 	x = 2 
 	y = 3 
 	z = 4 
-	_tvar0 = 'a' 
 	_tvar0 = 'a' * x
 	a = _tvar0 
 	_tvar0 = x + y

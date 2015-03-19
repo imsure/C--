@@ -3,7 +3,6 @@ main:
 	x = 31459 
 	Param x 
 	Call print_int  1 
-	_tvar0 = 5 
 	_tvar0 = x + 5 
 	Param _tvar0 
 	Call print_int  1 

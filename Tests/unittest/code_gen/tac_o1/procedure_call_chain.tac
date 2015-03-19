@@ -29,7 +29,6 @@ _L0:
 	Call add  1 
 	_tvar6 = f * y
 	f = _tvar6 
-	_tvar6 = 1 
 	_tvar6 = i - 1 
 	i = _tvar6 
 _L1:

@@ -9,7 +9,6 @@ _L0:
 _L1:
 	Param u 
 	Call incr  1 
-	_tvar3 = 1 
 	_tvar3 = u - 1 
 	Param _tvar3 
 	Call f  1 
@@ -31,7 +30,6 @@ main:
 	Param _tvar5 
 	Call f  1 
 	Retrieve _tvar4 
-	x = _tvar4 
 	_tvar5 = u + _tvar4
 	x = _tvar5 
 	Param x 

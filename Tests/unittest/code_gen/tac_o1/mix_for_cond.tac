@@ -29,7 +29,6 @@ _L12:
 	_tvar3 = res + k
 	res = _tvar3 
 _L13:
-	_tvar3 = 1 
 	_tvar3 = a + 1 
 	a = _tvar3 
 _L9:
@@ -37,14 +36,12 @@ _L9:
 	if ( a < _tvar2 ) goto _L8
 _L10:
 _L7:
-	_tvar3 = 1 
 	_tvar3 = j + 1 
 	j = _tvar3 
 _L4:
 	_tvar1 = 5 
 	if ( j < _tvar1 ) goto _L3
 _L5:
-	_tvar3 = 1 
 	_tvar3 = i + 1 
 	i = _tvar3 
 _L1:

@@ -6,7 +6,6 @@ _L0:
 	_tvar0 = i * 4 
 	_taddr0 = x + _tvar0
 	*_taddr0(int) = i 
-	_tvar0 = 1 
 	_tvar0 = i + 1 
 	i = _tvar0 
 _L1:
@@ -17,7 +16,6 @@ _L2:
 count:
 	Enter count  16 
 	c = 0 
-	_tvar0 = 1 
 	_tvar0 = n - 1 
 	n = _tvar0 
 	goto _L4
@@ -26,7 +24,6 @@ _L3:
 	_taddr1 = x + _tvar1
 	_tvar1 = c + *_taddr1(int) 
 	c = _tvar1 
-	_tvar1 = 1 
 	_tvar1 = n - 1 
 	n = _tvar1 
 _L4:
@@ -42,7 +39,6 @@ main:
 	Param _tvar2 
 	Call init  2 
 	Retrieve _tvar1 
-	z = _tvar1 
 	_tvar3 = 10 
 	Param x 
 	Param _tvar3 

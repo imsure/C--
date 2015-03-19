@@ -5,10 +5,8 @@ f:
 _L0:
 	_tvar1 = x * i
 	x = _tvar1 
-	_tvar1 = 2 
 	_tvar1 = 2 * y
 	y = _tvar1 
-	_tvar1 = 1 
 	_tvar1 = i - 1 
 	i = _tvar1 
 _L1:

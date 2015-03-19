@@ -1,7 +1,6 @@
 copy:
 	Enter copy  28 
 	i = 0 
-	i = 0 
 	goto _L1
 _L0:
 	_tvar1 = i * 1 
@@ -9,7 +8,6 @@ _L0:
 	_tvar1 = i * 1 
 	_taddr1 = a + _tvar1
 	*_taddr2(char) = *_taddr1(char) 
-	_tvar1 = 1 
 	_tvar1 = i + 1 
 	i = _tvar1 
 _L1:
@@ -33,7 +31,6 @@ _L3:
 	_taddr5 = b + _tvar2
 	_tvar2 = sum + *_taddr5(char) 
 	sum = _tvar2 
-	_tvar2 = 1 
 	_tvar2 = i + 1 
 	i = _tvar2 
 _L4:

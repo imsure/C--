@@ -4,7 +4,6 @@ main:
 	y = 10 
 	_tvar0 = x - y
 	x = _tvar0 
-	_tvar0 = 2 
 	_tvar1 = -2 
 	y = _tvar1 
 	_tvar0 = x + y

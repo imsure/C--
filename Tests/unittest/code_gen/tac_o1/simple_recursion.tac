@@ -7,7 +7,6 @@ _L0:
 	Return _tvar1 
 	goto _L2
 _L1:
-	_tvar3 = 1 
 	_tvar3 = n - 1 
 	Param _tvar3 
 	Call fact  1 
