@@ -121,6 +121,6 @@ void construct_basic_block( TAC_seq *tacseq )
 
   bhead = bbl_head; // make it globally accessible.
 
-  //print_bbl();
+  print_bbl();
 }
 

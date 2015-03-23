@@ -356,6 +356,93 @@ static void print_operands( TAC *tac )
 }
 
 /**
+ * Print out a single TAC instruction 'tac'.
+ */
+static void printtac( TAC *tac )
+{
+  switch ( tac->optype ) {
+  case Plus:
+  case BinaryMinus:
+  case Mult:
+  case Div:
+    printf( "\t%s = ", tac->dest->val.stptr->name ); 
+    print_operands( tac );
+    break;
+  case UnaryMinus:
+    printf( "\t%s = -", tac->dest->val.stptr->name );
+    print_operands( tac );
+    break;
+  case Assg:
+    if ( tac->dest->val.stptr->type == t_Tmp_Addr ) { // array reference
+      switch( tac->dest->val.stptr->elt_type ) {
+      case t_Char:
+	printf( "\t*%s(char) = ", tac->dest->val.stptr->name );
+	break;
+      case t_Int:
+	printf( "\t*%s(int) = ", tac->dest->val.stptr->name );
+	break;
+      }
+    } else {
+      printf( "\t%s = ", tac->dest->val.stptr->name );
+    }
+      
+    print_operands( tac );
+    break;
+  case Equals:
+  case Neq:
+  case Leq:
+  case Lt:
+  case Geq:
+  case Gt:
+  case LogicalAnd:
+  case LogicalOr:
+    printf( "\tif ( " ); 
+    print_operands( tac );
+    printf( " ) goto %s", tac->dest->val.label );
+    break;
+  case LogicalNot:
+    printf( "\tif ( !" );
+    print_operands( tac );
+    printf( " ) goto %s", tac->dest->val.label );
+    break;
+  case Label: // label instruction
+    printf( "%s:", tac->dest->val.label );
+    break;
+  case Goto: // goto instruction
+    printf( "\tgoto %s", tac->dest->val.label );
+    break;
+  case Return:
+    printf( "\tReturn " );
+    print_operands( tac );
+    break;
+  case Param:
+    printf( "\tParam " );
+    print_operands( tac );
+    break;
+  case Call:
+    printf( "\tCall " );
+    print_operands( tac );
+    break;
+  case Retrieve:
+    printf( "\tRetrieve " );
+    print_operands( tac );
+    break;
+  case Enter:
+    printf( "\tEnter " );
+    print_operands( tac );
+    break;
+  case Stringcon: // code for string constant, handled specially.
+    printf( "\t%s = \"%s\"", tac->dest->val.stptr->name,
+	    tac->dest->val.stptr->strcon );
+    break;
+  default:
+    fprintf( stderr, "Invalid TAC opertion type: %d\n", tac->optype );
+    break;
+  }
+  putchar( '\n' );
+}
+
+/**
  * Print TAC sequence for the syntax tree node 't'.
  */
 void print_TAC_seq( tnode *t, bool reverse )
@@ -370,85 +457,6 @@ void print_TAC_seq( tnode *t, bool reverse )
 
   for (; tac != NULL;
        tac = (reverse == false)? tac->next : tac->prev) {
-    switch ( tac->optype ) {
-    case Plus:
-    case BinaryMinus:
-    case Mult:
-    case Div:
-      printf( "\t%s = ", tac->dest->val.stptr->name ); 
-      print_operands( tac );
-      break;
-    case UnaryMinus:
-      printf( "\t%s = -", tac->dest->val.stptr->name );
-      print_operands( tac );
-      break;
-    case Assg:
-      if ( tac->dest->val.stptr->type == t_Tmp_Addr ) { // array reference
-	switch( tac->dest->val.stptr->elt_type ) {
-	case t_Char:
-	  printf( "\t*%s(char) = ", tac->dest->val.stptr->name );
-	  break;
-	case t_Int:
-	  printf( "\t*%s(int) = ", tac->dest->val.stptr->name );
-	  break;
-   	}
-      } else {
-	printf( "\t%s = ", tac->dest->val.stptr->name );
-      }
-      
-      print_operands( tac );
-      break;
-    case Equals:
-    case Neq:
-    case Leq:
-    case Lt:
-    case Geq:
-    case Gt:
-    case LogicalAnd:
-    case LogicalOr:
-      printf( "\tif ( " ); 
-      print_operands( tac );
-      printf( " ) goto %s", tac->dest->val.label );
-      break;
-    case LogicalNot:
-      printf( "\tif ( !" );
-      print_operands( tac );
-      printf( " ) goto %s", tac->dest->val.label );
-      break;
-    case Label: // label instruction
-      printf( "%s:", tac->dest->val.label );
-      break;
-    case Goto: // goto instruction
-      printf( "\tgoto %s", tac->dest->val.label );
-      break;
-    case Return:
-      printf( "\tReturn " );
-      print_operands( tac );
-      break;
-    case Param:
-      printf( "\tParam " );
-      print_operands( tac );
-      break;
-    case Call:
-      printf( "\tCall " );
-      print_operands( tac );
-      break;
-    case Retrieve:
-      printf( "\tRetrieve " );
-      print_operands( tac );
-      break;
-    case Enter:
-      printf( "\tEnter " );
-      print_operands( tac );
-      break;
-    case Stringcon: // code for string constant, handled specially.
-      printf( "\t%s = \"%s\"", tac->dest->val.stptr->name,
-	      tac->dest->val.stptr->strcon );
-      break;
-    default:
-      fprintf( stderr, "Invalid TAC opertion type: %d\n", tac->optype );
-      break;
-    }
-    putchar( '\n' );
+    printtac( tac );
   }
 }
