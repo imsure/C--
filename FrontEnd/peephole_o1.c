@@ -275,9 +275,6 @@ static TAC *lookup_dest( TAC *start_tac, label_list *llist_head )
     if ( strcmp(llist_run->mylabel->dest->val.label,
 		start_tac->dest->val.label) == 0 ) {
       tac_next = llist_run->mylabel->next;
-      while ( tac_next->optype == Noop ) {
-	tac_next = tac_next->next; // skip Noop TAC.
-      }
       if ( tac_next->optype == Goto ) { // pattern found
 	return lookup_dest( tac_next, llist_head );
       }

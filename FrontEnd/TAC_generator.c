@@ -1164,3 +1164,25 @@ TAC_seq *code_gen( tnode *t )
 
   return t->tac_seq;
 }
+
+/**
+ * Delete Noop instructions in TAC sequence 'tacseq'.
+ */
+void cleanup_noops( TAC_seq *tacseq )
+{
+  TAC *tac, *tactmp;
+
+  tac = tacseq->start;
+  while( tac != NULL ) {
+    if ( tac->optype == Noop ) {
+      /* Get rid of Noop instruction. */
+      tac->prev->next = tac->next;
+      tac->next->prev = tac->prev;
+      tactmp = tac;
+      tac = tac->next;
+      free( tactmp );
+      continue;
+    }
+    tac = tac->next;
+  }
+}

@@ -370,9 +370,6 @@ void print_TAC_seq( tnode *t, bool reverse )
 
   for (; tac != NULL;
        tac = (reverse == false)? tac->next : tac->prev) {
-    if ( tac->optype == Noop ) { // ignore TAC for int or char variables,
-      continue;
-    }
     switch ( tac->optype ) {
     case Plus:
     case BinaryMinus:

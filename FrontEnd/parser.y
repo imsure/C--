@@ -30,6 +30,7 @@
   extern void offset2fp_formals( symtabnode *func );
   extern void output_mips_data_section();
   extern void tac2mips( tnode *t, int ret_type );
+  extern void *cleanup_noops( TAC_seq *tacseq );
   extern void peephole_stage1( TAC_seq *tacseq );
   extern void peephole_stage2( TAC_seq *tacseq );
   extern void collect_labels( TAC_seq *tacseq );
@@ -142,6 +143,7 @@ prog
       currfnbodyTree->tac_seq->start->prev = enter;
       
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
+      cleanup_noops( currfnbodyTree->tac_seq );
 
       /* Carray out peephole optimization. */
       if ( perform_O1 == true ) {

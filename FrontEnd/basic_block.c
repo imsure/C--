@@ -61,26 +61,47 @@ static bool is_relational( SyntaxNodeType optype )
   }
 }
 
+void print_bbl()
+{
+  bbl *bbl_run = bhead;
+
+  while( bbl_run != NULL ) {
+    printf( "BBL%d(starts: %s, ends: %d, prev: BBL%d)\n",
+	    bbl_run->bblnum, bbl_run->first_tac->dest->val.label,
+	    bbl_run->last_tac->optype, (bbl_run->prev != NULL) ? bbl_run->prev->bblnum : -1 );
+    bbl_run = bbl_run->next;
+  }  
+}
+
 /**
  * Construct the list of basic block for the current function.
+ *
+ * The TAC generator guarantees that the leader (the first instruction)
+ * for each block is always a compiler generated label except the first
+ * basic block whose leader is a funtion label. This may introduce some
+ * unnecessary labels, but makes it easier to construct basic blocks. 
  */
 void construct_basic_block( TAC_seq *tacseq )
 {
   TAC *tac;
   bbl *bbl_head, *bbl_run;
+  int bbcounter = 0;
 
   bbl_head = (bbl *) zalloc( sizeof(bbl) );
   bbl_head->first_tac = tacseq->start; // start is always a function label
+  bbl_head->bblnum = bbcounter++;
   bbl_run = bbl_head;
 
   tac = tacseq->start->next;
   while ( tac != NULL ) {
     if ( tac->optype == Goto || is_relational(tac->optype) == true ||
 	 (tac->next != NULL)? tac->next->optype == Label : false ) { // identify the last tac.
-      bbl_run->last_tac = tac;
-      /* start next bbl */
+      bbl_run->last_tac = tac; // fill in last tac for the current bbl
+      /* Construct the next bbl. */
       bbl_run->next = (bbl *) zalloc( sizeof(bbl) );
-      if ( tac->next->optype == Label ) {
+      bbl_run->next->bblnum = bbcounter++;
+      bbl_run->next->prev = bbl_run;
+      if ( tac->next->optype == Label ) { // leader should always be a label.
 	bbl_run->next->first_tac = tac->next;
       } else {
 	fprintf( stderr, "Not a label (%d)! Sth wierd happended!\n", tac->next->optype );
@@ -92,16 +113,14 @@ void construct_basic_block( TAC_seq *tacseq )
     }
     tac = tac->next;
   }
+  
   if ( bbl_run->last_tac == NULL ) {
+    /* Fill in last tac (should be a return statement) for the last bbl. */
     bbl_run->last_tac = tacseq->end;
   }
 
-  bhead = bbl_head;
+  bhead = bbl_head; // make it globally accessible.
 
-  /* bbl_run = bhead; */
-  /* while( bbl_run != NULL ) { */
-  /*   printf( "BBL starts: %s, ends: %d\n", bbl_run->first_tac->dest->val.label, bbl_run->last_tac->optype ); */
-  /*   bbl_run = bbl_run->next; */
-  /* } */
+  //print_bbl();
 }
 
