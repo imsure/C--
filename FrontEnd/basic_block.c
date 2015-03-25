@@ -61,27 +61,15 @@ static bool is_relational( SyntaxNodeType optype )
   }
 }
 
-void print_bbl()
-{
-  bbl *bbl_run = bhead;
-
-  while( bbl_run != NULL ) {
-    printf( "BBL%d(starts: %s, ends: %d, prev: BBL%d)\n",
-	    bbl_run->bblnum, bbl_run->first_tac->dest->val.label,
-	    bbl_run->last_tac->optype, (bbl_run->prev != NULL) ? bbl_run->prev->bblnum : -1 );
-    bbl_run = bbl_run->next;
-  }  
-}
-
 /**
  * Construct the list of basic block for the current function.
  *
  * The TAC generator guarantees that the leader (the first instruction)
  * for each block is always a compiler generated label except the first
  * basic block whose leader is a funtion label. This may introduce some
- * unnecessary labels, but makes it easier to construct basic blocks. 
+ * unnecessary labels, but makes it easier to construct basic blocks.
  */
-void construct_basic_block( TAC_seq *tacseq )
+static void construct_bb_list( TAC_seq *tacseq )
 {
   TAC *tac;
   bbl *bbl_head, *bbl_run;
@@ -120,7 +108,85 @@ void construct_basic_block( TAC_seq *tacseq )
   }
 
   bhead = bbl_head; // make it globally accessible.
-
-  print_bbl();
 }
 
+/**
+ * Lookup and return the basic block with the first TAC (leader)
+ * be the label instruction 'succ_label'.
+ */
+static bbl *bbl_lookup( const char *succ_label )
+{
+  bbl *bbl_run;
+  
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    if ( strcmp(bbl_run->first_tac->dest->val.label, succ_label) == 0 ) {
+      return bbl_run;
+    }
+    bbl_run = bbl_run->next;
+  }
+  return NULL;
+}
+
+/**
+ * Append bbl 'pred' to bbl 'bb's predecessor list.
+ */
+static void bbl_append_pred( bbl *bb, bbl *pred )
+{
+  control_flow_list *cfl;
+
+  if ( bb->pred == NULL ) {
+    bb->pred = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+    bb->pred->bb = pred;
+  } else {
+    cfl = bb->pred;
+    while ( cfl->next != NULL ) {
+      cfl = cfl->next;
+    }
+    cfl->next = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+    cfl->next->bb = pred;
+  }
+}
+
+/**
+ * Construct control flow information for basic blocks.
+ */
+static void construct_bb_control_flow( TAC_seq *tacseq )
+{
+  TAC *tac;
+  bbl *bbl_run, *bbl_succ;
+  
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    tac = bbl_run->last_tac;
+    if ( tac->optype == Goto ) { // unconditional jump, one successor
+      /* current basic block has only one successor. */
+      bbl_run->succ = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+      bbl_succ = bbl_lookup( tac->dest->val.label );
+      bbl_run->succ->bb = bbl_succ; // the basic block current block jumps to is the only successor
+      bbl_append_pred( bbl_succ, bbl_run );
+    } else if ( is_relational(tac->optype) == true ) { // conditional jump, two successors
+      bbl_run->succ = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+      bbl_run->succ->bb = bbl_run->next; // next basic block is a successor
+      bbl_append_pred( bbl_run->next, bbl_run );
+      
+      bbl_run->succ->next = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+      bbl_succ = bbl_lookup( tac->dest->val.label );
+      bbl_run->succ->next->bb = bbl_succ; // the basic block current block jumps to is another successor
+      bbl_append_pred( bbl_succ, bbl_run );
+    } else if ( (tac->next != NULL)? tac->next->optype == Label : false ) {
+      /* not a jump instruction, only one successor which is next basic block. */
+      bbl_run->succ = (control_flow_list *) zalloc( sizeof(control_flow_list) );
+      bbl_run->succ->bb = bbl_run->next;
+      bbl_append_pred( bbl_run->next, bbl_run );
+    }
+    
+    bbl_run = bbl_run->next;
+  }
+}
+
+void construct_basic_block( TAC_seq *tacseq )
+{
+  construct_bb_list( tacseq );
+  construct_bb_control_flow( tacseq );
+}

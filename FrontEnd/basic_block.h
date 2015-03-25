@@ -9,6 +9,13 @@ typedef struct Label_List {
   struct Label_List *next_label;
 } label_list;
 
+struct basic_block_list;
+
+typedef struct bbl_control_flow_list {
+  struct basic_block_list *bb;
+  struct bbl_control_flow_list *next;
+} control_flow_list;
+
 /**
  * Represents basic block.
  */
@@ -16,7 +23,7 @@ typedef struct basic_block_list {
   int bblnum;
   TAC *first_tac;
   TAC *last_tac;
-  struct basic_block_list *pred, *succ;
+  control_flow_list *pred, *succ;
   struct basic_block_list *prev, *next;
 } bbl;
 

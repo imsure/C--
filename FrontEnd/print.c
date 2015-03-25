@@ -8,11 +8,13 @@
 #include "global.h"
 #include "protos.h"
 #include "syntax-tree.h"
+#include "basic_block.h"
 
 static void indent(int n);
 static void printBinop(int op);
 static void printUnop(int op);
 
+extern bbl *bhead;
 
 /*
  * printSyntaxTree(t,n) -- print out a syntax tree.  t is a pointer
@@ -439,7 +441,6 @@ static void printtac( TAC *tac )
     fprintf( stderr, "Invalid TAC opertion type: %d\n", tac->optype );
     break;
   }
-  putchar( '\n' );
 }
 
 /**
@@ -458,5 +459,43 @@ void print_TAC_seq( tnode *t, bool reverse )
   for (; tac != NULL;
        tac = (reverse == false)? tac->next : tac->prev) {
     printtac( tac );
+    putchar( '\n' );
   }
+}
+
+/**
+ * Print out the list of basic blocks for the current processed
+ * function given the global header to its basic block list 'bhead'.
+ */
+void print_bbl()
+{
+  bbl *bbl_run = bhead;
+  control_flow_list *cfl;
+
+  while( bbl_run != NULL ) {
+    printf( "BBL%d(start tac: %s, end tac:",
+	    bbl_run->bblnum, bbl_run->first_tac->dest->val.label );
+    printtac( bbl_run->last_tac );
+    printf( ", prev: BBL%d)\n", (bbl_run->prev != NULL) ? bbl_run->prev->bblnum : -1 );
+
+    /* Print out successors. */
+    printf( "     successors: ( " );
+    cfl = bbl_run->succ;
+    while ( cfl != NULL ) {
+      printf( "BBL%d ", cfl->bb->bblnum );
+      cfl = cfl->next;
+    }
+    printf( ")\n" );
+
+    /* Print out predecessors. */
+    printf( "     predecessors: ( " );
+    cfl = bbl_run->pred;
+    while ( cfl != NULL ) {
+      printf( "BBL%d ", cfl->bb->bblnum );
+      cfl = cfl->next;
+    }
+    printf( ")\n" );
+
+    bbl_run = bbl_run->next;
+  }  
 }

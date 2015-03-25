@@ -35,6 +35,7 @@
   extern void peephole_stage2( TAC_seq *tacseq );
   extern void collect_labels( TAC_seq *tacseq );
   extern void construct_basic_block( TAC_seq *tacseq );
+  extern void print_bbl();
   extern void copy_propagation();
   extern void liveness_local();
 
@@ -155,6 +156,7 @@ prog
 	   otherwise segmentation fault would occur! */
 	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
+	print_bbl();
 	copy_propagation();
 	liveness_local();
 	peephole_stage2( currfnbodyTree->tac_seq );
