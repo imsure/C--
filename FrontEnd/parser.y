@@ -33,6 +33,9 @@
   extern void *cleanup_noops( TAC_seq *tacseq );
   extern void peephole_stage1( TAC_seq *tacseq );
   extern void peephole_stage2( TAC_seq *tacseq );
+  extern void transform_cond_jump( TAC_seq *tacseq );
+  extern void delete_redundant_jump( TAC_seq *tacseq );
+  extern void collapse_label_chain( TAC_seq *tacseq );
   extern void collect_labels( TAC_seq *tacseq );
   extern void construct_basic_block( TAC_seq *tacseq );
   extern void print_bbl();
@@ -41,6 +44,7 @@
 
   extern bool tac_only;
   extern bool perform_O1;
+  extern bool perform_O2;
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -124,6 +128,11 @@ prog
       DumpSymTabGlobal();
       DumpSymTabLocal();
 #endif
+      /*--------------------------------------------------------------
+       * Start of constructing TACs for the current processed function
+       * which is represented by a syntax tree 'currfnbodyTree'.
+       --------------------------------------------------------------*/
+
       /* TAC sequence for function body */
       currfnbodyTree->tac_seq = code_gen( currfnbodyTree );
 
@@ -146,33 +155,73 @@ prog
       currfnbodyTree->tac_seq->start = func_label; // code sequence starts at function label
       cleanup_noops( currfnbodyTree->tac_seq );
 
-      /* Carray out peephole optimization. */
-      if ( perform_O1 == true ) {
-	collect_labels( currfnbodyTree->tac_seq );
+      /*------------------------------------------------------------
+       * End of constructing TACs for the current processed function
+       * which is represented by a syntax tree 'currfnbodyTree'.
+       ------------------------------------------------------------*/
+      
+      /*----------------------------------------------------------
+       * Start of performing optimizations according to user input.
+       ----------------------------------------------------------*/
 
+      /**
+       * Carry out only -O1 optimizations:
+       * peephole optimization;
+       * copy propagation;
+       * dead code elimination.
+       */
+      if ( perform_O1 == true && perform_O2 == false ) {
+	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
+	
 	/* Attention: peephole stage1 optimization must be done before
 	   constructing basic blocks because the latter relies on the
 	   former to clean up some nesty if (...) goto ... statements,
 	   otherwise segmentation fault would occur! */
 	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	print_bbl();
+	//	print_bbl();
 	copy_propagation();
 	liveness_local();
 	peephole_stage2( currfnbodyTree->tac_seq );
       }
 
+      /**
+       * Carry out only -O2 optimizations:
+       * register allocation.
+       */
+      if ( perform_O1 == false && perform_O2 == true ) {
+	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
+	transform_cond_jump( currfnbodyTree->tac_seq );
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	//print_bbl();
+      }
+
+      if ( perform_O1 == true && perform_O2 == true ) {
+	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
+	peephole_stage1( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	//print_bbl();
+	copy_propagation();
+	liveness_local();
+	peephole_stage2( currfnbodyTree->tac_seq );
+      }
+
+      /*----------------------------------------------------------
+       * End of performing optimizations according to user input.
+       ----------------------------------------------------------*/
+
+      /*----------------------------------------------------------
+       * Start of outputing final code to stdout.
+       ----------------------------------------------------------*/
+      
       if ( tac_only == true ) { // output TACs to stdout
 	  print_TAC_seq( currfnbodyTree, false );
 	  putchar( '\n' );
-	  //	  printf( "\nReversed Three Address Code:\n\n" );
-	  //	  print_TAC_seq( currfnbodyTree, true );
+	  // printf( "\nReversed Three Address Code:\n\n" );
+	  // print_TAC_seq( currfnbodyTree, true );
       }
-
-#ifdef DEBUG
-      printf( "stack_frame_size = %d\n", stack_frame_size );
-      DumpSymTabLocal();
-#endif
 
       if ( tac_only == false ) { // output MIPS assembly to stdout
 	output_mips_data_section();
@@ -180,6 +229,10 @@ prog
 	tac2mips( currfnbodyTree, currFun->ret_type );
 	putchar( '\n' );
       }
+      
+      /*----------------------------------------------------------
+       * End of outputing final code to stdout.
+       ----------------------------------------------------------*/
 
       CleanupFnInfo(); 
     }

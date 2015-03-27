@@ -136,7 +136,7 @@ static SyntaxNodeType reverse_relational_optype( SyntaxNodeType optype )
  * So given a TAC sequence, we traverse it forward, identify
  * the pattern.
  */
-static void transform_cond_jump( TAC_seq *tacseq )
+void transform_cond_jump( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   TAC *tac_next, *tac_next_next;
@@ -237,7 +237,7 @@ static void precompute_constant_arrayindex( TAC_seq *tacseq )
  * So given a TAC sequence, we traverse it forward, identify
  * the pattern.
  */
-static void delete_redundant_jump( TAC_seq *tacseq )
+void delete_redundant_jump( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   TAC *tac_next, *tac_prev;
@@ -334,6 +334,43 @@ static void collapse_jump_chain( TAC_seq *tacseq )
   }
 }
 
+/**
+ * Peephole optimization: collapse label chain.
+ *
+ * For exmaple:
+ *     ...
+ * L1:
+ * L2:
+ *     ...
+ * can be optimized as:
+ * L2:
+ *
+ * to delete an unnecessary label L1.
+ *
+ * Note this function should be called after
+ * transform_cond_jump() and delete_redundant_jump() to guarantee that
+ * there will be no statement that jumps to L1 in the TAC sequence.
+ */
+void collapse_label_chain( TAC_seq *tacseq )
+{
+  TAC *tac, *tactmp;
+  
+  label_list *llist_head = lhead;
+
+  tac = tacseq->start; // reset to the beginning
+  while ( tac != NULL ) {
+    if ( tac->optype == Label && tac->next->optype == Label ) {
+      tac->prev->next = tac->next;
+      tac->next->prev = tac->prev;
+      tactmp = tac;
+      tac = tac->next;
+      free( tactmp );
+      continue;
+    }
+    tac = tac->next;
+  }
+}
+
 static int calculate( SyntaxNodeType optype, int v1, int v2 )
 {
   switch ( optype ) {
@@ -401,6 +438,7 @@ void peephole_stage1( TAC_seq *tacseq )
   precompute_constant_arrayindex( tacseq );
   delete_redundant_jump( tacseq );
   collapse_jump_chain( tacseq );
+  collapse_label_chain( tacseq );
   collapse_constant_arith( tacseq );
 }
 
