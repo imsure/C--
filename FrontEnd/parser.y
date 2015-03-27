@@ -191,7 +191,7 @@ prog
        */
       if ( perform_O1 == false && perform_O2 == true ) {
 	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
-	transform_cond_jump( currfnbodyTree->tac_seq );
+	//	transform_cond_jump( currfnbodyTree->tac_seq );
 	delete_redundant_jump( currfnbodyTree->tac_seq );
 	collapse_label_chain( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
