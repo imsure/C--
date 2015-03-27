@@ -7,3 +7,4 @@ y.tab.*
 y.output
 *.tgz
 spim-7.2.1-keepstats/
+.DS_Store
