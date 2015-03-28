@@ -43,20 +43,6 @@ typedef struct copytable {
   struct copytable *next;
 } copytable;
 
-static bool is_arith_op( SyntaxNodeType optype )
-{
-  switch ( optype ) {
-  case Plus:
-  case BinaryMinus:
-  case UnaryMinus:
-  case Mult:
-  case Div:
-    return true;
-  default:
-    return false;
-  }
-}
-
 /**
  * Return the replaced operand if 'operand' is found in the
  * copy table 'ct' as a LHS result (lhs_res).
@@ -230,20 +216,6 @@ static void insert_ls( live_set *ls_head, address *var )
   }
   ls->next = (live_set *) zalloc( sizeof(live_set) );
   ls->next->stptr = var->val.stptr;
-}
-
-static bool is_valid_local( address *var )
-{
-  if ( var != NULL &&
-       var->atype == AT_StRef &&
-       var->val.stptr->scope == Local ) {
-    if ( var->val.stptr->type == t_Int ||
-	 var->val.stptr->type == t_Char ||
-	 var->val.stptr->type == t_Tmp_Var ) {
-      return true;
-    }
-  }
-  return false;
 }
 
 static bool is_in_liveset( address *var, live_set *ls_head )

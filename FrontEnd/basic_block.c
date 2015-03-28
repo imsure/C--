@@ -44,24 +44,6 @@ void collect_labels( TAC_seq *tacseq )
 }
 
 /**
- * Check whether the given 'optype' is a relational operation.
- */
-static bool is_relational( SyntaxNodeType optype )
-{
-  switch ( optype ) {
-  case Equals:
-  case Neq:
-  case Leq:
-  case Lt:
-  case Geq:
-  case Gt:
-    return true;
-  default:
-    return false;
-  }
-}
-
-/**
  * Construct the list of basic block for the current function.
  *
  * The TAC generator guarantees that the leader (the first instruction)
@@ -82,7 +64,7 @@ static void construct_bb_list( TAC_seq *tacseq )
 
   tac = tacseq->start->next;
   while ( tac != NULL ) {
-    if ( tac->optype == Goto || is_relational(tac->optype) == true ||
+    if ( tac->optype == Goto || is_relational_op(tac->optype) == true ||
 	 (tac->next != NULL)? tac->next->optype == Label : false ) { // identify the last tac.
       bbl_run->last_tac = tac; // fill in last tac for the current bbl
       /* Construct the next bbl. */
@@ -165,7 +147,7 @@ static void construct_bb_control_flow( TAC_seq *tacseq )
       bbl_succ = bbl_lookup( tac->dest->val.label );
       bbl_run->succ->bb = bbl_succ; // the basic block current block jumps to is the only successor
       bbl_append_pred( bbl_succ, bbl_run );
-    } else if ( is_relational(tac->optype) == true ) { // conditional jump, two successors
+    } else if ( is_relational_op(tac->optype) == true ) { // conditional jump, two successors
       bbl_run->succ = (control_flow_list *) zalloc( sizeof(control_flow_list) );
       bbl_run->succ->bb = bbl_run->next; // next basic block is a successor
       bbl_append_pred( bbl_run->next, bbl_run );

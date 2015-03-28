@@ -77,24 +77,6 @@ static void collapse_constant_assg( TAC_seq *tacseq )
 }
 
 /**
- * Check whether the given 'optype' is a relational operation.
- */
-static bool is_relational_op( SyntaxNodeType optype )
-{
-  switch ( optype ) {
-  case Equals:
-  case Neq:
-  case Leq:
-  case Lt:
-  case Geq:
-  case Gt:
-    return true;
-  default:
-    return false;
-  }
-}
-
-/**
  * Return the reverse of the relational operation 'optype'.
  */
 static SyntaxNodeType reverse_relational_optype( SyntaxNodeType optype )
@@ -384,23 +366,6 @@ static int calculate( SyntaxNodeType optype, int v1, int v2 )
     return v1/v2;
   default:
     return 0;
-  }
-}
-
-/**
- * Check whether the given 'optype' is a arithmetic operation.
- */
-static bool is_arith_op( SyntaxNodeType optype )
-{
-  switch ( optype ) {
-  case Plus:
-  case BinaryMinus:
-  case UnaryMinus:
-  case Mult:
-  case Div:
-    return true;
-  default:
-    return false;
   }
 }
 

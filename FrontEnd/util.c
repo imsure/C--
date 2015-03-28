@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "syntax-tree.h"
 
 /*
  * return a pointer to a zero-initialized block of n bytes.
@@ -63,3 +64,57 @@ llistptr Attach(llistptr list1, llistptr list2)
 
   return list1;
 }
+
+/**
+ * Check whether the given 'optype' is a arithmetic operation.
+ */
+bool is_arith_op( SyntaxNodeType optype )
+{
+  switch ( optype ) {
+  case Plus:
+  case BinaryMinus:
+  case UnaryMinus:
+  case Mult:
+  case Div:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * Check whether the given 'optype' is a relational operation.
+ */
+bool is_relational_op( SyntaxNodeType optype )
+{
+  switch ( optype ) {
+  case Equals:
+  case Neq:
+  case Leq:
+  case Lt:
+  case Geq:
+  case Gt:
+    return true;
+  default:
+    return false;
+  }
+}
+
+/**
+ * Check if address 'var' is a valid local variable, either
+ * user defined or compiler generated tmp variables.
+ */
+bool is_valid_local( address *var )
+{
+  if ( var != NULL &&
+       var->atype == AT_StRef &&
+       var->val.stptr->scope == Local ) {
+    if ( var->val.stptr->type == t_Int ||
+	 var->val.stptr->type == t_Char ||
+	 var->val.stptr->type == t_Tmp_Var ) {
+      return true;
+    }
+  }
+  return false;
+}
+
