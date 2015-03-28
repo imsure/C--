@@ -337,8 +337,6 @@ void collapse_label_chain( TAC_seq *tacseq )
 {
   TAC *tac, *tactmp;
   
-  label_list *llist_head = lhead;
-
   tac = tacseq->start; // reset to the beginning
   while ( tac != NULL ) {
     if ( tac->optype == Label && tac->next->optype == Label ) {
