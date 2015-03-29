@@ -18,7 +18,8 @@ CFILES = error.c \
 	MIPS_generator.c\
 	peephole_o1.c\
 	basic_block.c\
-	liveness_local.c
+	liveness_local.c\
+	bitvector.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -32,7 +33,8 @@ OFILES = error.o \
 	MIPS_generator.o\
 	peephole_o1.o\
 	basic_block.o\
-	liveness_local.o
+	liveness_local.o\
+	bitvector.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -57,6 +59,8 @@ basic_block.o : global.h basic_block.c
 liveness_local.o : global.h liveness_local.c
 
 MIPS_generator.o : global.h MIPS_generator.c
+
+bitvector.o : bitvector.h bitvector.c
 
 util.o : global.h util.h util.c
 
