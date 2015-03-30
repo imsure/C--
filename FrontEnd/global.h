@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+typedef unsigned int bitvec;
+
 #include "error.h"
 #include "util.h"
 

@@ -7,6 +7,8 @@
 #ifndef _SYMBOL_TABLE_H_
 #define _SYMBOL_TABLE_H_
 
+#include "global.h"
+
 #define Global 0
 #define Local  1
 
@@ -26,6 +28,7 @@ typedef struct stblnode {
   int offset2fp; // offset to frame pointer, only applies to local variables and tmps (type=t_Tmp_Var).
   bool to_mips; // indicate whether the global variables or tmps (type=t_Tmp_Strcon) has been
                 // converted to MIPS .data section.
+  bitvec *bv;
 } symtabnode;
 
 /*********************************************************************

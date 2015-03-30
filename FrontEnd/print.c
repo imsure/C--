@@ -9,12 +9,14 @@
 #include "protos.h"
 #include "syntax-tree.h"
 #include "basic_block.h"
+#include "bitvector.h"
 
 static void indent(int n);
 static void printBinop(int op);
 static void printUnop(int op);
 
 extern bbl *bhead;
+extern int num_defs;
 
 /*
  * printSyntaxTree(t,n) -- print out a syntax tree.  t is a pointer
@@ -362,6 +364,7 @@ static void print_operands( TAC *tac )
  */
 static void printtac( TAC *tac )
 {
+  printf( "(%d)", tac->def_num );
   switch ( tac->optype ) {
   case Plus:
   case BinaryMinus:
@@ -495,6 +498,10 @@ void print_bbl()
       cfl = cfl->next;
     }
     printf( ")\n" );
+
+    /* Print out Gen and Kill set. */
+    print_bv( "Gen", bbl_run->gen, num_defs-1 );
+    print_bv( "Kill", bbl_run->kill, num_defs-1 );
 
     bbl_run = bbl_run->next;
   }  

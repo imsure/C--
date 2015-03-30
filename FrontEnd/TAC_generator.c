@@ -905,7 +905,11 @@ static TAC_seq *code_gen_funcall1( tnode *t )
   operand1->val.stptr = t->place; // symbol table entry for the return value.
   /* Can we reuse this tmp variable? No! This value has yet to be assigned.*/
   operand2 = NULL;
-  dest = NULL;
+  /* Note: dest is identical to operand1, it is used to be NULL,
+     but we do this to make further optimization easier! */
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place; // symbol table entry for the return value.
   tac_retrieve = newTAC( optype, operand1, operand2, dest );
 
   /* chain TACs */
@@ -946,7 +950,12 @@ static TAC_seq *code_gen_funcall2( tnode *t )
   operand1->atype = AT_StRef;
   operand1->val.stptr = t->place; // symbol table entry for the return value.
   operand2 = NULL;
-  dest = NULL;
+  /* Note: dest is identical to operand1, it is used to be NULL,
+     but we do this to make further optimization easier! */
+  dest = (address *) zalloc( sizeof(address) );
+  dest->atype = AT_StRef;
+  dest->val.stptr = t->place; // symbol table entry for the return value.
+
   tac_retrieve = newTAC( optype, operand1, operand2, dest );
 
   t->tac_seq->end->next = tac_retrieve;

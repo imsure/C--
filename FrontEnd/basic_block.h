@@ -1,6 +1,8 @@
 #ifndef BASIC_BLOCK_H
 #define BASIC_BLOCK_H
 
+#include "global.h"
+
 /**
  * Linked list of compiler generated labels.
  */
@@ -25,6 +27,11 @@ typedef struct basic_block_list {
   TAC *last_tac;
   control_flow_list *pred, *succ;
   struct basic_block_list *prev, *next;
+  bitvec *gen; // the set of definitions reaches the end of the basic block.
+  bitvec *kill; // the set of definitions(in the entire funciton) that
+                // are killed by definitions with in the basic block.
+  bitvec *in;
+  bitvec *out;
 } bbl;
 
 #endif

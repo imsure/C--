@@ -19,7 +19,8 @@ CFILES = error.c \
 	peephole_o1.c\
 	basic_block.c\
 	liveness_local.c\
-	bitvector.c
+	bitvector.c\
+	reaching_def.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -34,7 +35,8 @@ OFILES = error.o \
 	peephole_o1.o\
 	basic_block.o\
 	liveness_local.o\
-	bitvector.o
+	bitvector.o\
+	reaching_def.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -60,7 +62,9 @@ liveness_local.o : global.h liveness_local.c
 
 MIPS_generator.o : global.h MIPS_generator.c
 
-bitvector.o : bitvector.h bitvector.c
+bitvector.o : global.h bitvector.c
+
+reaching_def.o : global.h reaching_def.c
 
 util.o : global.h util.h util.c
 
