@@ -19,6 +19,7 @@
 bitvec *bv_diff( bitvec *bv1, bitvec *bv2, int len );
 bitvec *bv_union( bitvec *bv1, bitvec *bv2, int len );
 bitvec *bv_intersec( bitvec *bv1, bitvec *bv2, int len );
+bool bv_unequal_check( bitvec *bv1, bitvec *bv2, int len );
 void print_bv( const char *name, bitvec *bv, int len );
   
 #endif

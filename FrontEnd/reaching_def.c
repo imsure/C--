@@ -132,20 +132,81 @@ static void compute_genkill()
 }
 
 /**
+ * Compute the in set for the basic block 'bb'.
+ * bb.in = union of in sets of all predecessor of bb.
+ */
+static bitvec *compute_inset_bb( bbl *bb )
+{
+  bitvec *bvtmp;
+  bitvec *res = NEW_BV( num_defs-1 );
+  control_flow_list *cfl = bb->pred;
+  
+  while ( cfl != NULL ) {
+    bvtmp = res;
+    res = bv_union( res, cfl->bb->out, num_defs-1 );
+    free( bvtmp );
+    cfl = cfl->next;
+  }
+  return res;
+}
+
+/**
+ * Compute the out set for the basic block 'bb'.
+ * bb.out = bb.gen union (bb.in - bb.kill)
+ */
+static bitvec *compute_outset_bb( bbl *bb )
+{
+  bitvec *bvtmp;
+  bitvec *res;
+  
+  res = bv_diff( bb->in, bb->kill, num_defs-1 );
+  bvtmp = res;
+  res = bv_union( res, bb->gen, num_defs-1 );
+  free( bvtmp );
+  return res;
+}
+
+/**
  * Compute in and out set for each basic block of the current
  * processed function.
  */
 static void compute_inout()
 {
   bbl *bbl_run;
-  
+  bitvec *bvtmp, *oldout;
+  bool change;
+  int iter_num = 0;
+
+  /* Initialize in and out set for each basic block. */
   bbl_run = bhead;
   while( bbl_run != NULL ) {
-    bbl_run->gen = NEW_BV( num_defs-1 );
-    bbl_run->kill = NEW_BV( num_defs-1 );
-    compute_genkill_bb( bbl_run );
+    bbl_run->in = NEW_BV( num_defs-1 );
+    bbl_run->out = NEW_BV( num_defs-1 );
+    bvtmp = bbl_run->out;
+    bbl_run->out = bv_union( bbl_run->out, bbl_run->gen, num_defs-1 );
+    free( bvtmp );
     bbl_run = bbl_run->next;
   }
+
+  /* Iteratively compute in and out set until they converge. */
+  change = true;
+  while ( change ) {
+    printf( "Computing inout: iteration %d\n", iter_num++ );
+    change = false;
+    bbl_run = bhead;
+    while( bbl_run != NULL ) {
+      bbl_run->in = compute_inset_bb( bbl_run );
+      oldout = bbl_run->out;
+      bbl_run->out = compute_outset_bb( bbl_run );
+      if ( bv_unequal_check(oldout, bbl_run->out, num_defs-1) == true ) {
+	printf( "Iteration %d: change is true\n", iter_num );
+	change = true;
+      }
+      free( oldout );
+      bbl_run = bbl_run->next;
+    }
+  }
+  printf( "Converge!\n" );
 }
 
 
@@ -176,5 +237,6 @@ void reaching_defs( TAC_seq *tacseq )
 {
   compute_defset_locals( tacseq );
   compute_genkill();
+  compute_inout();
   //print_var_defs( tacseq );
 }

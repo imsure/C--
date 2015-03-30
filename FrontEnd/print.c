@@ -500,8 +500,10 @@ void print_bbl()
     printf( ")\n" );
 
     /* Print out Gen and Kill set. */
-    print_bv( "Gen", bbl_run->gen, num_defs-1 );
-    print_bv( "Kill", bbl_run->kill, num_defs-1 );
+    print_bv( "     Gen", bbl_run->gen, num_defs-1 );
+    print_bv( "     Kill", bbl_run->kill, num_defs-1 );
+    print_bv( "     In", bbl_run->in, num_defs-1 );
+    print_bv( "     Out", bbl_run->out, num_defs-1 );
 
     bbl_run = bbl_run->next;
   }  
