@@ -38,6 +38,8 @@ typedef struct basic_block_list {
   /* For liveness analysis. */
   bitvec *def;
   bitvec *use;
+  bitvec *livein;
+  bitvec *liveout;
 } bbl;
 
 #endif

@@ -12,4 +12,6 @@ void main(void)
 
   print_int(i);
   print_string("\n");
+  /* print_int(j); */
+  /* print_string("\n"); */
 }

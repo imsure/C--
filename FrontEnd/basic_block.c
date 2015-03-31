@@ -173,7 +173,7 @@ static void construct_bb_control_flow()
 static void count_tac_num()
 {
   TAC *tac;
-  bbl *bbl_run, *bbl_succ;
+  bbl *bbl_run;
   int count;
   
   bbl_run = bhead;

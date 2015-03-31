@@ -183,19 +183,38 @@ static void compute_defuse()
 }
 
 /**
- * Compute the in set for the basic block 'bb'.
- * bb.in = union of in sets of all predecessor of bb.
- */
-static bitvec *compute_inset_bb( bbl *bb )
-{
-}
-
-/**
  * Compute the out set for the basic block 'bb'.
- * bb.out = bb.gen union (bb.in - bb.kill)
+ * bb.liveout = union of in sets of all successors of bb.
  */
 static bitvec *compute_outset_bb( bbl *bb )
 {
+  bitvec *bvtmp;
+  bitvec *res = NEW_BV( num_vars-1 );
+  control_flow_list *cfl = bb->succ;
+  
+  while ( cfl != NULL ) {
+    bvtmp = res;
+    res = bv_union( res, cfl->bb->livein, num_vars-1 );
+    free( bvtmp );
+    cfl = cfl->next;
+  }
+  return res;
+}
+
+/**
+ * Compute the in set for the basic block 'bb'.
+ * bb.livein = bb.use union (bb.liveout - bb.def)
+ */
+static bitvec *compute_inset_bb( bbl *bb )
+{
+  bitvec *bvtmp;
+  bitvec *res;
+  
+  res = bv_diff( bb->liveout, bb->def, num_vars-1 );
+  bvtmp = res;
+  res = bv_union( res, bb->use, num_vars-1 );
+  free( bvtmp );
+  return res;
 }
 
 /**
@@ -204,10 +223,46 @@ static bitvec *compute_outset_bb( bbl *bb )
  */
 static void compute_inout()
 {
+  bbl *bbl_run;
+  bitvec *bvtmp, *oldin;
+  bool change;
+  int iter_num = 0;
+
+  /* Initialize in and out set for each basic block. */
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    bbl_run->livein = NEW_BV( num_vars-1 );
+    bbl_run->liveout = NEW_BV( num_vars-1 );
+    bvtmp = bbl_run->livein;
+    bbl_run->livein = bv_union( bbl_run->livein, bbl_run->use, num_vars-1 );
+    free( bvtmp );
+    bbl_run = bbl_run->next;
+  }
+
+  /* Iteratively compute in and out set until they converge. */
+  change = true;
+  while ( change ) {
+    printf( "Computing liveness: iteration %d\n", ++iter_num );
+    change = false;
+    bbl_run = bhead;
+    while( bbl_run != NULL ) {
+      bbl_run->liveout = compute_outset_bb( bbl_run );
+      oldin = bbl_run->livein;
+      bbl_run->livein = compute_inset_bb( bbl_run );
+      if ( bv_unequal_check(oldin, bbl_run->livein, num_vars-1) == true ) {
+	printf( "Iteration %d: change is true\n", iter_num );
+	change = true;
+      }
+      free( oldin );
+      bbl_run = bbl_run->next;
+    }
+  }
+  printf( "Converge!\n" );
 }
 
 void liveness_global( TAC_seq *tacseq )
 {
   num_vars = count_assign_varids( tacseq );
   compute_defuse();
+  compute_inout();
 }

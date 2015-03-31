@@ -514,6 +514,8 @@ void print_bbl()
     if ( bbl_run->def && bbl_run->use ) {
       print_bv( "     Def", bbl_run->def, num_vars-1 );
       print_bv( "     Use", bbl_run->use, num_vars-1 );
+      print_bv( "     In", bbl_run->livein, num_vars-1 );
+      print_bv( "     Out", bbl_run->liveout, num_vars-1 );
     }
 
     bbl_run = bbl_run->next;
