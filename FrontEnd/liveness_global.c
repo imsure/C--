@@ -75,6 +75,11 @@ static int count_assign_varids( TAC_seq *tacseq )
   return var_counter;
 }
 
+/**
+ * Check if 'tac' is a special instruction for calculating
+ * the address of an array element, like: _taddr0 = x + 4
+ * where x is the name of array.
+ */
 static bool array_addr_cal_tac( TAC *tac)
 {
   if ( is_arith_op(tac->optype) &&
