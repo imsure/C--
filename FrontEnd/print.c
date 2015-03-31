@@ -310,14 +310,14 @@ static void print_operands( TAC *tac )
       if ( tac->operand1->val.stptr->type == t_Tmp_Addr ) { // array reference
 	switch( tac->operand1->val.stptr->elt_type ) {
 	case t_Char:
-	  printf( "*%s(char) ", tac->operand1->val.stptr->name );
+	  printf( "(%d)*%s(char) ", tac->operand1->val.stptr->varid, tac->operand1->val.stptr->name );
 	  break;
 	case t_Int:
-	  printf( "*%s(int) ", tac->operand1->val.stptr->name );
+	  printf( "(%d)*%s(int) ", tac->operand1->val.stptr->varid, tac->operand1->val.stptr->name );
 	  break;
    	}
       } else {
-	printf( "%s ", tac->operand1->val.stptr->name );
+	printf( "(%d)%s ", tac->operand1->val.stptr->varid, tac->operand1->val.stptr->name );
       }
       break;
     default:
@@ -342,14 +342,14 @@ static void print_operands( TAC *tac )
       if ( tac->operand2->val.stptr->type == t_Tmp_Addr ) { // array reference
 	switch( tac->operand2->val.stptr->elt_type ) {
 	case t_Char:
-	  printf( " *%s(char) ", tac->operand2->val.stptr->name );
+	  printf( " (%d)*%s(char) ", tac->operand2->val.stptr->varid, tac->operand2->val.stptr->name );
 	  break;
 	case t_Int:
-	  printf( " *%s(int) ", tac->operand2->val.stptr->name );
+	  printf( " (%d)*%s(int) ", tac->operand2->val.stptr->varid, tac->operand2->val.stptr->name );
 	  break;
    	}
       } else {
-	printf( " %s", tac->operand2->val.stptr->name );
+	printf( " (%d)%s", tac->operand2->val.stptr->varid, tac->operand2->val.stptr->name );
       }
       break;
     default:
@@ -371,25 +371,25 @@ static void printtac( TAC *tac )
   case BinaryMinus:
   case Mult:
   case Div:
-    printf( "\t%s = ", tac->dest->val.stptr->name ); 
+    printf( "\t(%d)%s = ", tac->dest->val.stptr->varid, tac->dest->val.stptr->name ); 
     print_operands( tac );
     break;
   case UnaryMinus:
-    printf( "\t%s = -", tac->dest->val.stptr->name );
+    printf( "\t(%d)%s = -", tac->dest->val.stptr->varid, tac->dest->val.stptr->name );
     print_operands( tac );
     break;
   case Assg:
     if ( tac->dest->val.stptr->type == t_Tmp_Addr ) { // array reference
       switch( tac->dest->val.stptr->elt_type ) {
       case t_Char:
-	printf( "\t*%s(char) = ", tac->dest->val.stptr->name );
+	printf( "\t(%d)*%s(char) = ", tac->dest->val.stptr->varid, tac->dest->val.stptr->name );
 	break;
       case t_Int:
-	printf( "\t*%s(int) = ", tac->dest->val.stptr->name );
+	printf( "\t(%d)*%s(int) = ", tac->dest->val.stptr->varid, tac->dest->val.stptr->name );
 	break;
       }
     } else {
-      printf( "\t%s = ", tac->dest->val.stptr->name );
+      printf( "\t(%d)%s = ", tac->dest->val.stptr->varid, tac->dest->val.stptr->name );
     }
       
     print_operands( tac );

@@ -84,26 +84,26 @@ static void compute_defuse_bb( bbl *bb )
   while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
       if ( tac->dest->val.stptr->scope == Local ) {
-	SET_BIT( bb->def, tac->dest->val.stptr->varid );
-	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid );
+	SET_BIT( bb->def, tac->dest->val.stptr->varid-1 );
+	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
       }
       if ( valid_local(tac->operand1) == true ) {
-	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid );
-	SET_BIT( bb->use, tac->operand1->val.stptr->varid );
+	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
       }
       if ( valid_local(tac->operand2) == true ) {
-	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid );
-	SET_BIT( bb->use, tac->operand2->val.stptr->varid );
+	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
       }
     } else if ( tac->optype == Retrieve ) { // def
       if ( tac->dest->val.stptr->scope == Local ) {
-	SET_BIT( bb->def, tac->dest->val.stptr->varid );
-	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid );
+	SET_BIT( bb->def, tac->dest->val.stptr->varid-1 );
+	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
       }
     } else if ( tac->optype == Param ) { // use
       if ( tac->dest->val.stptr->scope == Local ) {
-	CLEAR_BIT( bb->def, tac->dest->val.stptr->varid );
-	SET_BIT( bb->use, tac->dest->val.stptr->varid );
+	CLEAR_BIT( bb->def, tac->dest->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->dest->val.stptr->varid-1 );
       }
     }
     tac = tac->prev;
