@@ -42,6 +42,7 @@
   extern void copy_propagation();
   extern void liveness_local();
   extern void reaching_defs( TAC_seq *tacseq );
+  extern void liveness_global( TAC_seq *tacseq );
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -180,10 +181,11 @@ prog
 	   otherwise segmentation fault would occur! */
 	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	//	print_bbl();
 	copy_propagation();
-	liveness_local();
+	liveness_global( currfnbodyTree->tac_seq );
+	//liveness_local();
 	peephole_stage2( currfnbodyTree->tac_seq );
+	print_bbl();
       }
 
       /**

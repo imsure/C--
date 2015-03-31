@@ -133,7 +133,7 @@ static void bbl_append_pred( bbl *bb, bbl *pred )
 /**
  * Construct control flow information for basic blocks.
  */
-static void construct_bb_control_flow( TAC_seq *tacseq )
+static void construct_bb_control_flow()
 {
   TAC *tac;
   bbl *bbl_run, *bbl_succ;
@@ -167,8 +167,31 @@ static void construct_bb_control_flow( TAC_seq *tacseq )
   }
 }
 
+/**
+ * Construct control flow information for basic blocks.
+ */
+static void count_tac_num()
+{
+  TAC *tac;
+  bbl *bbl_run, *bbl_succ;
+  int count;
+  
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    count = 0;
+    tac = bbl_run->first_tac;
+    while ( tac != bbl_run->last_tac ) {
+      ++count;
+      tac = tac->next;
+    }
+    bbl_run->numtacs = ++count;
+    bbl_run = bbl_run->next;
+  }
+}
+
 void construct_basic_block( TAC_seq *tacseq )
 {
   construct_bb_list( tacseq );
-  construct_bb_control_flow( tacseq );
+  count_tac_num();
+  construct_bb_control_flow();
 }

@@ -871,7 +871,12 @@ static TAC_seq *code_gen_funcall1( tnode *t )
     operand1->atype = AT_StRef;
     operand1->val.stptr = arg->place;
     operand2 = NULL;
-    dest = NULL;
+    /* Note that dest is identical to operand1 because we want to
+       make future optimization easier to do. */
+    dest = (address *) zalloc( sizeof(address) );
+    dest->atype = AT_StRef;
+    dest->val.stptr = arg->place;
+
     tac_param = newTAC( optype, operand1, operand2, dest );
 
     /* Chain TAC one by one. */
@@ -990,7 +995,12 @@ static TAC_seq *code_gen_funcall3( tnode *t )
     operand1->atype = AT_StRef;
     operand1->val.stptr = arg->place;
     operand2 = NULL;
-    dest = NULL;
+    /* Note that dest is identical to operand1 because we want to
+       make future optimization easier to do. */
+    dest = (address *) zalloc( sizeof(address) );
+    dest->atype = AT_StRef;
+    dest->val.stptr = arg->place;
+
     tac_param = newTAC( optype, operand1, operand2, dest );
 
     /* Chain TAC one by one. */

@@ -17,6 +17,7 @@ static void printUnop(int op);
 
 extern bbl *bhead;
 extern int num_defs;
+extern int num_vars;
 
 /*
  * printSyntaxTree(t,n) -- print out a syntax tree.  t is a pointer
@@ -476,8 +477,9 @@ void print_bbl()
   control_flow_list *cfl;
 
   while( bbl_run != NULL ) {
-    printf( "BBL%d(start tac: %s, end tac:",
-	    bbl_run->bblnum, bbl_run->first_tac->dest->val.label );
+    printf( "BBL%d(# of TACs: %d, start: %s, end:",
+	    bbl_run->bblnum, bbl_run->numtacs,
+	    bbl_run->first_tac->dest->val.label );
     printtac( bbl_run->last_tac );
     printf( ", prev: BBL%d)\n", (bbl_run->prev != NULL) ? bbl_run->prev->bblnum : -1 );
 
@@ -499,11 +501,20 @@ void print_bbl()
     }
     printf( ")\n" );
 
-    /* Print out Gen and Kill set. */
-    print_bv( "     Gen", bbl_run->gen, num_defs-1 );
-    print_bv( "     Kill", bbl_run->kill, num_defs-1 );
-    print_bv( "     In", bbl_run->in, num_defs-1 );
-    print_bv( "     Out", bbl_run->out, num_defs-1 );
+    /* Print out bit vectors for reaching definitions. */
+    if ( bbl_run->gen && bbl_run->kill &&
+	 bbl_run->in && bbl_run->out ) {
+      print_bv( "     Gen", bbl_run->gen, num_defs-1 );
+      print_bv( "     Kill", bbl_run->kill, num_defs-1 );
+      print_bv( "     In", bbl_run->in, num_defs-1 );
+      print_bv( "     Out", bbl_run->out, num_defs-1 );
+    }
+
+    /* Print out bit vectors for liveness analysis. */
+    if ( bbl_run->def && bbl_run->use ) {
+      print_bv( "     Def", bbl_run->def, num_vars-1 );
+      print_bv( "     Use", bbl_run->use, num_vars-1 );
+    }
 
     bbl_run = bbl_run->next;
   }  

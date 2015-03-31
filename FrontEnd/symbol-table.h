@@ -28,7 +28,9 @@ typedef struct stblnode {
   int offset2fp; // offset to frame pointer, only applies to local variables and tmps (type=t_Tmp_Var).
   bool to_mips; // indicate whether the global variables or tmps (type=t_Tmp_Strcon) has been
                 // converted to MIPS .data section.
-  bitvec *bv;
+  bitvec *bv; // bit vector for holding the set of instructions that defines the variable.
+              // This is for reaching definition.
+  int varid; // a unique id for the local variable. This is for intra-procedural liveness analysis.
 } symtabnode;
 
 /*********************************************************************

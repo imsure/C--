@@ -27,11 +27,17 @@ typedef struct basic_block_list {
   TAC *last_tac;
   control_flow_list *pred, *succ;
   struct basic_block_list *prev, *next;
+  int numtacs; // number of TACs in side the basic block.
+  /* For reaching definition. */
   bitvec *gen; // the set of definitions reaches the end of the basic block.
   bitvec *kill; // the set of definitions(in the entire funciton) that
                 // are killed by definitions with in the basic block.
   bitvec *in;
   bitvec *out;
+
+  /* For liveness analysis. */
+  bitvec *def;
+  bitvec *use;
 } bbl;
 
 #endif

@@ -20,7 +20,8 @@ CFILES = error.c \
 	basic_block.c\
 	liveness_local.c\
 	bitvector.c\
-	reaching_def.c
+	reaching_def.c\
+	liveness_global.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -36,7 +37,8 @@ OFILES = error.o \
 	basic_block.o\
 	liveness_local.o\
 	bitvector.o\
-	reaching_def.o
+	reaching_def.o\
+	liveness_global.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -65,6 +67,8 @@ MIPS_generator.o : global.h MIPS_generator.c
 bitvector.o : global.h bitvector.c
 
 reaching_def.o : global.h reaching_def.c
+
+liveness_global.o : global.h liveness_global.c
 
 util.o : global.h util.h util.c
 
