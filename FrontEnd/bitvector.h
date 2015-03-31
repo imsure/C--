@@ -16,6 +16,10 @@
 #define CLEAR_BIT(A, k) \
   ( A[(k)/UINT_SZ] &= ~(0x1 << ((k) % UINT_SZ)) )
 
+/* Test if the 'k'th bit of the bit vector 'A' has been set to 1. */
+#define TEST_BIT(A, k) \
+  ( A[(k)/UINT_SZ] & (0x1 << ((k) % UINT_SZ)) )
+
 bitvec *bv_diff( bitvec *bv1, bitvec *bv2, int len );
 bitvec *bv_union( bitvec *bv1, bitvec *bv2, int len );
 bitvec *bv_intersec( bitvec *bv1, bitvec *bv2, int len );

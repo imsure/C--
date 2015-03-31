@@ -363,7 +363,7 @@ static void print_operands( TAC *tac )
 /**
  * Print out a single TAC instruction 'tac'.
  */
-static void printtac( TAC *tac )
+void printtac( TAC *tac )
 {
   printf( "(%d)", tac->def_num );
   switch ( tac->optype ) {

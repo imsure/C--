@@ -11,18 +11,22 @@
 #include "syntax-tree.h"
 #include "basic_block.h"
 
+extern void printtac( TAC *tac );
+
 int num_vars; // total number of variables inside the current
               // processed function. This will be the size of bit vectors.
 extern bbl *bhead; // header to the basic block list of the current function.
 
 /**
  * Check if address 'var' is a valid local variable, either
- * user defined or compiler generated tmp variables.
+ * user defined or compiler generated tmp variables. The name
+ * of local array variable is excluded.
  */
 static bool valid_local( address *var )
 {
   if ( var != NULL && var->atype == AT_StRef &&
-       var->val.stptr->scope == Local ) {
+       var->val.stptr->scope == Local &&
+       var->val.stptr->type != t_Array ) {
     return true;
   }
   return false;
@@ -71,6 +75,17 @@ static int count_assign_varids( TAC_seq *tacseq )
   return var_counter;
 }
 
+static bool array_addr_cal_tac( TAC *tac)
+{
+  if ( is_arith_op(tac->optype) &&
+       tac->dest->val.stptr->type == t_Tmp_Addr &&
+       tac->operand1->atype == AT_StRef &&
+       tac->operand1->val.stptr->type == t_Array ) {
+    return true;
+  }
+  return false;
+}
+     
 /**
  * Compute def and use set for the basic block 'bb'
  * using its local information.
@@ -78,14 +93,38 @@ static int count_assign_varids( TAC_seq *tacseq )
 static void compute_defuse_bb( bbl *bb )
 {
   TAC *tac = bb->last_tac;
-  bitvec *bvtmp;
   int iternum = 0;
 
   while ( iternum < bb->numtacs ) {
+    if ( array_addr_cal_tac(tac) == true ) {
+      if ( valid_local(tac->operand2) == true ) {
+	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
+      }
+      tac = tac->prev;
+      iternum++;
+      continue;
+    }
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
       if ( tac->dest->val.stptr->scope == Local ) {
-	SET_BIT( bb->def, tac->dest->val.stptr->varid-1 );
-	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
+	if ( TEST_BIT(bb->def, tac->dest->val.stptr->varid-1) ) {
+	  /* if tac->dest is already in the def set, the current definition
+	     must be dead. for example:
+	     x = x + 1;
+	     x = 5;
+	     x = x + 1 is dead before it is overwritten by x = 5.
+	     in this case, mark the current tac as dead, then
+	     continue to the next iteration. */
+	  printf( "The current instruction:" );
+	  printtac( tac );
+	  printf( " is dead\n" );
+	  tac = tac->prev;
+	  iternum++;
+	  continue;
+	} else {
+	  SET_BIT( bb->def, tac->dest->val.stptr->varid-1 );
+	  CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
+	}
       }
       if ( valid_local(tac->operand1) == true ) {
 	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
@@ -105,6 +144,16 @@ static void compute_defuse_bb( bbl *bb )
 	CLEAR_BIT( bb->def, tac->dest->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->dest->val.stptr->varid-1 );
       }
+    } else if ( is_relational_op(tac->optype) ) {
+      if ( valid_local(tac->operand1) == true ) {
+	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
+      }      
+
+      if ( valid_local(tac->operand2) == true ) {
+	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
+      }      
     }
     tac = tac->prev;
     iternum++;
