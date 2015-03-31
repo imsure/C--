@@ -105,6 +105,7 @@ static void compute_defuse_bb( bbl *bb )
       if ( valid_local(tac->operand2) == true ) {
 	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }
       tac = tac->prev;
       iternum++;
@@ -120,9 +121,10 @@ static void compute_defuse_bb( bbl *bb )
 	     x = x + 1 is dead before it is overwritten by x = 5.
 	     in this case, mark the current tac as dead, then
 	     continue to the next iteration. */
-	  printf( "The current instruction:" );
-	  printtac( tac );
-	  printf( " is dead\n" );
+	  /* printf( "Dead code (local):" ); */
+	  /* printtac( tac ); */
+	  /* printf( "\n" ); */
+	  tac->is_dead = true;
 	  tac = tac->prev;
 	  iternum++;
 	  continue;
@@ -134,10 +136,12 @@ static void compute_defuse_bb( bbl *bb )
       if ( valid_local(tac->operand1) == true ) {
 	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
       }
       if ( valid_local(tac->operand2) == true ) {
 	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }
     } else if ( tac->optype == Retrieve ) { // def
       if ( tac->dest->val.stptr->scope == Local ) {
@@ -148,16 +152,19 @@ static void compute_defuse_bb( bbl *bb )
       if ( tac->dest->val.stptr->scope == Local ) {
 	CLEAR_BIT( bb->def, tac->dest->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->dest->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->dest->val.stptr->varid-1 );
       }
     } else if ( is_relational_op(tac->optype) ) {
       if ( valid_local(tac->operand1) == true ) {
 	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
       }      
 
       if ( valid_local(tac->operand2) == true ) {
 	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }      
     }
     tac = tac->prev;
@@ -226,7 +233,6 @@ static void compute_inout()
   bbl *bbl_run;
   bitvec *bvtmp, *oldin;
   bool change;
-  int iter_num = 0;
 
   /* Initialize in and out set for each basic block. */
   bbl_run = bhead;
@@ -242,7 +248,6 @@ static void compute_inout()
   /* Iteratively compute in and out set until they converge. */
   change = true;
   while ( change ) {
-    printf( "Computing liveness: iteration %d\n", ++iter_num );
     change = false;
     bbl_run = bhead;
     while( bbl_run != NULL ) {
@@ -250,14 +255,118 @@ static void compute_inout()
       oldin = bbl_run->livein;
       bbl_run->livein = compute_inset_bb( bbl_run );
       if ( bv_unequal_check(oldin, bbl_run->livein, num_vars-1) == true ) {
-	printf( "Iteration %d: change is true\n", iter_num );
 	change = true;
       }
       free( oldin );
       bbl_run = bbl_run->next;
     }
   }
-  printf( "Converge!\n" );
+}
+
+static void detect_dead_code_bb( bbl *bb )
+{
+  TAC *tac = bb->last_tac;
+  int iternum = 0;
+
+  while ( iternum < bb->numtacs ) {
+    if ( array_addr_cal_tac(tac) == true ) {
+      if ( valid_local(tac->operand2) == true ) {
+	SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
+      }
+      tac = tac->prev;
+      iternum++;
+      continue;
+    }
+    if ( tac->is_dead == true ) {
+      tac = tac->prev;
+      iternum++;
+      continue;
+    }
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
+      if ( tac->dest->val.stptr->scope == Local ) {
+	if ( bv_test_bit(bb->liveout, tac->dest->val.stptr->varid-1) == false &&
+	     bv_test_bit(bb->used, tac->dest->val.stptr->varid-1) == false ) {
+	  /* if tac->dest is neither in bb->out nor in bb->used,
+	     then tac must be dead. */
+	  /* printf( "Dead code (global):" ); */
+	  /* printtac( tac ); */
+	  /* printf( "\n" ); */
+	  tac->is_dead = true;
+	  tac = tac->prev;
+	  iternum++;
+	  continue;
+	} else { // update bb->used set only if tac is not dead
+	  if ( valid_local(tac->operand1) == true ) {
+	    SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
+	  }
+	  if ( valid_local(tac->operand2) == true ) {
+	    SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
+	  }
+	}
+      }
+    } else if ( tac->optype == Retrieve ) { // def
+      if ( tac->dest->val.stptr->scope == Local ) {
+	if ( !TEST_BIT(bb->liveout, tac->dest->val.stptr->varid-1) &&
+	     !TEST_BIT(bb->used, tac->dest->val.stptr->varid-1) ) {
+	  /* if tac->dest is neither in bb->out nor in bb->used,
+	     then tac must be dead. */
+	  /* printf( "Dead code (global):" ); */
+	  /* printtac( tac ); */
+	  /* printf( "\n" ); */
+	  tac->is_dead = true;
+	  tac = tac->prev;
+	  iternum++;
+	  continue;
+	}
+      }
+    } else if ( tac->optype == Param ) { // use
+      if ( tac->dest->val.stptr->scope == Local ) {
+	SET_BIT( bb->used, tac->dest->val.stptr->varid-1 );
+      }
+    } else if ( is_relational_op(tac->optype) ) {
+      if ( valid_local(tac->operand1) == true ) {
+	SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
+      }
+      if ( valid_local(tac->operand2) == true ) {
+	SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
+      }      
+    }
+    tac = tac->prev;
+    iternum++;
+  }
+}
+
+static void detect_dead_code()
+{
+  bbl *bbl_run;
+  
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    bbl_run->used = NEW_BV( num_vars-1 );
+    detect_dead_code_bb( bbl_run );
+    bbl_run = bbl_run->next;
+  }
+}
+
+static void remove_dead_code( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  TAC *tmp;
+
+  while ( tac != NULL ) {
+    if ( tac->is_dead == true ) {
+      tac->prev->next = tac->next;
+      tac->next->prev = tac->prev;
+      tmp = tac;
+      printf( "Remove: " );
+      printtac( tac );
+      putchar( '\n' );
+      tac = tac->next;
+      free( tmp );
+      continue;
+    }
+    tac = tac->next;
+  }
 }
 
 void liveness_global( TAC_seq *tacseq )
@@ -265,4 +374,6 @@ void liveness_global( TAC_seq *tacseq )
   num_vars = count_assign_varids( tacseq );
   compute_defuse();
   compute_inout();
+  detect_dead_code();
+  remove_dead_code( tacseq );
 }

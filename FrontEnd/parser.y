@@ -185,7 +185,7 @@ prog
 	liveness_global( currfnbodyTree->tac_seq );
 	//liveness_local();
 	peephole_stage2( currfnbodyTree->tac_seq );
-	print_bbl();
+	//print_bbl();
       }
 
       /**

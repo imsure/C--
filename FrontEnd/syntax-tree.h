@@ -90,6 +90,7 @@ typedef struct three_address_code {
   int def_num; // a unique positive number if TAC is a definition
                // to some local variables/tmps. It is used by bitvector
                // for computing reaching definitions.
+  bool is_dead; // indicate if TAC is dead.
 } TAC;
 
 /**

@@ -74,3 +74,12 @@ void print_bv( const char *name, bitvec *bv, int len )
   }
   putchar( '\n' );
 }
+
+bool bv_test_bit( bitvec *bv, int k )
+{
+  if ( bv[k/UINT_SZ] & (0x1 << (k % UINT_SZ)) ) {
+    return true;
+  } else {
+    return false;
+  }
+}

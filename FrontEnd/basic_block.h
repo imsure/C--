@@ -35,11 +35,12 @@ typedef struct basic_block_list {
   bitvec *in;
   bitvec *out;
 
-  /* For liveness analysis. */
+  /* For liveness analysis and dead code elimination. */
   bitvec *def;
   bitvec *use;
   bitvec *livein;
   bitvec *liveout;
+  bitvec *used; // the set of local variables that are used inside the block.
 } bbl;
 
 #endif
