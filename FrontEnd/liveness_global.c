@@ -48,21 +48,21 @@ static int count_assign_varids( TAC_seq *tacseq )
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ||
 	 tac->optype == Retrieve || tac->optype == Param ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	if ( tac->dest->val.stptr->varid == 0 ) {
 	  /* make sure only assign once for each variable. */
 	  tac->dest->val.stptr->varid = ++var_counter;
 	}
       }
 
-      if ( valid_local( tac->operand1 ) == true ) {
+      if ( is_valid_local( tac->operand1 ) == true ) {
 	if ( tac->operand1->val.stptr->varid == 0 ) {
 	  /* make sure only assign once for each variable. */
 	  tac->operand1->val.stptr->varid = ++var_counter;
 	}
       }
 
-      if ( valid_local( tac->operand2 ) == true ) {
+      if ( is_valid_local( tac->operand2 ) == true ) {
 	if ( tac->operand2->val.stptr->varid == 0 ) {
 	  /* make sure only assign once for each variable. */
 	  tac->operand2->val.stptr->varid = ++var_counter;
@@ -101,18 +101,8 @@ static void compute_defuse_bb( bbl *bb )
   int iternum = 0;
 
   while ( iternum < bb->numtacs ) {
-    if ( array_addr_cal_tac(tac) == true ) {
-      if ( valid_local(tac->operand2) == true ) {
-	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
-	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
-	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
-      }
-      tac = tac->prev;
-      iternum++;
-      continue;
-    }
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	if ( TEST_BIT(bb->def, tac->dest->val.stptr->varid-1) ) {
 	  /* if tac->dest is already in the def set, the current definition
 	     must be dead. for example:
@@ -133,39 +123,45 @@ static void compute_defuse_bb( bbl *bb )
 	  CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
 	}
       }
-      if ( valid_local(tac->operand1) == true ) {
+      if ( is_valid_local(tac->operand1) == true ) {
 	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
 	//SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
       }
-      if ( valid_local(tac->operand2) == true ) {
+      if ( is_valid_local(tac->operand2) == true ) {
 	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
 	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }
     } else if ( tac->optype == Retrieve ) { // def
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	SET_BIT( bb->def, tac->dest->val.stptr->varid-1 );
 	CLEAR_BIT( bb->use, tac->dest->val.stptr->varid-1 );
       }
     } else if ( tac->optype == Param ) { // use
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	CLEAR_BIT( bb->def, tac->dest->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->dest->val.stptr->varid-1 );
 	//SET_BIT( bb->used, tac->dest->val.stptr->varid-1 );
       }
     } else if ( is_relational_op(tac->optype) ) {
-      if ( valid_local(tac->operand1) == true ) {
+      if ( is_valid_local(tac->operand1) == true ) {
 	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
 	//SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
       }      
 
-      if ( valid_local(tac->operand2) == true ) {
+      if ( is_valid_local(tac->operand2) == true ) {
 	CLEAR_BIT( bb->def, tac->operand2->val.stptr->varid-1 );
 	SET_BIT( bb->use, tac->operand2->val.stptr->varid-1 );
 	//SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }      
+    } else if ( tac->optype == Return ) { // use
+      if ( is_valid_local(tac->operand1) ) {
+	CLEAR_BIT( bb->def, tac->operand1->val.stptr->varid-1 );
+	SET_BIT( bb->use, tac->operand1->val.stptr->varid-1 );
+	//SET_BIT( bb->used, tac->dest->val.stptr->varid-1 );
+      }
     }
     tac = tac->prev;
     iternum++;
@@ -269,21 +265,13 @@ static void detect_dead_code_bb( bbl *bb )
   int iternum = 0;
 
   while ( iternum < bb->numtacs ) {
-    if ( array_addr_cal_tac(tac) == true ) {
-      if ( valid_local(tac->operand2) == true ) {
-	SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
-      }
-      tac = tac->prev;
-      iternum++;
-      continue;
-    }
     if ( tac->is_dead == true ) {
       tac = tac->prev;
       iternum++;
       continue;
     }
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	if ( bv_test_bit(bb->liveout, tac->dest->val.stptr->varid-1) == false &&
 	     bv_test_bit(bb->used, tac->dest->val.stptr->varid-1) == false ) {
 	  /* if tac->dest is neither in bb->out nor in bb->used,
@@ -295,17 +283,16 @@ static void detect_dead_code_bb( bbl *bb )
 	  tac = tac->prev;
 	  iternum++;
 	  continue;
-	} else { // update bb->used set only if tac is not dead
-	  if ( valid_local(tac->operand1) == true ) {
-	    SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
-	  }
-	  if ( valid_local(tac->operand2) == true ) {
-	    SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
-	  }
 	}
       }
+      if ( is_valid_local(tac->operand1) == true ) {
+	SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
+      }
+      if ( is_valid_local(tac->operand2) == true ) {
+	SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
+      }
     } else if ( tac->optype == Retrieve ) { // def
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	if ( !TEST_BIT(bb->liveout, tac->dest->val.stptr->varid-1) &&
 	     !TEST_BIT(bb->used, tac->dest->val.stptr->varid-1) ) {
 	  /* if tac->dest is neither in bb->out nor in bb->used,
@@ -320,16 +307,20 @@ static void detect_dead_code_bb( bbl *bb )
 	}
       }
     } else if ( tac->optype == Param ) { // use
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	SET_BIT( bb->used, tac->dest->val.stptr->varid-1 );
       }
     } else if ( is_relational_op(tac->optype) ) {
-      if ( valid_local(tac->operand1) == true ) {
+      if ( is_valid_local(tac->operand1) == true ) {
 	SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
       }
-      if ( valid_local(tac->operand2) == true ) {
+      if ( is_valid_local(tac->operand2) == true ) {
 	SET_BIT( bb->used, tac->operand2->val.stptr->varid-1 );
       }      
+    } else if ( tac->optype == Return ) { // use
+      if ( is_valid_local(tac->operand1) ) {
+	SET_BIT( bb->used, tac->operand1->val.stptr->varid-1 );
+      }
     }
     tac = tac->prev;
     iternum++;
@@ -358,9 +349,9 @@ static void remove_dead_code( TAC_seq *tacseq )
       tac->prev->next = tac->next;
       tac->next->prev = tac->prev;
       tmp = tac;
-      printf( "Remove: " );
-      printtac( tac );
-      putchar( '\n' );
+      /* printf( "Remove: " ); */
+      /* printtac( tac ); */
+      /* putchar( '\n' ); */
       tac = tac->next;
       free( tmp );
       continue;
