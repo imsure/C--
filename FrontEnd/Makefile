@@ -21,7 +21,8 @@ CFILES = error.c \
 	liveness_local.c\
 	bitvector.c\
 	reaching_def.c\
-	liveness_global.c
+	liveness_global.c\
+	live_range.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -38,7 +39,8 @@ OFILES = error.o \
 	liveness_local.o\
 	bitvector.o\
 	reaching_def.o\
-	liveness_global.o
+	liveness_global.o\
+	live_range.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -69,6 +71,8 @@ bitvector.o : global.h bitvector.c
 reaching_def.o : global.h reaching_def.c
 
 liveness_global.o : global.h liveness_global.c
+
+live_range.o : global.h live_range.c
 
 util.o : global.h util.h util.c
 

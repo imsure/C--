@@ -12,6 +12,14 @@
 #define Global 0
 #define Local  1
 
+/**
+ * A linked list of live ranges.
+ */
+typedef struct live_range {
+  bitvec *val;
+  struct live_range *next;
+} live_range;
+
 typedef struct stblnode {
   char *name;
   char *strcon; // string constant value, on used when type==t_Tmp_Str
@@ -31,6 +39,7 @@ typedef struct stblnode {
   bitvec *bv; // bit vector for holding the set of instructions that defines the variable.
               // This is for reaching definition.
   int varid; // a unique id for the local variable. This is for intra-procedural liveness analysis.
+  live_range *live_ranges; // a list of live ranges for the variable
 } symtabnode;
 
 /*********************************************************************
