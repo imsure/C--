@@ -12,7 +12,7 @@ void main(void)
       j = 3*i+1;
     else 
       j = i/2;
-  };
+  }
   print_int(i);
   print_string("\n");
 }
