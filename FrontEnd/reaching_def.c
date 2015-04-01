@@ -46,7 +46,6 @@ static void compute_defset_locals( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   num_defuses = func_num_defuses( tacseq );
-  printf( "Number of defuses: %d\n", num_defuses );
 
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ||
@@ -170,7 +169,7 @@ static void compute_inout()
   /* Iteratively compute in and out set until they converge. */
   change = true;
   while ( change ) {
-    printf( "Computing inout: iteration %d\n", iter_num++ );
+    //    printf( "Computing inout: iteration %d\n", iter_num++ );
     change = false;
     bbl_run = bhead;
     while( bbl_run != NULL ) {
@@ -178,14 +177,14 @@ static void compute_inout()
       oldout = bbl_run->out;
       bbl_run->out = compute_outset_bb( bbl_run );
       if ( bv_unequal_check(oldout, bbl_run->out, num_defuses-1) == true ) {
-	printf( "Iteration %d: change is true\n", iter_num );
+	//	printf( "Iteration %d: change is true\n", iter_num );
 	change = true;
       }
       free( oldout );
       bbl_run = bbl_run->next;
     }
   }
-  printf( "Converge!\n" );
+  //  printf( "Converge!\n" );
 }
 
 

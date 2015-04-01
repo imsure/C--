@@ -6,6 +6,8 @@
 extern bbl *bhead; // header to the basic block list of the current function.
 extern int num_defuses; // total number of definitions inside the current processed function.
 
+extern void printtac( TAC *tac );
+
 /**
  * Check if 'tac' is a valid definition of a local variable/tmp.
  */
@@ -45,8 +47,15 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
   control_flow_list *cfl;
   bool keeprunning = true;
 
-  if ( tac_in_bb == true ) tacrun = tac->next;
-  else tacrun = bb->first_tac;
+  if ( tac_in_bb == true ) {
+    if ( tac == bb->last_tac ) {
+      goto check;
+    }
+    tacrun = tac->next;
+  }
+  else {
+    tacrun = bb->first_tac;
+  }
 
   /* Put all instructions that uses 'tac->dest' and can be reached
      by the definition of 'tac->dest' into its live range. */
@@ -54,22 +63,26 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
     if ( tacrun == bb->last_tac ) {
       keeprunning = false;
     }
-    if ( is_valid_local_def( tacrun ) ) { // variable is redefined
+    if ( is_valid_local_def( tacrun ) &&
+	 tac->dest->val.stptr == tacrun->dest->val.stptr ) { // variable is redefined
       return;
     }
     if ( is_valid_local_read( tacrun ) ) {
       if ( is_valid_local( tacrun->operand1 ) &&
 	   tacrun->operand1->val.stptr == tac->dest->val.stptr ) {
 	SET_BIT( lr->val, tacrun->id-1 );
+	printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
       }
       if ( is_valid_local( tacrun->operand2 ) &&
 	   tacrun->operand2->val.stptr == tac->dest->val.stptr ) {
 	SET_BIT( lr->val, tacrun->id-1 );
+	printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
       }
     }
     tacrun = tacrun->next;
   }
 
+ check:
   /* If the variable is alive at the exit of the block and the definition
      can reach to the exist of the block, recursively compute the live
      range for the variable by going down the control-flow-graph. */
@@ -82,6 +95,34 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
     }
   } else {
     return;
+  }
+}
+
+void print_live_range()
+{
+  TAC *tac;
+  int iternum;
+  bbl *bbl_run = bhead;
+  symtabnode *stptr;
+  live_range *lr, *lrun;
+  
+  while( bbl_run != NULL ) {
+    tac = bbl_run->first_tac;
+    iternum = 0;
+    while ( iternum < bbl_run->numtacs ) {
+      if ( is_valid_local_def( tac ) ) {
+	stptr = tac->dest->val.stptr;
+	lrun = stptr->live_ranges;
+	printf( "Live range for %s\n", stptr->name );
+	while ( lrun != NULL ) {
+	  print_bv( "", lrun->val, num_defuses-1 );
+	  lrun = lrun->next;
+	}
+      }
+      iternum++;
+      tac = tac->next;
+    }
+    bbl_run = bbl_run->next;
   }
 }
 
@@ -102,10 +143,12 @@ void compute_live_ranges()
     iternum = 0;
     while ( iternum < bbl_run->numtacs ) {
       if ( is_valid_local_def( tac ) ) {
+	/* Compute live range for 'tac->dest'. */
 	stptr = tac->dest->val.stptr;
 	lr = (live_range *) zalloc( sizeof(live_range) );
 	lr->val = NEW_BV( num_defuses-1 );
 	live_range_bb( bbl_run, tac, lr, true );
+	SET_BIT( lr->val, tac->id-1 ); // live range also contains the definition itself
 	if ( stptr->live_ranges == NULL ) {
 	  stptr->live_ranges = lr;
 	} else { // append lr to the end of list
@@ -116,9 +159,11 @@ void compute_live_ranges()
 	  lrun->next = lr;
 	}
       }
+      iternum++;
       tac = tac->next;
     }
 
     bbl_run = bbl_run->next;
   }
+  print_live_range();
 }

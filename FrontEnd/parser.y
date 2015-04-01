@@ -44,6 +44,7 @@
   extern void reaching_defs( TAC_seq *tacseq );
   extern void liveness_global( TAC_seq *tacseq );
   extern void dead_code_elimination( TAC_seq *tacseq );
+  extern void compute_live_ranges();
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -201,6 +202,10 @@ prog
 	collapse_label_chain( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
 	reaching_defs( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	printf( "Before computing live range\n" );
+	compute_live_ranges();
+	printf( "After computing live range\n" );
 	print_bbl();
       }
 

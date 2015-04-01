@@ -516,7 +516,7 @@ void print_bbl()
       print_bv( "     Use", bbl_run->use, num_vars-1 );
       print_bv( "     In", bbl_run->livein, num_vars-1 );
       print_bv( "     Out", bbl_run->liveout, num_vars-1 );
-      print_bv( "     Used", bbl_run->used, num_vars-1 );
+      //      print_bv( "     Used", bbl_run->used, num_vars-1 );
     }
 
     bbl_run = bbl_run->next;
