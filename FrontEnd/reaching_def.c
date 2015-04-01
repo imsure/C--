@@ -11,30 +11,26 @@
 #include "syntax-tree.h"
 #include "basic_block.h"
 
-int num_defs; // total number of definitions inside the current processed function.
+int num_defuses; // total number of definitions inside the current processed function.
 extern bbl *bhead; // header to the basic block list of the current function.
 
 /**
- * Compute the number of the definitions (only apply for locals)
- * in the TAC sequence 'tacseq' for a producedure/function.
+ * Compute the total number of possbile definitions/uses of local
+ * variables/tmps in the TAC sequence 'tacseq' for a producedure/function.
  *
  * The value returned will be the size of the bitvector used
  * for computing reaching definition.
  */
-static int func_num_defs( TAC_seq *tacseq )
+static int func_num_defuses( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   int def_counter = 0;
 
   while ( tac != NULL ) {
-    if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
-	tac->def_num = ++def_counter;
-      }
-    } else if (tac->optype == Retrieve) {
-      if ( tac->operand1->val.stptr->scope == Local ) {
-	tac->def_num = ++def_counter;
-      }
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ||
+	 tac->optype == Retrieve || tac->optype == Param ||
+	 is_relational_op(tac->optype) || tac->optype == Return ) {
+	tac->id = ++def_counter;
     }
     tac = tac->next;
   }
@@ -42,27 +38,25 @@ static int func_num_defs( TAC_seq *tacseq )
   return def_counter;
 }
 
+/**
+ * Compute the set of definitions for each local variables/tmps.
+ * The results are stored in the their symbol table entries.
+ */
 static void compute_defset_locals( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
-  num_defs = func_num_defs( tacseq );
-  printf( "Number of defs: %d\n", num_defs );
+  num_defuses = func_num_defuses( tacseq );
+  printf( "Number of defuses: %d\n", num_defuses );
 
   while ( tac != NULL ) {
-    if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ||
+	 tac->optype == Retrieve ) {
+      if ( is_valid_local(tac->dest) ) {
 	if ( tac->dest->val.stptr->bv == NULL ) {
-	  tac->dest->val.stptr->bv = NEW_BV( num_defs-1 );
+	  tac->dest->val.stptr->bv = NEW_BV( num_defuses-1 );
 	}
-	//printf( "set %d to bit vec of %s\n", tac->def_num, tac->dest->val.stptr->name );		
-	SET_BIT( tac->dest->val.stptr->bv, tac->def_num-1 );
-      }
-    } else if (tac->optype == Retrieve) {
-      if ( tac->operand1->val.stptr->scope == Local ) {
-	if ( tac->operand1->val.stptr->bv == NULL ) {
-	  tac->operand1->val.stptr->bv = NEW_BV( num_defs-1 );
-	}
-	SET_BIT( tac->operand1->val.stptr->bv, tac->def_num-1 );
+	//printf( "set %d to bit vec of %s\n", tac->id, tac->dest->val.stptr->name );		
+	SET_BIT( tac->dest->val.stptr->bv, tac->id-1 );
       }
     }
     tac = tac->next;
@@ -73,44 +67,29 @@ static void compute_defset_locals( TAC_seq *tacseq )
  * Compute gen and kill set for the basic block 'bb'
  * using its local information.
  */
-
 static void compute_genkill_bb( bbl *bb )
 {
   TAC *tac = bb->first_tac;
   bitvec *bvtmp;
+  int iternum = 0;
 
-  while ( tac != bb->last_tac ) {
+  while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ||
 	 tac->optype == Retrieve ) {
-      if ( tac->dest->val.stptr->scope == Local ) {
+      if ( is_valid_local(tac->dest) ) {
 	bvtmp = bb->gen;
-	bb->gen = bv_diff( bb->gen, tac->dest->val.stptr->bv, num_defs-1 );
+	bb->gen = bv_diff( bb->gen, tac->dest->val.stptr->bv, num_defuses-1 );
 	free( bvtmp );
-	SET_BIT( bb->gen, tac->def_num-1 );
+	SET_BIT( bb->gen, tac->id-1 );
 
 	bvtmp = bb->kill;
-	bb->kill = bv_union( bb->kill, tac->dest->val.stptr->bv, num_defs-1 );
+	bb->kill = bv_union( bb->kill, tac->dest->val.stptr->bv, num_defuses-1 );
 	free( bvtmp );
-	CLEAR_BIT( bb->kill, tac->def_num-1 );
+	CLEAR_BIT( bb->kill, tac->id-1 );
       }
     }
     tac = tac->next;
-  }
-
-  /* One more iteration for the last tac. */
-  if ( is_arith_op(tac->optype) || tac->optype == Assg ||
-       tac->optype == Retrieve ) {
-    if ( tac->dest->val.stptr->scope == Local ) {
-      bvtmp = bb->gen;
-      bb->gen = bv_diff( bb->gen, tac->dest->val.stptr->bv, num_defs-1 );
-      free( bvtmp );
-      SET_BIT( bb->gen, tac->def_num-1 );
-
-      bvtmp = bb->kill;
-      bb->kill = bv_union( bb->kill, tac->dest->val.stptr->bv, num_defs-1 );
-      free( bvtmp );
-      CLEAR_BIT( bb->kill, tac->def_num-1 );
-    }
+    ++iternum;
   }
 }
 
@@ -124,8 +103,8 @@ static void compute_genkill()
   
   bbl_run = bhead;
   while( bbl_run != NULL ) {
-    bbl_run->gen = NEW_BV( num_defs-1 );
-    bbl_run->kill = NEW_BV( num_defs-1 );
+    bbl_run->gen = NEW_BV( num_defuses-1 );
+    bbl_run->kill = NEW_BV( num_defuses-1 );
     compute_genkill_bb( bbl_run );
     bbl_run = bbl_run->next;
   }
@@ -138,12 +117,12 @@ static void compute_genkill()
 static bitvec *compute_inset_bb( bbl *bb )
 {
   bitvec *bvtmp;
-  bitvec *res = NEW_BV( num_defs-1 );
+  bitvec *res = NEW_BV( num_defuses-1 );
   control_flow_list *cfl = bb->pred;
   
   while ( cfl != NULL ) {
     bvtmp = res;
-    res = bv_union( res, cfl->bb->out, num_defs-1 );
+    res = bv_union( res, cfl->bb->out, num_defuses-1 );
     free( bvtmp );
     cfl = cfl->next;
   }
@@ -159,9 +138,9 @@ static bitvec *compute_outset_bb( bbl *bb )
   bitvec *bvtmp;
   bitvec *res;
   
-  res = bv_diff( bb->in, bb->kill, num_defs-1 );
+  res = bv_diff( bb->in, bb->kill, num_defuses-1 );
   bvtmp = res;
-  res = bv_union( res, bb->gen, num_defs-1 );
+  res = bv_union( res, bb->gen, num_defuses-1 );
   free( bvtmp );
   return res;
 }
@@ -180,10 +159,10 @@ static void compute_inout()
   /* Initialize in and out set for each basic block. */
   bbl_run = bhead;
   while( bbl_run != NULL ) {
-    bbl_run->in = NEW_BV( num_defs-1 );
-    bbl_run->out = NEW_BV( num_defs-1 );
+    bbl_run->in = NEW_BV( num_defuses-1 );
+    bbl_run->out = NEW_BV( num_defuses-1 );
     bvtmp = bbl_run->out;
-    bbl_run->out = bv_union( bbl_run->out, bbl_run->gen, num_defs-1 );
+    bbl_run->out = bv_union( bbl_run->out, bbl_run->gen, num_defuses-1 );
     free( bvtmp );
     bbl_run = bbl_run->next;
   }
@@ -198,7 +177,7 @@ static void compute_inout()
       bbl_run->in = compute_inset_bb( bbl_run );
       oldout = bbl_run->out;
       bbl_run->out = compute_outset_bb( bbl_run );
-      if ( bv_unequal_check(oldout, bbl_run->out, num_defs-1) == true ) {
+      if ( bv_unequal_check(oldout, bbl_run->out, num_defuses-1) == true ) {
 	printf( "Iteration %d: change is true\n", iter_num );
 	change = true;
       }
@@ -221,12 +200,12 @@ void print_var_defs( TAC_seq *tacseq )
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) {
       if ( tac->dest->val.stptr->scope == Local ) {
 	print_bv( tac->dest->val.stptr->name,
-		  tac->dest->val.stptr->bv, num_defs-1 );
+		  tac->dest->val.stptr->bv, num_defuses-1 );
       }
     } else if (tac->optype == Retrieve) {
       if ( tac->operand1->val.stptr->scope == Local ) {
 	print_bv( tac->operand1->val.stptr->name,
-		  tac->operand1->val.stptr->bv, num_defs-1 );
+		  tac->operand1->val.stptr->bv, num_defuses-1 );
       }
     }
     tac = tac->next;

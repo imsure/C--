@@ -16,7 +16,7 @@ static void printBinop(int op);
 static void printUnop(int op);
 
 extern bbl *bhead;
-extern int num_defs;
+extern int num_defuses;
 extern int num_vars;
 
 /*
@@ -365,7 +365,7 @@ static void print_operands( TAC *tac )
  */
 void printtac( TAC *tac )
 {
-  printf( "(%d)", tac->def_num );
+  printf( "(%d)", tac->id );
   switch ( tac->optype ) {
   case Plus:
   case BinaryMinus:
@@ -504,10 +504,10 @@ void print_bbl()
     /* Print out bit vectors for reaching definitions. */
     if ( bbl_run->gen && bbl_run->kill &&
 	 bbl_run->in && bbl_run->out ) {
-      print_bv( "     Gen", bbl_run->gen, num_defs-1 );
-      print_bv( "     Kill", bbl_run->kill, num_defs-1 );
-      print_bv( "     In", bbl_run->in, num_defs-1 );
-      print_bv( "     Out", bbl_run->out, num_defs-1 );
+      print_bv( "     Gen", bbl_run->gen, num_defuses-1 );
+      print_bv( "     Kill", bbl_run->kill, num_defuses-1 );
+      print_bv( "     In", bbl_run->in, num_defuses-1 );
+      print_bv( "     Out", bbl_run->out, num_defuses-1 );
     }
 
     /* Print out bit vectors for liveness analysis. */

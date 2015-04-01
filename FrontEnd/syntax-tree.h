@@ -87,9 +87,9 @@ typedef struct three_address_code {
   struct address *dest, *operand1, *operand2; // three addresses
   struct three_address_code *prev; // previous instruction
   struct three_address_code *next; // next instruction
-  int def_num; // a unique positive number if TAC is a definition
-               // to some local variables/tmps. It is used by bitvector
-               // for computing reaching definitions.
+  int id; // a unique positive number if TAC is a definition
+          // to some local variables/tmps or it reads some local
+          // variables/tmps. It is used for computing reaching definitions.
   bool is_dead; // indicate if TAC is dead.
 } TAC;
 
