@@ -43,6 +43,7 @@
   extern void liveness_local();
   extern void reaching_defs( TAC_seq *tacseq );
   extern void liveness_global( TAC_seq *tacseq );
+  extern void dead_code_elimination( TAC_seq *tacseq );
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -183,6 +184,7 @@ prog
 	construct_basic_block( currfnbodyTree->tac_seq );
 	copy_propagation();
 	liveness_global( currfnbodyTree->tac_seq );
+	dead_code_elimination( currfnbodyTree->tac_seq );
 	//liveness_local();
 	peephole_stage2( currfnbodyTree->tac_seq );
 	//print_bbl();

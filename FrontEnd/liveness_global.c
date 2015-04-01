@@ -360,11 +360,22 @@ static void remove_dead_code( TAC_seq *tacseq )
   }
 }
 
+/**
+ * Carry out intra-procedural liveness analysis.
+ */
 void liveness_global( TAC_seq *tacseq )
 {
   num_vars = count_assign_varids( tacseq );
   compute_defuse();
   compute_inout();
+}
+
+/**
+ * Eliminate dead code. This function must be called
+ * after liveness_global() is called!
+ */
+void dead_code_elimination( TAC_seq *tacseq )
+{
   detect_dead_code();
   remove_dead_code( tacseq );
 }
