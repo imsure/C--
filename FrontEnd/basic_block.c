@@ -189,9 +189,37 @@ static void count_tac_num()
   }
 }
 
+/**
+ * For degbugging purpose:
+ *
+ * print out all pairs of circular defined basic blocks.
+ */
+void print_circular_bbs()
+{
+  bbl *bbl_run = bhead;
+  control_flow_list *succs, *preds;
+
+  while( bbl_run != NULL ) {
+    succs = bbl_run->succ;
+    while ( succs != NULL ) {
+      preds = bbl_run->pred;
+      while ( preds != NULL ) {
+	if ( succs->bb == preds->bb ) {
+	  printf( "BBL%d and BBL%d have a circular definition!\n",
+		  bbl_run->bblnum, succs->bb->bblnum );
+	}
+	preds = preds->next;
+      }
+      succs = succs->next;
+    }
+    bbl_run = bbl_run->next;
+  }
+}
+
 void construct_basic_block( TAC_seq *tacseq )
 {
   construct_bb_list( tacseq );
   count_tac_num();
   construct_bb_control_flow();
+  //print_circular_bbs();
 }

@@ -317,6 +317,38 @@ static void collapse_jump_chain( TAC_seq *tacseq )
 }
 
 /**
+ * This is called after removing redundant labels, like:
+ * L1:
+ * L2:
+ *   ...
+ *
+ * After L1 is removed, there might be some jump instructions that 
+ * still goto L1, we need to update labels for these instruction so
+ * that they now goto L2 instead.
+ *
+ * 'dest_old' is removed label and 'dest_new' is its replacement.
+ */
+static void update_jump_dest( TAC_seq *tacseq,
+			      address *dest_old,
+			      address *dest_new )
+{
+  TAC *tac;
+  
+  tac = tacseq->start;
+  while ( tac != NULL ) {
+    if ( is_relational_op(tac->optype) == true ||
+	 tac->optype == Goto ) {
+      if ( tac->dest == dest_old ) {
+	tac->dest = dest_new;
+	//printf( "dest %s has been replaced by dest %s.\n",
+	//	dest_old->val.label, dest_new->val.label );
+      }
+    }
+    tac = tac->next;
+  }  
+}
+
+/**
  * Peephole optimization: collapse label chain.
  *
  * For exmaple:
@@ -332,6 +364,12 @@ static void collapse_jump_chain( TAC_seq *tacseq )
  * Note this function should be called after
  * transform_cond_jump() and delete_redundant_jump() to guarantee that
  * there will be no statement that jumps to L1 in the TAC sequence.
+ *
+ * NOTE:
+ * the above claim is not true, becuase the test case:
+ * Tests/unittest/reg_alloc/simple_while.c
+ * reveals that there could still be statements that jump to the removed label,
+ * so we need to take care of that!
  */
 void collapse_label_chain( TAC_seq *tacseq )
 {
@@ -342,6 +380,7 @@ void collapse_label_chain( TAC_seq *tacseq )
     if ( tac->optype == Label && tac->next->optype == Label ) {
       tac->prev->next = tac->next;
       tac->next->prev = tac->prev;
+      update_jump_dest( tacseq, tac->dest, tac->next->dest );
       tactmp = tac;
       tac = tac->next;
       free( tactmp );
