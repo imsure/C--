@@ -45,10 +45,13 @@ typedef struct stblnode {
   bitvec *single_lr; // the single live range for the variable
   struct colive_list *colives; // the list of varibles that co-live with the symbol.
   int degree;
+  bool removed;
 } symtabnode;
 
 typedef struct colive_list {
   symtabnode *stptr;
+  bool tmp_removed;
+  bool perm_removed;
   struct colive_list *next;
 } colive_list;
 

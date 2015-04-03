@@ -45,6 +45,7 @@
   extern void liveness_global( TAC_seq *tacseq );
   extern void dead_code_elimination( TAC_seq *tacseq );
   extern void compute_live_ranges();
+  extern void reg_alloc();
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -204,7 +205,8 @@ prog
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	compute_live_ranges();
-	print_bbl();
+	reg_alloc();
+	//print_bbl();
       }
 
       if ( perform_O1 == true && perform_O2 == true ) {
