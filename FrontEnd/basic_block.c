@@ -216,6 +216,45 @@ void print_circular_bbs()
   }
 }
 
+/**
+ * Check if basic block 'bb_from' and its successor 'bb_to'
+ * form a circular referenece, that is, 'bb_to' is also a
+ * predecessor of 'bb_from'.
+ */
+bool check_circular_bbs( bbl *bb_from, bbl *bb_to )
+{
+  control_flow_list *preds;
+
+  preds = bb_from->pred;
+  while ( preds != NULL ) {
+    if ( bb_to == preds->bb ) {
+      return true;
+    }
+    preds = preds->next;
+  }
+  return false;
+}
+
+void bb_reset_visit_counter()
+{
+  bbl *bbl_run = bhead;
+
+  while( bbl_run != NULL ) {
+    bbl_run->visit_counter = 0;
+    bbl_run = bbl_run->next;
+  }
+}
+
+void bb_reset_circular_flags()
+{
+  bbl *bbl_run = bhead;
+
+  while( bbl_run != NULL ) {
+    bbl_run->circular_processed = false;
+    bbl_run = bbl_run->next;
+  }
+}
+
 void construct_basic_block( TAC_seq *tacseq )
 {
   construct_bb_list( tacseq );

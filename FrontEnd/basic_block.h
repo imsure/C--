@@ -41,6 +41,13 @@ typedef struct basic_block_list {
   bitvec *livein;
   bitvec *liveout;
   bitvec *used; // the set of local variables that are used inside the block.
+
+  bool circular_processed;
+  int visit_counter;
 } bbl;
+
+bool check_circular_bbs( bbl *bb_from, bbl *bb_to );
+void bb_reset_circular_flags();
+void bb_reset_visit_counter();
 
 #endif
