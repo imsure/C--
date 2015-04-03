@@ -116,10 +116,47 @@ void print_live_range()
     stptr = lvtmp->stptr;
     lrun = stptr->live_ranges;
     printf( "Live range for %s\n", stptr->name );
-    while ( lrun != NULL ) {
-      print_bv( "", lrun->val, num_defuses-1 );
-      lrun = lrun->next;
-    }    
+    if ( stptr->type != t_Tmp_Var ) {
+      print_bv( "", stptr->single_lr, num_defuses-1 );
+    } else {
+      while ( lrun != NULL ) {
+	print_bv( "", lrun->val, num_defuses-1 );
+	lrun = lrun->next;
+      }
+    }
+    lvtmp = lvtmp->next;
+  }
+}
+
+/**
+ * Merge overlapped live ranges.
+ *
+ * To keep it simple:
+ * 1. Do not touch compiler-generated tmp variables;
+ * 2. Only merge disjoint live ranges for user-defined local
+ *    variables into a single live range. (without checking
+ *    whether or not they overlap.)
+ */
+void merge_live_range()
+{
+  symtabnode *stptr;
+  live_range *lrun;
+  localvars *lvtmp = locals->next;
+  bitvec *bv, *bvtmp;
+
+  while ( lvtmp != NULL ) {
+    stptr = lvtmp->stptr;
+    if ( stptr->type != t_Tmp_Var ) {
+      bv = NEW_BV( num_defuses-1 );
+      lrun = stptr->live_ranges;
+      while ( lrun != NULL ) {
+	bvtmp = bv;
+	bv = bv_union( bv, lrun->val, num_defuses-1 );
+	free( bvtmp );
+	lrun = lrun->next;
+      }
+      stptr->single_lr = bv;
+    }
     lvtmp = lvtmp->next;
   }
 }
@@ -173,5 +210,6 @@ void compute_live_ranges()
 
     bbl_run = bbl_run->next;
   }
+  merge_live_range();
   print_live_range();
 }

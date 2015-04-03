@@ -40,6 +40,7 @@ typedef struct stblnode {
               // This is for reaching definition.
   int varid; // a unique id for the local variable. This is for intra-procedural liveness analysis.
   live_range *live_ranges; // a list of live ranges for the variable
+  bitvec *single_lr; // the single live range for the variable
 } symtabnode;
 
 /*********************************************************************
