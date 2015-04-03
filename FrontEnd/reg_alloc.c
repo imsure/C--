@@ -11,7 +11,7 @@
 #include "syntax-tree.h"
 #include "basic_block.h"
 
-/* A pool of registers available for coloring.
+/* A pool (bit vector) of registers available for coloring.
    ($11,$12,...,$25) */
 #define REG_POOL 0x1FFFC00
 #define K 15 // total number of available register for coloring
@@ -113,10 +113,12 @@ static void put_vertices2stack()
     lvrun = locals->next;
     while ( lvrun != NULL ) {
       stptr = lvrun->stptr;
+      /* Pick a vertex not yet removed and has degree < 'K' to remove. */
       if ( !(stptr->removed) && stptr->degree < K ) {
 	printf( "%s(degree=%d) is picked to be removed.\n",
 		stptr->name, stptr->degree );
 	remove_vertex( stptr );
+	stack.vals[ ++(stack.top) ] = stptr; // push removed vertex to stack.
       }
       lvrun = lvrun->next;
     }
@@ -130,11 +132,71 @@ static void put_vertices2stack()
 }
 
 /**
+ * Find and return a register number that does not
+ * conflict any register numbers in 'used_regs'.
+ */
+static int find_a_color( bitvec used_regs )
+{
+  int i;
+  printf( "conflicting registers: 0x%x\n", used_regs );
+  /* Pick up a register from register pool that is not in 'used_regs'. */
+  for ( i = 10; i < 25; ++i ) {
+    if ( !TEST_BIT( &used_regs, i ) ) {
+      return i+1;
+    }
+  }
+  return -1; // should not reach here!
+}
+
+/**
+ * Assign color to removed vertex 'stptr'.
+ */
+static void assign_color( symtabnode *stptr )
+{
+  colive_list *clrun = stptr->colives->next;
+  /* A bit vector of registers allocated to the neighbors of 'stptr'. */
+  bitvec used_regs = 0; // no need to be a pointer since we
+                        // have only 15 registers available.
+  
+  stptr->removed = false; // add it back to graph
+  /* Iterate through its neighbors. */
+  while ( clrun != NULL ) {
+    stptr->degree++;
+    clrun->tmp_removed = false; // add edge back
+    if ( !(clrun->stptr->removed) ) {
+      /* need to choose a different color with 'clrun->stptr'. */
+      SET_BIT( &used_regs, clrun->stptr->regnum - 1 );
+    }
+    clrun = clrun->next;
+  }
+
+  stptr->regnum = find_a_color( used_regs );
+  printf( "Assigning register $%d to %s\n", stptr->regnum, stptr->name );
+}
+
+/**
  * Coloring the register interference graph formed by variable
  * in 'locals' with 'K' available registers in 'REG_POOL'.
  */
 static void graph_coloring()
 {
+  symtabnode *stptr;
+  int i;
+  for ( i = stack.top; i >= 0; --i ) {
+    /* Pop variable out of stack. */
+    stptr = stack.vals[ i ];
+    assign_color( stptr );
+  }
+}
+
+static void print_stack()
+{
+  int i;
+  printf( "stack top: %d\n", stack.top );
+  for ( i = stack.top; i >= 0; --i ) {
+    printf( "%s, ", stack.vals[i]->name );
+  }
+  putchar( '\n' );
 }
 
 void reg_alloc()

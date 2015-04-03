@@ -87,7 +87,7 @@ bool bv_test_bit( bitvec *bv, int k )
 /**
  * Return the position of the least significant 1 in 'bv'.
  */
-static int bv_ls1( bitvec *bv, int len )
+int bv_ls1( bitvec *bv, int len )
 {
   int i, j;
   for ( i = 0; i <= len/UINT_SZ; ++i ) {
