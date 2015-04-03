@@ -66,6 +66,15 @@ typedef enum addrtype {
 } addrtype;
 
 /**
+ * A list of local varibles/tmps with their live ranges identified.
+ * This will be used for register allocation.
+ */
+typedef struct localvars {
+  symtabnode *stptr;
+  struct localvars *next;
+} localvars;
+
+/**
  * Represents an address in TAC (three address code).
  */
 typedef struct address {

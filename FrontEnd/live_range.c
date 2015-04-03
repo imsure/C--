@@ -8,6 +8,10 @@ extern int num_defuses; // total number of definitions inside the current proces
 
 extern void printtac( TAC *tac );
 
+/* a list of local vars/tmps of the current processed function
+   with their live ranges identified. */
+localvars *locals; 
+
 /**
  * Check if 'tac' is a valid definition of a local variable/tmp.
  */
@@ -104,29 +108,19 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
 
 void print_live_range()
 {
-  TAC *tac;
-  int iternum;
-  bbl *bbl_run = bhead;
   symtabnode *stptr;
   live_range *lrun;
-  
-  while( bbl_run != NULL ) {
-    tac = bbl_run->first_tac;
-    iternum = 0;
-    while ( iternum < bbl_run->numtacs ) {
-      if ( is_valid_local_def( tac ) ) {
-	stptr = tac->dest->val.stptr;
-	lrun = stptr->live_ranges;
-	printf( "Live range for %s\n", stptr->name );
-	while ( lrun != NULL ) {
-	  print_bv( "", lrun->val, num_defuses-1 );
-	  lrun = lrun->next;
-	}
-      }
-      iternum++;
-      tac = tac->next;
-    }
-    bbl_run = bbl_run->next;
+  localvars *lvtmp = locals->next;
+
+  while ( lvtmp != NULL ) {
+    stptr = lvtmp->stptr;
+    lrun = stptr->live_ranges;
+    printf( "Live range for %s\n", stptr->name );
+    while ( lrun != NULL ) {
+      print_bv( "", lrun->val, num_defuses-1 );
+      lrun = lrun->next;
+    }    
+    lvtmp = lvtmp->next;
   }
 }
 
@@ -141,6 +135,9 @@ void compute_live_ranges()
   bbl *bbl_run = bhead;
   symtabnode *stptr;
   live_range *lr, *lrun;
+  localvars *lvtmp;
+
+  locals = (localvars *) zalloc( sizeof(localvars) );
   
   while( bbl_run != NULL ) {
     tac = bbl_run->first_tac;
@@ -154,7 +151,13 @@ void compute_live_ranges()
 	bb_reset_visit_counter();
 	live_range_bb( bbl_run, tac, lr, true );
 	SET_BIT( lr->val, tac->id-1 ); // live range also contains the definition itself
-	if ( stptr->live_ranges == NULL ) {
+	if ( stptr->live_ranges == NULL ) { // found a new variable
+	  lvtmp = locals;
+	  while ( lvtmp->next != NULL ) {
+	    lvtmp = lvtmp->next;
+	  }
+	  lvtmp->next = (localvars *) zalloc( sizeof(localvars) );
+	  lvtmp->next->stptr = stptr;
 	  stptr->live_ranges = lr;
 	} else { // append lr to the end of list
 	  lrun = stptr->live_ranges;
