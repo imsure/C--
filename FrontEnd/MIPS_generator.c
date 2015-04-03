@@ -16,8 +16,6 @@
 #define REG_8 8
 #define REG_9 9
 #define REG_10 10
-#define REG_11 11
-#define REG_12 12
 
 #define REG_V0 2 // register for holding return value
 
