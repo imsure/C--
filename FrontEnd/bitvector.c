@@ -83,3 +83,62 @@ bool bv_test_bit( bitvec *bv, int k )
     return false;
   }
 }
+
+/**
+ * Return the position of the least significant 1 in 'bv'.
+ */
+static int bv_ls1( bitvec *bv, int len )
+{
+  int i, j;
+  for ( i = 0; i <= len/UINT_SZ; ++i ) {
+    for ( j = 0; j < UINT_SZ; ++j ) {
+      if ( bv_test_bit( bv, i*UINT_SZ + j ) ) {
+	return i*UINT_SZ + j + 1;
+      }
+    }
+  }
+  return 0;
+}
+
+/**
+ * Return the position of the most significant 1 in 'bv'.
+ */
+static int bv_ms1( bitvec *bv, int len )
+{
+  int i, j;
+  for ( i = len/UINT_SZ; i >= 0; --i ) {
+    for ( j = UINT_SZ-1; j >= 0; --j ) {
+      if ( bv_test_bit( bv, i*UINT_SZ + j ) ) {
+	return i*UINT_SZ + j + 1;
+      }
+    }
+  }
+  return 0;
+}
+
+static bool in_range( int x, int min, int max )
+{
+  if ( x > min && x < max ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool bv_have_overlap( bitvec *bv1, bitvec *bv2, int len )
+{
+  int pos_ls1 = bv_ls1( bv1, len );
+  int pos_ms1 = bv_ms1( bv1, len );
+  
+  int pos_ls2 = bv_ls1( bv2, len );
+  int pos_ms2 = bv_ms1( bv2, len );
+
+  if ( in_range(pos_ls1, pos_ls2, pos_ms2) ) return true;
+  if ( in_range(pos_ms1, pos_ls2, pos_ms2) ) return true;
+  if ( in_range(pos_ls2, pos_ls1, pos_ms1) ) return true;
+  if ( in_range(pos_ms2, pos_ls1, pos_ms1) ) return true;
+
+  if ( pos_ls1 == pos_ls2 && pos_ms1 == pos_ms2 ) return true;
+
+  return false;
+}

@@ -20,6 +20,8 @@ typedef struct live_range {
   struct live_range *next;
 } live_range;
 
+struct colive_list;
+
 typedef struct stblnode {
   char *name;
   char *strcon; // string constant value, on used when type==t_Tmp_Str
@@ -41,7 +43,14 @@ typedef struct stblnode {
   int varid; // a unique id for the local variable. This is for intra-procedural liveness analysis.
   live_range *live_ranges; // a list of live ranges for the variable
   bitvec *single_lr; // the single live range for the variable
+  struct colive_list *colives; // the list of varibles that co-live with the symbol.
+  int degree;
 } symtabnode;
+
+typedef struct colive_list {
+  symtabnode *stptr;
+  struct colive_list *next;
+} colive_list;
 
 /*********************************************************************
  *                                                                   *

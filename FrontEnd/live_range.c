@@ -161,6 +161,204 @@ void merge_live_range()
   }
 }
 
+static void add_edge( symtabnode *stptr_from, symtabnode *stptr_to )
+{
+  colive_list *clrun;
+
+  //  printf( "adding edge between %s and %s\n", stptr_from->name, stptr_to->name );
+
+  /* stptr_from --> stptr_to */
+  clrun = stptr_from->colives;
+  while ( clrun->next != NULL ) {
+    clrun = clrun->next;
+  }
+  clrun->next = (colive_list *) zalloc( sizeof(colive_list) );
+  clrun->next->stptr = stptr_to;
+
+  //  printf( "%s ==> %s\n", stptr_from->name, stptr_to->name );
+
+  /* stptr_to --> stptr_from */
+  clrun = stptr_to->colives;
+  while ( clrun->next != NULL ) {
+    clrun = clrun->next;
+  }
+  clrun->next = (colive_list *) zalloc( sizeof(colive_list) );
+  clrun->next->stptr = stptr_from;
+
+  //  printf( "%s ==> %s\n", stptr_to->name, stptr_from->name );
+}
+
+static void identify_edge_tmp2tmp( symtabnode *stptr_from,
+				   symtabnode *stptr_to )
+{
+  live_range *lrun_from, *lrun_to;
+  
+  lrun_from = stptr_from->live_ranges;
+  lrun_to = stptr_to->live_ranges;
+
+  while ( lrun_from != NULL ) {
+    while ( lrun_to != NULL ) {
+      if ( bv_have_overlap( lrun_from->val, lrun_to->val, num_defuses-1 ) ) {
+	/* add an edge 'stptr_from' -> 'stptr_to' */
+	add_edge( stptr_from, stptr_to );
+	printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+	return;
+      }
+      lrun_to = lrun_to->next;
+    }
+    lrun_from = lrun_from->next;
+  }  
+}
+
+static void identify_edge_tmp2var( symtabnode *stptr_from,
+				   symtabnode *stptr_to )
+{
+  live_range *lrun_from;
+  bitvec *lv_to;
+  
+  lrun_from = stptr_from->live_ranges;
+  lv_to = stptr_to->single_lr;
+
+  while ( lrun_from != NULL ) {
+    if ( bv_have_overlap( lrun_from->val, lv_to, num_defuses-1 ) ) {
+      /* add an edge 'stptr_from' -> 'stptr_to' */
+      add_edge( stptr_from, stptr_to );
+      printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+      return;
+    }
+    lrun_from = lrun_from->next;
+  }  
+}
+
+static void identify_edge_var2var( symtabnode *stptr_from,
+				   symtabnode *stptr_to )
+{
+  bitvec *lv_from, *lv_to;
+  
+  lv_from = stptr_from->single_lr;
+  lv_to = stptr_to->single_lr;
+
+  if ( bv_have_overlap( lv_from, lv_to, num_defuses-1 ) ) {
+    /* add an edge 'stptr_from' -> 'stptr->to' */
+    add_edge( stptr_from, stptr_to );
+    printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+  }
+}
+
+static void identify_edge_var2tmp( symtabnode *stptr_from,
+				   symtabnode *stptr_to )
+{
+  bitvec *lv_from;
+  live_range *lrun_to;
+  
+  lv_from = stptr_from->single_lr;
+  lrun_to = stptr_to->live_ranges;
+
+  while ( lrun_to != NULL ) {
+    if ( bv_have_overlap( lv_from, lrun_to->val, num_defuses-1 ) ) {
+      /* add an edge 'stptr_from' -> 'stptr->to' */
+      add_edge( stptr_from, stptr_to );
+      printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+      return;
+    }
+    lrun_to = lrun_to->next;
+  }
+}
+
+/**
+ * identify the edges between 'stptr' and a list of varibles
+ * pointed by 'lvrun'.
+ */
+static void identify_edges( symtabnode *stptr, localvars *lvrun )
+{ 
+  if ( lvrun == NULL ) {
+    return;
+  }
+
+  if ( stptr->type == t_Tmp_Var ) {
+    /* tmps have disjoint live ranges. */
+    while ( lvrun != NULL ) {
+      if ( lvrun->stptr->type == t_Tmp_Var ) {
+	identify_edge_tmp2tmp( stptr, lvrun->stptr );
+      } else {
+	identify_edge_tmp2var( stptr, lvrun->stptr );
+      }
+      lvrun = lvrun->next;
+    }
+  } else {
+    /* user-defined variables have a single live range. */
+    while ( lvrun != NULL ) {
+      if ( lvrun->stptr->type == t_Tmp_Var ) {
+	identify_edge_var2tmp( stptr, lvrun->stptr );
+      } else {
+	identify_edge_var2var( stptr, lvrun->stptr );
+      }
+      lvrun = lvrun->next;
+    }    
+  }
+}
+
+void construct_interference_graph()
+{
+  symtabnode *stptr;
+  localvars *lvrun1, *lvrun2;
+
+  lvrun1 = locals->next;
+  while ( lvrun1 != NULL ) {
+    stptr = lvrun1->stptr;
+    stptr->colives = (colive_list *) zalloc( sizeof(colive_list) );
+    lvrun1 = lvrun1->next;
+  }
+
+  lvrun1 = locals->next;
+  while ( lvrun1 != NULL ) {
+    stptr = lvrun1->stptr;
+    lvrun2 = lvrun1->next;
+    identify_edges( stptr, lvrun2 );
+    lvrun1 = lvrun1->next;
+  }
+}
+
+void assign_degrees()
+{
+  symtabnode *stptr;
+  localvars *lvrun;
+  colive_list *clrun;
+
+  lvrun = locals->next;
+  while ( lvrun != NULL ) {
+    stptr = lvrun->stptr;
+    clrun = stptr->colives->next;
+    while ( clrun != NULL ) {
+      stptr->degree++;
+      clrun = clrun->next;
+    }
+    printf( "Degree of %s is: %d\n", stptr->name, stptr->degree );
+    lvrun = lvrun->next;
+  }
+}
+
+void print_graph()
+{
+  symtabnode *stptr;
+  localvars *lvrun;
+  colive_list *clrun;
+
+  lvrun = locals->next;
+  while ( lvrun != NULL ) {
+    stptr = lvrun->stptr;
+    printf( "%s(degree=%d):\n", stptr->name, stptr->degree );
+    putchar( '\t' );
+    clrun = stptr->colives->next;
+    while ( clrun != NULL ) {
+      printf( "%s, ", clrun->stptr->name );
+      clrun = clrun->next;
+    }
+    putchar( '\n' );
+    lvrun = lvrun->next;
+  }
+}
+
 /**
  * Compute live ranges for all local variables of the current
  * processed function.
@@ -212,4 +410,7 @@ void compute_live_ranges()
   }
   merge_live_range();
   print_live_range();
+  construct_interference_graph();
+  assign_degrees();
+  print_graph();
 }

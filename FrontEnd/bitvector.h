@@ -26,5 +26,6 @@ bitvec *bv_intersec( bitvec *bv1, bitvec *bv2, int len );
 bool bv_unequal_check( bitvec *bv1, bitvec *bv2, int len );
 void print_bv( const char *name, bitvec *bv, int len );
 bool bv_test_bit( bitvec *bv, int k );
+bool bv_have_overlap( bitvec *bv1, bitvec *bv2, int len );
 
 #endif
