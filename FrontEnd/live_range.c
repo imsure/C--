@@ -71,12 +71,12 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
       if ( is_valid_local( tacrun->operand1 ) &&
 	   tacrun->operand1->val.stptr == tac->dest->val.stptr ) {
 	SET_BIT( lr->val, tacrun->id-1 );
-	printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
+	//printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
       }
       if ( is_valid_local( tacrun->operand2 ) &&
 	   tacrun->operand2->val.stptr == tac->dest->val.stptr ) {
 	SET_BIT( lr->val, tacrun->id-1 );
-	printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
+	//printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
       }
     }
     tacrun = tacrun->next;
@@ -89,13 +89,11 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
   if ( TEST_BIT( bb->liveout, tac->dest->val.stptr->varid-1 ) &&
        TEST_BIT( bb->out, tac->id-1 ) ) {
     if ( bb->visit_counter >= 2 ) {
-      printf( "leaving from circular processing!\n" );
       return;
     }
     bb->visit_counter++;
     cfl = bb->succ;
     while ( cfl != NULL ) {
-      bb->circular_processed = true;
       live_range_bb( cfl->bb, tac, lr, false );
       cfl = cfl->next;
     }
@@ -153,7 +151,6 @@ void compute_live_ranges()
 	stptr = tac->dest->val.stptr;
 	lr = (live_range *) zalloc( sizeof(live_range) );
 	lr->val = NEW_BV( num_defuses-1 );
-	//	bb_reset_circular_flags();
 	bb_reset_visit_counter();
 	live_range_bb( bbl_run, tac, lr, true );
 	SET_BIT( lr->val, tac->id-1 ); // live range also contains the definition itself

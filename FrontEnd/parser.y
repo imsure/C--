@@ -203,9 +203,7 @@ prog
 	construct_basic_block( currfnbodyTree->tac_seq );
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
-	printf( "Before computing live range\n" );
 	compute_live_ranges();
-	printf( "After computing live range\n" );
 	print_bbl();
       }
 

@@ -245,16 +245,6 @@ void bb_reset_visit_counter()
   }
 }
 
-void bb_reset_circular_flags()
-{
-  bbl *bbl_run = bhead;
-
-  while( bbl_run != NULL ) {
-    bbl_run->circular_processed = false;
-    bbl_run = bbl_run->next;
-  }
-}
-
 void construct_basic_block( TAC_seq *tacseq )
 {
   construct_bb_list( tacseq );

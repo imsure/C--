@@ -42,7 +42,6 @@ typedef struct basic_block_list {
   bitvec *liveout;
   bitvec *used; // the set of local variables that are used inside the block.
 
-  bool circular_processed;
   int visit_counter;
 } bbl;
 
