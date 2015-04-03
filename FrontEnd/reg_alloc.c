@@ -21,6 +21,13 @@
    vertex of register interference graph. */
 extern localvars *locals;
 
+typedef struct Stack {
+  symtabnode **vals;
+  int top;
+} Stack;
+
+Stack stack;
+
 static void remove_edge( symtabnode *stptr_from,
 			 symtabnode *stptr_to )
 {
@@ -78,6 +85,23 @@ static bool is_graph_empty()
 }
 
 /**
+ * Initialize stack for register allocation.
+ */
+static void init_stack()
+{
+  int size = 0;
+  localvars *lvrun = locals->next;
+  while ( lvrun != NULL ) {
+    size++;
+    lvrun = lvrun->next;
+  }
+
+  stack.vals = (symtabnode **) zalloc( size * sizeof(symtabnode *) );
+  stack.top = -1; // no element at the beginning.
+  printf( "size of stack: %d\n", size );
+}
+
+/**
  * Put vertices with 'K' fewer neighbors onto stack.
  */
 static void put_vertices2stack()
@@ -115,6 +139,7 @@ static void graph_coloring()
 
 void reg_alloc()
 {
+  init_stack();
   put_vertices2stack();
   graph_coloring();
 }
