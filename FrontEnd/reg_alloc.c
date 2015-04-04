@@ -35,8 +35,8 @@ static void remove_edge( symtabnode *stptr_from,
   while ( clrun != NULL ) {
     if ( clrun->stptr == stptr_to ) {
       clrun->tmp_removed = true;
-      printf( "Removing edge: %s --> %s\n",
-	      stptr_from->name, stptr_to->name );
+      /* printf( "Removing edge: %s --> %s\n", */
+      /* 	      stptr_from->name, stptr_to->name ); */
       return;
     }
     clrun = clrun->next;
@@ -50,7 +50,7 @@ static void remove_vertex( symtabnode *stptr )
 {
   colive_list *clrun = stptr->colives->next;
   stptr->removed = true; // indicate it is removed temporarily.
-  printf( "Removing vertex %s\n", stptr->name );
+  //  printf( "Removing vertex %s\n", stptr->name );
   while ( clrun != NULL ) {
     if ( !(clrun->stptr->removed) ) { // ignore those have been removed
       /* Indicate edge 'stptr' --> 'clrun->stptr' is
@@ -58,8 +58,7 @@ static void remove_vertex( symtabnode *stptr )
       clrun->tmp_removed = true;
       stptr->degree--; // update degree
       clrun->stptr->degree--; // update degree
-      printf( "Removing edge: %s --> %s\n",
-	      stptr->name, clrun->stptr->name );
+      //      printf( "Removing edge: %s --> %s\n", stptr->name, clrun->stptr->name );
       
       /* Also 'clrun->stptr' also needs to know this edge is removed
 	 since we are duplicating the same edge on both ends.*/
@@ -98,7 +97,7 @@ static void init_stack()
 
   stack.vals = (symtabnode **) zalloc( size * sizeof(symtabnode *) );
   stack.top = -1; // no element at the beginning.
-  printf( "size of stack: %d\n", size );
+  //  printf( "size of stack: %d\n", size );
 }
 
 /**
@@ -115,18 +114,17 @@ static void put_vertices2stack()
       stptr = lvrun->stptr;
       /* Pick a vertex not yet removed and has degree < 'K' to remove. */
       if ( !(stptr->removed) && stptr->degree < K ) {
-	printf( "%s(degree=%d) is picked to be removed.\n",
-		stptr->name, stptr->degree );
+	//	printf( "%s(degree=%d) is picked to be removed.\n", stptr->name, stptr->degree );
 	remove_vertex( stptr );
 	stack.vals[ ++(stack.top) ] = stptr; // push removed vertex to stack.
       }
       lvrun = lvrun->next;
     }
   }
-  printf( "Done! graph is empty now.\n" );
+  //printf( "Done! graph is empty now.\n" );
   lvrun = locals->next;
   while ( lvrun != NULL ) {
-    printf( "%s(degree=%d)\n", lvrun->stptr->name, lvrun->stptr->degree );
+    //printf( "%s(degree=%d)\n", lvrun->stptr->name, lvrun->stptr->degree );
     lvrun = lvrun->next;
   }
 }
@@ -138,7 +136,7 @@ static void put_vertices2stack()
 static int find_a_color( bitvec used_regs )
 {
   int i;
-  printf( "conflicting registers: 0x%x\n", used_regs );
+  //printf( "conflicting registers: 0x%x\n", used_regs );
   /* Pick up a register from register pool that is not in 'used_regs'. */
   for ( i = 10; i < 25; ++i ) {
     if ( !TEST_BIT( &used_regs, i ) ) {
@@ -171,7 +169,7 @@ static void assign_color( symtabnode *stptr )
   }
 
   stptr->regnum = find_a_color( used_regs );
-  printf( "Assigning register $%d to %s\n", stptr->regnum, stptr->name );
+  //printf( "Assigning register $%d to %s\n", stptr->regnum, stptr->name );
 }
 
 /**

@@ -47,6 +47,7 @@ typedef struct stblnode {
   int degree;
   bool removed;
   int regnum;
+  bool is_loaded;
 } symtabnode;
 
 typedef struct colive_list {

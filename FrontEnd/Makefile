@@ -15,7 +15,6 @@ CFILES = error.c \
 	util.c\
 	y.tab.c\
 	TAC_generator.c\
-	MIPS_generator.c\
 	peephole_o1.c\
 	basic_block.c\
 	liveness_local.c\
@@ -23,7 +22,8 @@ CFILES = error.c \
 	reaching_def.c\
 	liveness_global.c\
 	live_range.c\
-	reg_alloc.c
+	reg_alloc.c\
+	MIPS_generator_advanced.c
 
 OFILES = error.o \
 	lex.yy.o \
@@ -34,7 +34,6 @@ OFILES = error.o \
 	util.o \
 	y.tab.o \
 	TAC_generator.o\
-	MIPS_generator.o\
 	peephole_o1.o\
 	basic_block.o\
 	liveness_local.o\
@@ -42,7 +41,8 @@ OFILES = error.o \
 	reaching_def.o\
 	liveness_global.o\
 	live_range.o\
-	reg_alloc.o
+	reg_alloc.o\
+	MIPS_generator_advanced.o
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -66,7 +66,7 @@ basic_block.o : global.h basic_block.c
 
 liveness_local.o : global.h liveness_local.c
 
-MIPS_generator.o : global.h MIPS_generator.c
+#MIPS_generator.o : global.h MIPS_generator.c
 
 bitvector.o : global.h bitvector.c
 
@@ -77,6 +77,8 @@ liveness_global.o : global.h liveness_global.c
 live_range.o : global.h live_range.c
 
 reg_alloc.o : global.h reg_alloc.c
+
+MIPS_generator_advanced.o : global.h MIPS_generator_advanced.c
 
 util.o : global.h util.h util.c
 

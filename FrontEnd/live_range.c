@@ -201,7 +201,7 @@ static void identify_edge_tmp2tmp( symtabnode *stptr_from,
       if ( bv_have_overlap( lrun_from->val, lrun_to->val, num_defuses-1 ) ) {
 	/* add an edge 'stptr_from' -> 'stptr_to' */
 	add_edge( stptr_from, stptr_to );
-	printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+	//printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
 	return;
       }
       lrun_to = lrun_to->next;
@@ -223,7 +223,7 @@ static void identify_edge_tmp2var( symtabnode *stptr_from,
     if ( bv_have_overlap( lrun_from->val, lv_to, num_defuses-1 ) ) {
       /* add an edge 'stptr_from' -> 'stptr_to' */
       add_edge( stptr_from, stptr_to );
-      printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+      //printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
       return;
     }
     lrun_from = lrun_from->next;
@@ -241,7 +241,7 @@ static void identify_edge_var2var( symtabnode *stptr_from,
   if ( bv_have_overlap( lv_from, lv_to, num_defuses-1 ) ) {
     /* add an edge 'stptr_from' -> 'stptr->to' */
     add_edge( stptr_from, stptr_to );
-    printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+    //printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
   }
 }
 
@@ -258,7 +258,7 @@ static void identify_edge_var2tmp( symtabnode *stptr_from,
     if ( bv_have_overlap( lv_from, lrun_to->val, num_defuses-1 ) ) {
       /* add an edge 'stptr_from' -> 'stptr->to' */
       add_edge( stptr_from, stptr_to );
-      printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
+      //printf( "%s and %s overlap\n", stptr_from->name, stptr_to->name );
       return;
     }
     lrun_to = lrun_to->next;
@@ -333,7 +333,7 @@ void assign_degrees()
       stptr->degree++;
       clrun = clrun->next;
     }
-    printf( "Degree of %s is: %d\n", stptr->name, stptr->degree );
+    //printf( "Degree of %s is: %d\n", stptr->name, stptr->degree );
     lvrun = lvrun->next;
   }
 }
@@ -409,8 +409,8 @@ void compute_live_ranges()
     bbl_run = bbl_run->next;
   }
   merge_live_range();
-  print_live_range();
+  //  print_live_range();
   construct_interference_graph();
   assign_degrees();
-  print_graph();
+  //  print_graph();
 }
