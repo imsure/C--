@@ -129,7 +129,7 @@ bool bv_have_overlap( bitvec *bv1, bitvec *bv2, int len )
 {
   int pos_ls1 = bv_ls1( bv1, len );
   int pos_ms1 = bv_ms1( bv1, len );
-  
+
   int pos_ls2 = bv_ls1( bv2, len );
   int pos_ms2 = bv_ms1( bv2, len );
 

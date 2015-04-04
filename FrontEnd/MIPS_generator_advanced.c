@@ -19,6 +19,11 @@
 
 #define REG_V0 2 // register for holding return value
 
+/* a list of local vars/tmps of the current processed function
+   with their live ranges identified and each of them is a
+   vertex of register interference graph. */
+extern localvars *locals;
+
 /**
  * Spim routinue for printing int value.
  */
@@ -95,6 +100,8 @@ static void load_global_var_to_reg( symtabnode *stptr, int reg_num )
  */
 static void load_local_var_to_reg( symtabnode *stptr, int reg_num, int *assigned_reg )
 {
+  int tmpreg; // for temporarily holding address to array element
+  
   switch ( stptr->type ) {
   case t_Int: // local int variable
     if ( stptr->regnum > 0 ) { // the varible has been assigned a register
@@ -148,16 +155,30 @@ static void load_local_var_to_reg( symtabnode *stptr, int reg_num, int *assigned
     }
     break;
   case t_Tmp_Addr: // local tmp address (reference to an array element)
+    /* Find a valid register to hold the address. Make sure
+       it uses a scratch register only and does not confilict
+       with 'reg_num' which holds the value to be assigned. */
+    switch ( reg_num ) {
+    case REG_8:
+      tmpreg = REG_9; break;
+    case REG_9:
+      tmpreg = REG_10; break;
+    case REG_10:
+      tmpreg = REG_8; break;
+    default:
+      tmpreg = REG_8; break;
+    }
+
     /* Load address into $(reg_num+1) first. */
     printf( "\tlw $%d, -%d($fp) # Load tmp address %s.\n",
-	    reg_num+1, stptr->offset2fp, stptr->name );
+	    tmpreg, stptr->offset2fp, stptr->name );
     /* Load value of array element referenced by the address stored in $(reg_num+1). */
     if ( stptr->elt_type == t_Int ) {
       printf( "\tlw $%d, ($%d) # Load value of the int array element pointed by %s.\n",
-	      reg_num, reg_num+1, stptr->name );
+	      reg_num, tmpreg, stptr->name );
     } else {
       printf( "\tlb $%d, ($%d) # Load value of the char array element pointed by %s.\n",
-	      reg_num, reg_num+1, stptr->name );
+	      reg_num, tmpreg, stptr->name );
     }
     break;
   default:
@@ -179,10 +200,12 @@ static void load_formal_to_reg( symtabnode *stptr, int reg_num )
 {
   switch ( stptr->type ) {
   case t_Int: // formal is a int value
+    if ( stptr->regnum > 0 ) printf( "# I am a formal and I have pre-assigned register!!!!\n" );
     printf( "\tlw $%d, %d($fp) # Load int formal %s.\n",
 	    reg_num, 4*stptr->offset2fp + 4, stptr->name );
     break;
   case t_Char: // formal is a char value
+    if ( stptr->regnum > 0 ) printf( "# I am a formal and I have pre-assigned register!!!!\n" );
     printf( "\tlb $%d, %d($fp) # Load char formal %s.\n",
 	    reg_num, 4*stptr->offset2fp + 4, stptr->name );
     break;
@@ -322,6 +345,7 @@ static void store_value_to_formal( symtabnode *stptr, int reg_num )
  */
 static void store_value_to_local( TAC *tac, int reg_num )
 {
+  int tmpreg; // used for holding address of array element
   symtabnode *stptr = tac->dest->val.stptr;
 
   switch ( stptr->type ) {
@@ -337,8 +361,14 @@ static void store_value_to_local( TAC *tac, int reg_num )
     break;
   case t_Char: // local char variable
     if ( stptr->regnum > 0 ) { // 'dest' has pre-assigned register.
-      printf( "\tmove $%d, $%d # Store local char %s to its pre-assigned register.\n",
-	      stptr->regnum, reg_num, stptr->name );
+      printf( "\tsb $%d, -%d($fp) # Store to local char %s.\n",
+	      reg_num, stptr->offset2fp, stptr->name );
+      printf( "\tlb $%d, -%d($fp) # Load local char %s to its pre-assigned register.\n",
+	      stptr->regnum, stptr->offset2fp, stptr->name );
+      //      printf( "\tandi $%d, $%d, 0x100000FF # store value into char %s\n",
+      //	      stptr->regnum, reg_num, stptr->name );	
+      //      printf( "\tmove $%d, $%d # Store local char %s to its pre-assigned register.\n",
+      //	      stptr->regnum, reg_num, stptr->name );
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
     } else {
       printf( "\tsb $%d, -%d($fp) # Store to local char %s.\n",
@@ -357,18 +387,32 @@ static void store_value_to_local( TAC *tac, int reg_num )
     break;
   case t_Tmp_Addr: // local tmp address (reference to an array element)
     if ( tac->optype == Assg ) {
+      /* Find a valid register to hold the address. Make sure
+	 it uses a scratch register only and does not confilict
+	 with 'reg_num' which holds the value to be assigned. */
+      switch ( reg_num ) {
+      case REG_8:
+	tmpreg = REG_9; break;
+      case REG_9:
+	tmpreg = REG_10; break;
+      case REG_10:
+	tmpreg = REG_8; break;
+      default:
+	tmpreg = REG_8; break;
+      }
+
       /* Whenever assignment a value to a t_Tmp_Addr, we mean assigning
 	 the value to the array element it points to. */
-          /* Load address into $(reg_num+1) first. */
+      /* Load address into $(reg_num+1) first. */
       printf( "\tlw $%d, -%d($fp) # Load tmp address %s.\n",
-	      reg_num+1, stptr->offset2fp, stptr->name );
+	      tmpreg, stptr->offset2fp, stptr->name );
       /* Load value of array element referenced by the address stored in $(reg_num+1). */
       if ( stptr->elt_type == t_Int ) {
 	printf( "\tsw $%d, ($%d) # Store value pointed by %s to int array element.\n",
-		reg_num, reg_num+1, stptr->name );
+		reg_num, tmpreg, stptr->name );
       } else {
 	printf( "\tsb $%d, ($%d) # Store value pointed by %s to char array element.\n",
-		reg_num, reg_num+1, stptr->name );
+		reg_num, tmpreg, stptr->name );
       }
     } else { // when it appears in arithmetic operation, like t_addr0 = A + 8
              // we just want to assign a value to t_Tmp_Addr, the value is an address.
@@ -614,7 +658,8 @@ static void tac2mips_return( TAC *tac, int ret_type )
     /* Load the return value into $v0. */
     if ( tac->operand1->val.stptr->regnum > 0 &&
 	 tac->operand1->val.stptr->is_loaded ) {
-      printf( "\tmove $%d, $%d\n", REG_V0, tac->operand1->val.stptr->regnum );
+      printf( "\tmove $%d, $%d # return int %s\n", REG_V0,
+	      tac->operand1->val.stptr->regnum, tac->operand1->val.stptr->name );
     } else {
       load_operand_to_reg( tac->operand1, REG_V0, &assigned_reg );
     }
@@ -664,16 +709,53 @@ static void tac2mips_param( TAC *tac )
  */
 static void tac2mips_call( TAC *tac )
 {
+  localvars *lvrun;
+  
   /* No _prefix for these three function. */
   if ( strcmp(tac->operand1->val.stptr->name, "print_int") == 0 ||
        strcmp(tac->operand1->val.stptr->name, "print_string") == 0 ||
        strcmp(tac->operand1->val.stptr->name, "main") == 0 ) {
     printf( "\tjal %s\n", tac->operand1->val.stptr->name );
-  } else {
-    printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
-  }
-  printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
+    printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
 	  tac->operand2->val.iconst * 4 );
+  } else {
+    /* Need to save all values of local vars/tmps with pre-allocated registers
+       to their actual memory locations so these register can be safely used
+       by the callee. */
+    if ( locals != NULL ) { // not null only when -O2 is on
+      lvrun = locals->next;
+      while ( lvrun != NULL ) {
+	if ( lvrun->stptr->type == t_Char ) {
+	  printf( "\tsb $%d, -%d($fp) # Store local char %s from its pre-assigned register to memory location.\n",
+		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	} else {
+	  printf( "\tsw $%d, -%d($fp) # Store local int/tmp %s from its pre-assigned register to memory location.\n",
+		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	}
+	lvrun = lvrun->next;
+      }
+      printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
+      printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
+	      tac->operand2->val.iconst * 4 );
+
+      /* Reload variables back into their pre-assigned register. */
+      lvrun = locals->next;
+      while ( lvrun != NULL ) {
+	if ( lvrun->stptr->type == t_Char ) {
+	  printf( "\tlb $%d, -%d($fp) # Reload local char %s into its pre-assigned register.\n",
+		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	} else {
+	  printf( "\tlw $%d, -%d($fp) # Reload local int/tmp %s into its pre-assigned register.\n",
+		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	}
+	lvrun = lvrun->next;
+      }
+    } else {
+      printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
+      printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
+	      tac->operand2->val.iconst * 4 );
+    }
+  }
 }
 
 /**
@@ -687,8 +769,9 @@ static void tac2mips_retrieve( TAC *tac )
      to hold the return value. */
   if ( tac->operand1 != NULL ) { // non void return
     if ( tac->operand1->val.stptr->regnum > 0 ) {
-      printf( "\tmove %d, %d # retrieve return value into %s\n",
+      printf( "\tmove $%d, $%d # retrieve return value into %s\n",
 	      tac->operand1->val.stptr->regnum, REG_V0, tac->operand1->val.stptr->name );
+      tac->operand1->val.stptr->is_loaded = true;
     } else {
       printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n",
 	      REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name );

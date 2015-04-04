@@ -95,7 +95,8 @@ static void init_stack()
     lvrun = lvrun->next;
   }
 
-  stack.vals = (symtabnode **) zalloc( size * sizeof(symtabnode *) );
+  // increment size by 1 in case size is 0
+  stack.vals = (symtabnode **) zalloc( (size+1) * sizeof(symtabnode *) );
   stack.top = -1; // no element at the beginning.
   //  printf( "size of stack: %d\n", size );
 }

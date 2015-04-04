@@ -205,9 +205,9 @@ static void identify_edge_tmp2tmp( symtabnode *stptr_from,
   live_range *lrun_from, *lrun_to;
   
   lrun_from = stptr_from->live_ranges;
-  lrun_to = stptr_to->live_ranges;
 
   while ( lrun_from != NULL ) {
+    lrun_to = stptr_to->live_ranges;
     while ( lrun_to != NULL ) {
       if ( bv_have_overlap( lrun_from->val, lrun_to->val, num_defuses-1 ) ) {
 	/* add an edge 'stptr_from' -> 'stptr_to' */
