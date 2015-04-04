@@ -3,7 +3,8 @@
 ## Run all the test cases with -O1 optimization.
 
 compiler_path=../FrontEnd
-test_path=../Tests/codegen_tests_from_professor
+#test_path=../Tests/codegen_tests_from_professor
+test_path=../Tests/codeopt1_tests
 tmp_asm="tmp.s"
 tmp_output="output.txt"
 tmp_output2="output2.txt"
