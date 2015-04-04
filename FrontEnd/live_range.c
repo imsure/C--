@@ -69,6 +69,17 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
     }
     if ( is_valid_local_def( tacrun ) &&
 	 tac->dest->val.stptr == tacrun->dest->val.stptr ) { // variable is redefined
+      /* Check if it is used as operand, then return. */
+      if ( is_valid_local( tacrun->operand1 ) &&
+	   tacrun->operand1->val.stptr == tac->dest->val.stptr ) {
+	SET_BIT( lr->val, tacrun->id-1 );
+	//printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
+      }
+      if ( is_valid_local( tacrun->operand2 ) &&
+	   tacrun->operand2->val.stptr == tac->dest->val.stptr ) {
+	SET_BIT( lr->val, tacrun->id-1 );
+	//printf( "add tac %d as used tac for %s\n", tacrun->id, tac->dest->val.stptr->name );
+      }
       return;
     }
     if ( is_valid_local_read( tacrun ) ) {
