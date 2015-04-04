@@ -1,4 +1,6 @@
 /* function calls: char array parameters */
+extern void print_int (int n);
+extern void print_string (char s[]);
 
 char x[15];
 
@@ -7,9 +9,11 @@ int copy(char a[], char b[])
   int i;
 
   i = 0;
-  for (i = 0; a[i] > 0; i = i+1)
+  for (i = 0; a[i] > 0; i = i+1) {
     b[i] = a[i];
+  }
   b[i] = 0;
+
   return i;
 }
 
@@ -25,9 +29,6 @@ int sum(char b[])
   }
   return sum;
 }
-
-extern void print_int (int n);
-extern void print_string (char s[]);
 
 void main(void)
 {

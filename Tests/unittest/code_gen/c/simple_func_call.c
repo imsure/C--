@@ -2,6 +2,7 @@
 
 int id(int x)
 {
+  x = x * 2;
   return x;
 }
 
