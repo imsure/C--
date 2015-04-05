@@ -3,14 +3,17 @@
 int flag;
 int val;
 
+extern void print_int (int n);
+extern void print_string (char s[]);
+
 int side_effect(int x)
 {
   flag = -1;
+  print_int("x");
+  print_string("side_effect");
+  print_string("\n");
   return x;
 }
-
-extern void print_int (int n);
-extern void print_string (char s[]);
 
 void main(void)
 {
@@ -20,12 +23,14 @@ void main(void)
   flag = 1;
   val = 1234;
 
-  if (x < y && y > z && side_effect(x) < z)
+  if (x < y && y > z && side_effect(x) < z) {
     x = x-1;
+  }
   if (flag < 0)
     val = 4321;
-  if (x < y || y > z || side_effect(x) < z)
+  if (x < y || y > z || side_effect(x) < z) {
     x = x-1;
+  }
   if (flag < 0)
     val = 4321;
   val = x*val;
