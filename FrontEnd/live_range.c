@@ -10,7 +10,8 @@ extern void printtac( TAC *tac );
 
 /* a list of local vars/tmps of the current processed function
    with their live ranges identified. */
-localvars *locals; 
+localvars *locals;
+static bool debug = false;
 
 /**
  * Check if 'tac' is a valid definition of a local variable/tmp.
@@ -51,7 +52,18 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
   control_flow_list *cfl;
   bool keeprunning = true;
 
+  if ( debug ) {
+    if ( strcmp(tac->dest->val.stptr->name, "k") == 0 ) {
+      printf( "Computing live range for k. Label for the current bb: %s\n",
+	      bb->first_tac->dest->val.label );
+    }
+  }
+
   if ( tac_in_bb == true ) {
+    if ( debug ) {
+      if ( strcmp(tac->dest->val.stptr->name, "k") == 0 )
+	printf( "Processing the bbb that contains the definition of k.\n" );
+    }
     if ( tac == bb->last_tac ) {
       goto check;
     }
@@ -101,8 +113,8 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
   /* If the variable is alive at the exit of the block and the definition
      can reach to the exist of the block, recursively compute the live
      range for the variable by going down the control-flow-graph. */
-  if ( TEST_BIT( bb->liveout, tac->dest->val.stptr->varid-1 ) &&
-       TEST_BIT( bb->out, tac->id-1 ) ) {
+  if ( TEST_BIT( bb->liveout, tac->dest->val.stptr->varid-1 ) ) { //&&
+       //       TEST_BIT( bb->out, tac->id-1 ) ) {
     if ( bb->visit_counter >= 2 ) {
       return;
     }
@@ -113,6 +125,16 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
       cfl = cfl->next;
     }
   } else {
+    if ( debug ) {
+      if ( strcmp(tac->dest->val.stptr->name, "k") == 0 ) {
+	if ( !TEST_BIT( bb->liveout, tac->dest->val.stptr->varid-1 ) )
+	  printf( "k is not alive after the current bb: %s\n",
+		  bb->first_tac->dest->val.label );
+	else 
+	  printf( "Def of k does not reach to exit of current bb: %s\n",
+		  bb->first_tac->dest->val.label );
+      }
+    }
     return;
   }
 }
@@ -420,8 +442,10 @@ void compute_live_ranges()
     bbl_run = bbl_run->next;
   }
   merge_live_range();
-  //  print_live_range();
+  if ( debug )
+    print_live_range();
   construct_interference_graph();
   assign_degrees();
-  //  print_graph();
+  if ( debug )
+    print_graph();
 }

@@ -217,7 +217,7 @@ prog
 	copy_propagation();
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
-	compute_live_ranges();
+	//	compute_live_ranges();
 	dead_code_elimination( currfnbodyTree->tac_seq );
 	peephole_stage2( currfnbodyTree->tac_seq );
 
@@ -229,8 +229,9 @@ prog
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	compute_live_ranges();
+	//print_bbl();
 	reg_alloc( currfnbodyTree->tac_seq );
-	//	printf( "Carrying out both -O1 & -O2 optimization.\n" );
+	//printf( "Carrying out both -O1 & -O2 optimization.\n" );
       }
 
       /*----------------------------------------------------------
