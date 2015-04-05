@@ -100,7 +100,8 @@ TAC *enter_func( symtabnode *func, int stack_size )
   quad->operand2 = (address *) zalloc( sizeof(address) );
   quad->operand2->atype = AT_Intcon;
   quad->operand2->val.iconst = stack_size;
-  quad->dest = NULL;
+  quad->dest = (address *) zalloc( sizeof(address) );
+  quad->dest->atype = AT_Intcon;
   quad->next = NULL;
 
   return quad;

@@ -49,6 +49,7 @@ typedef struct stblnode {
   int regnum;
   bool is_loaded;
   bool is_dirty;
+  bitvec saved_regs;
 } symtabnode;
 
 typedef struct colive_list {

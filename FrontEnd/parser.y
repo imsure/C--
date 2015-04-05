@@ -205,7 +205,7 @@ prog
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	compute_live_ranges();
-	reg_alloc();
+	reg_alloc( currfnbodyTree->tac_seq );
 	//print_bbl();
       }
 

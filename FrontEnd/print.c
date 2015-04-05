@@ -434,7 +434,7 @@ void printtac( TAC *tac )
     print_operands( tac );
     break;
   case Enter:
-    printf( "\tEnter " );
+    printf( "\tEnter(saved regs:0x%x) ", tac->dest->val.iconst );
     print_operands( tac );
     break;
   case Stringcon: // code for string constant, handled specially.

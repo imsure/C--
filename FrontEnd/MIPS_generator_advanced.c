@@ -11,6 +11,7 @@
 #include <string.h>
 #include "global.h"
 #include "syntax-tree.h"
+#include "bitvector.h"
 
 /* General purpose MIPS registers (used as scratch register)  */
 #define REG_8 8
@@ -23,6 +24,7 @@
    with their live ranges identified and each of them is a
    vertex of register interference graph. */
 extern localvars *locals;
+extern bitvec saved_regs;
 
 /**
  * Spim routinue for printing int value.
@@ -357,9 +359,9 @@ static void store_value_to_local( TAC *tac, int reg_num )
       printf( "\tmove $%d, $%d # Store local int %s to its pre-assigned register.\n",
 	      stptr->regnum, reg_num, stptr->name );
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
-      printf( "\tsw $%d, -%d($fp) # Store to local int %s.\n",
-	      reg_num, stptr->offset2fp, stptr->name );
-      stptr->is_dirty = false; // indicate its value is not consistent with the value stored at its memory location.
+      /* printf( "\tsw $%d, -%d($fp) # Store to local int %s.\n", */
+      /* 	      reg_num, stptr->offset2fp, stptr->name ); */
+      stptr->is_dirty = true; // indicate its value is not consistent with the value stored at its memory location.
     } else {
       printf( "\tsw $%d, -%d($fp) # Store to local int %s.\n",
 	      reg_num, stptr->offset2fp, stptr->name );
@@ -387,9 +389,9 @@ static void store_value_to_local( TAC *tac, int reg_num )
       printf( "\tmove $%d, $%d # Store local tmp %s to its pre-assigned register.\n",
 	      stptr->regnum, reg_num, stptr->name );
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
-      printf( "\tsw $%d, -%d($fp) # Store to tmp variable %s.\n",
-	      reg_num, stptr->offset2fp, stptr->name );
-      stptr->is_dirty = false; // indicate its value is not consistent with the value stored at its memory location.
+      /* printf( "\tsw $%d, -%d($fp) # Store to tmp variable %s.\n", */
+      /* 	      reg_num, stptr->offset2fp, stptr->name ); */
+      stptr->is_dirty = true; // indicate its value is not consistent with the value stored at its memory location.
     } else {
       printf( "\tsw $%d, -%d($fp) # Store to tmp variable %s.\n",
 	      reg_num, stptr->offset2fp, stptr->name );
@@ -640,6 +642,7 @@ static void tac2mips_assg( TAC *tac )
  */
 static void tac2mips_enterfunc( TAC *tac )
 {
+  int i, counter = 0;
   int stack_size = tac->operand2->val.iconst;
   
   printf( "\tla $sp, -8($sp) # Allocate space for old $fp and $ra\n" );
@@ -734,20 +737,22 @@ static void tac2mips_call( TAC *tac )
        by the callee. */
     if ( locals != NULL ) { // not null only when -O2 is on
       lvrun = locals->next;
-      /* while ( lvrun != NULL ) { */
-      /* 	if ( lvrun->stptr->type == t_Char ) { */
-      /* 	  if ( lvrun->stptr->is_dirty == true ) { */
-      /* 	    printf( "\tsb $%d, -%d($fp) # Store local char %s from its pre-assigned register to memory location.\n", */
-      /* 		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name ); */
-      /* 	  } */
-      /* 	} else { */
-      /* 	  if ( lvrun->stptr->is_dirty == true ) { */
-      /* 	    printf( "\tsw $%d, -%d($fp) # Store local int/tmp %s from its pre-assigned register to memory location.\n", */
-      /* 		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name ); */
-      /* 	  } */
-      /* 	} */
-      /* 	lvrun = lvrun->next; */
-      /* } */
+      while ( lvrun != NULL ) {
+      	if ( lvrun->stptr->type == t_Char ) {
+      	  if ( lvrun->stptr->is_dirty == true ) {
+      	    printf( "\tsb $%d, -%d($fp) # Store local char %s from its pre-assigned register to memory location.\n",
+      		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+      	  }
+      	} else {
+      	  if ( lvrun->stptr->is_dirty == true ) {
+      	    printf( "\tsw $%d, -%d($fp) # Store local int/tmp %s from its pre-assigned register to memory location.\n",
+      		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+      	  }
+      	}
+      	lvrun = lvrun->next;
+      }
+      
+      tac->operand1->val.stptr->saved_regs = saved_regs;
       printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
       printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
 	      tac->operand2->val.iconst * 4 );
@@ -756,24 +761,24 @@ static void tac2mips_call( TAC *tac )
 	 all variables that are pre-allocated registers to indicate inconsistency
 	 between values in their memory locations and values in registers	 
 	 since we don't know which registers are changed by the callee. */
-      lvrun = locals->next;
-      while ( lvrun != NULL ) {
-	lvrun->stptr->is_loaded = false;
-	lvrun = lvrun->next;
-      }
-
-      /* Reload variables back into their pre-assigned register. */
       /* lvrun = locals->next; */
       /* while ( lvrun != NULL ) { */
-      /* 	if ( lvrun->stptr->type == t_Char ) { */
-      /* 	  printf( "\tlb $%d, -%d($fp) # Reload local char %s into its pre-assigned register.\n", */
-      /* 		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name ); */
-      /* 	} else { */
-      /* 	  printf( "\tlw $%d, -%d($fp) # Reload local int/tmp %s into its pre-assigned register.\n", */
-      /* 		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name ); */
-      /* 	} */
+      /* 	lvrun->stptr->is_loaded = false; */
       /* 	lvrun = lvrun->next; */
       /* } */
+
+      /* Reload variables back into their pre-assigned register. */
+      lvrun = locals->next;
+      while ( lvrun != NULL ) {
+      	if ( lvrun->stptr->type == t_Char ) {
+      	  printf( "\tlb $%d, -%d($fp) # Reload local char %s into its pre-assigned register.\n",
+      		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+      	} else {
+      	  printf( "\tlw $%d, -%d($fp) # Reload local int/tmp %s into its pre-assigned register.\n",
+      		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+      	}
+      	lvrun = lvrun->next;
+      }
     } else {
       printf( "\tjal _%s\n", tac->operand1->val.stptr->name );
       printf( "\tla $sp, %d($sp) # Pop parameters off the stack.\n",
@@ -796,9 +801,9 @@ static void tac2mips_retrieve( TAC *tac )
       printf( "\tmove $%d, $%d # retrieve return value into %s\n",
 	      tac->operand1->val.stptr->regnum, REG_V0, tac->operand1->val.stptr->name );
       tac->operand1->val.stptr->is_loaded = true;
-      printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n",
-	      REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name );
-      tac->operand1->val.stptr->is_dirty = false;
+      /* printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n", */
+      /* 	      REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name ); */
+      tac->operand1->val.stptr->is_dirty = true;
     } else {
       printf( "\tsw $%d, -%d($fp) # Store returned value to tmp variable %s.\n",
 	      REG_V0, tac->operand1->val.stptr->offset2fp, tac->operand1->val.stptr->name );

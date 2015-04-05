@@ -21,6 +21,8 @@
    vertex of register interference graph. */
 extern localvars *locals;
 
+bitvec saved_regs = 0;
+
 typedef struct Stack {
   symtabnode **vals;
   int top;
@@ -170,6 +172,7 @@ static void assign_color( symtabnode *stptr )
   }
 
   stptr->regnum = find_a_color( used_regs );
+  SET_BIT( &saved_regs, stptr->regnum-1 );
   //printf( "Assigning register $%d to %s\n", stptr->regnum, stptr->name );
 }
 
@@ -198,9 +201,23 @@ static void print_stack()
   putchar( '\n' );
 }
 
-void reg_alloc()
+static void put_saved_regs2tacseq( TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  
+  while ( tac != NULL ) {
+    if ( tac->optype == Enter ) {
+      tac->dest->val.iconst = saved_regs;
+    }
+    tac = tac->next;
+  }
+}
+
+void reg_alloc( TAC_seq *tacseq )
 {
   init_stack();
   put_vertices2stack();
   graph_coloring();
+  put_saved_regs2tacseq( tacseq );
+  //printf( "save registers: 0x%x\n", saved_regs );
 }
