@@ -73,15 +73,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $14, -16($fp) # Reload local int/tmp _tvar4 into its pre-assigned register.
 	lw $13, -28($fp) # Reload local int/tmp _tvar7 into its pre-assigned register.
 	lw $11, -68($fp) # Reload local int/tmp _tvar10 into its pre-assigned register.
-	lw $12, -36($fp) # Reload local int/tmp _tvar9 into its pre-assigned register.
-	lw $11, -72($fp) # Reload local int/tmp _tvar11 into its pre-assigned register.
-	lw $11, -32($fp) # Reload local int/tmp _tvar8 into its pre-assigned register.
-	lw $13, -24($fp) # Reload local int/tmp _tvar6 into its pre-assigned register.
-	lw $11, -76($fp) # Reload local int/tmp _tvar12 into its pre-assigned register.
-	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
-	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
-	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $12, $2 # retrieve return value into _tvar9
 	li $8, 1 # Load int constant shorter than 16-bits
 	move $11, $8 # Store local tmp _tvar11 to its pre-assigned register.
@@ -107,13 +98,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $11, -68($fp) # Reload local int/tmp _tvar10 into its pre-assigned register.
 	lw $12, -36($fp) # Reload local int/tmp _tvar9 into its pre-assigned register.
 	lw $11, -72($fp) # Reload local int/tmp _tvar11 into its pre-assigned register.
-	lw $11, -32($fp) # Reload local int/tmp _tvar8 into its pre-assigned register.
-	lw $13, -24($fp) # Reload local int/tmp _tvar6 into its pre-assigned register.
-	lw $11, -76($fp) # Reload local int/tmp _tvar12 into its pre-assigned register.
-	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
-	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
-	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $11, $2 # retrieve return value into _tvar8
 	la $sp, -4($sp) # Allocate stack space for parameter _tvar7.
 	sw $13, 0($sp) # Push the parameter value.
@@ -139,12 +123,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $12, -36($fp) # Reload local int/tmp _tvar9 into its pre-assigned register.
 	lw $11, -72($fp) # Reload local int/tmp _tvar11 into its pre-assigned register.
 	lw $11, -32($fp) # Reload local int/tmp _tvar8 into its pre-assigned register.
-	lw $13, -24($fp) # Reload local int/tmp _tvar6 into its pre-assigned register.
-	lw $11, -76($fp) # Reload local int/tmp _tvar12 into its pre-assigned register.
-	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
-	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
-	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $13, $2 # retrieve return value into _tvar6
 	li $8, 5 # Load int constant shorter than 16-bits
 	move $11, $8 # Store local tmp _tvar12 to its pre-assigned register.
@@ -180,9 +158,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $13, -24($fp) # Reload local int/tmp _tvar6 into its pre-assigned register.
 	lw $11, -76($fp) # Reload local int/tmp _tvar12 into its pre-assigned register.
 	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
-	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
-	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $11, $2 # retrieve return value into _tvar5
 	la $sp, -4($sp) # Allocate stack space for parameter _tvar4.
 	sw $14, 0($sp) # Push the parameter value.
@@ -216,8 +191,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $11, -76($fp) # Reload local int/tmp _tvar12 into its pre-assigned register.
 	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
 	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
-	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $11, $2 # retrieve return value into _tvar3
 	li $8, 1 # Load int constant shorter than 16-bits
 	move $12, $8 # Store local tmp _tvar13 to its pre-assigned register.
@@ -255,7 +228,6 @@ _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	lw $12, -80($fp) # Reload local int/tmp _tvar13 into its pre-assigned register.
 	lw $11, -20($fp) # Reload local int/tmp _tvar5 into its pre-assigned register.
 	lw $11, -12($fp) # Reload local int/tmp _tvar3 into its pre-assigned register.
-	lw $11, -8($fp) # Reload local int/tmp _tvar2 into its pre-assigned register.
 	move $11, $2 # retrieve return value into _tvar2
 	mul $10, $16, $11
 	move $12, $10 # Store local tmp _tvar13 to its pre-assigned register.

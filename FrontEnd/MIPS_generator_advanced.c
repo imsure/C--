@@ -379,6 +379,7 @@ static void store_value_to_local( TAC *tac, int reg_num )
       //	      stptr->regnum, reg_num, stptr->name );
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
       stptr->is_dirty = false; // indicate its value is not consistent with the value stored at its memory location.
+      stptr->saved = true;
     } else {
       printf( "\tsb $%d, -%d($fp) # Store to local char %s.\n",
 	      reg_num, stptr->offset2fp, stptr->name );
@@ -742,11 +743,13 @@ static void tac2mips_call( TAC *tac )
       	  if ( lvrun->stptr->is_dirty == true ) {
       	    printf( "\tsb $%d, -%d($fp) # Store local char %s from its pre-assigned register to memory location.\n",
       		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	    lvrun->stptr->saved = true;
       	  }
       	} else {
       	  if ( lvrun->stptr->is_dirty == true ) {
       	    printf( "\tsw $%d, -%d($fp) # Store local int/tmp %s from its pre-assigned register to memory location.\n",
       		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	    lvrun->stptr->saved = true;
       	  }
       	}
       	lvrun = lvrun->next;
@@ -770,13 +773,15 @@ static void tac2mips_call( TAC *tac )
       /* Reload variables back into their pre-assigned register. */
       lvrun = locals->next;
       while ( lvrun != NULL ) {
-      	if ( lvrun->stptr->type == t_Char ) {
-      	  printf( "\tlb $%d, -%d($fp) # Reload local char %s into its pre-assigned register.\n",
-      		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
-      	} else {
-      	  printf( "\tlw $%d, -%d($fp) # Reload local int/tmp %s into its pre-assigned register.\n",
-      		  lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
-      	}
+	if ( lvrun->stptr->saved ) {
+	  if ( lvrun->stptr->type == t_Char ) {
+	    printf( "\tlb $%d, -%d($fp) # Reload local char %s into its pre-assigned register.\n",
+		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	  } else {
+	    printf( "\tlw $%d, -%d($fp) # Reload local int/tmp %s into its pre-assigned register.\n",
+		    lvrun->stptr->regnum, lvrun->stptr->offset2fp, lvrun->stptr->name );
+	  }
+	}
       	lvrun = lvrun->next;
       }
     } else {
