@@ -45,6 +45,20 @@ static void remove_edge( symtabnode *stptr_from,
   }
 }
 
+static void delete_edge( symtabnode *stptr_from,
+			 symtabnode *stptr_to )
+{
+  colive_list *clrun = stptr_from->colives->next;
+  while ( clrun != NULL ) {
+    if ( clrun->stptr == stptr_to ) {
+      clrun->perm_removed = true;
+      //      printf( "Deleting edge: %s --> %s\n", stptr_from->name, stptr_to->name );
+      return;
+    }
+    clrun = clrun->next;
+  }
+}
+
 /**
  * Remove vertex 'stptr' from 'locals' temporarily.
  */
@@ -54,7 +68,7 @@ static void remove_vertex( symtabnode *stptr )
   stptr->removed = true; // indicate it is removed temporarily.
   //  printf( "Removing vertex %s\n", stptr->name );
   while ( clrun != NULL ) {
-    if ( !(clrun->stptr->removed) ) { // ignore those have been removed
+    if ( !(clrun->stptr->removed) && !(clrun->stptr->deleted) ) { // ignore those have been removed
       /* Indicate edge 'stptr' --> 'clrun->stptr' is
 	 temporarily removed.*/
       clrun->tmp_removed = true;
@@ -71,18 +85,56 @@ static void remove_vertex( symtabnode *stptr )
 }
 
 /**
+ * Delete vertex 'stptr' from 'locals' temporarily.
+ */
+static void delete_vertex( symtabnode *stptr )
+{
+  colive_list *clrun = stptr->colives->next;
+  stptr->deleted = true; // indicate it is removed temporarily.
+  //  printf( "Removing vertex %s\n", stptr->name );
+  while ( clrun != NULL ) {
+    if ( !(clrun->stptr->deleted) ) { // ignore those have been removed
+      /* Indicate edge 'stptr' --> 'clrun->stptr' is
+	 permanently deleted.*/
+      clrun->perm_removed = true;
+      stptr->degree--; // update degree
+      clrun->stptr->degree--; // update degree
+      //      printf( "Deleting edge: %s --> %s\n", stptr->name, clrun->stptr->name );
+      
+      /* Also 'clrun->stptr' also needs to know this edge is removed
+	 since we are duplicating the same edge on both ends.*/
+      delete_edge( clrun->stptr, stptr );
+    }
+    clrun = clrun->next;
+  }
+}
+
+/**
  * Check whether the graph is empty or not.
  */
 static bool is_graph_empty()
 {
   localvars *lvrun = locals->next;
   while ( lvrun != NULL ) {
-    if ( !(lvrun->stptr->removed) ) {
+    if ( !(lvrun->stptr->removed) && !(lvrun->stptr->deleted) ) {
       return false; // not empty
     }
     lvrun = lvrun->next;
   }
   return true;
+}
+
+static bool is_graph_colorable()
+{
+  localvars *lvrun = locals->next;
+  while ( lvrun != NULL ) {
+    if ( !(lvrun->stptr->removed) && !(lvrun->stptr->deleted) &&
+	 lvrun->stptr->degree < K ) {
+      return true; // colorable
+    }
+    lvrun = lvrun->next;
+  }
+  return false;
 }
 
 /**
@@ -103,6 +155,21 @@ static void init_stack()
   //  printf( "size of stack: %d\n", size );
 }
 
+static void find_a_vertex_to_delete()
+{
+  localvars *lvrun = locals->next;
+  while ( lvrun != NULL ) {
+    if ( lvrun->stptr->removed || lvrun->stptr->deleted ) {
+      lvrun = lvrun->next;
+      continue;
+    } else {
+      lvrun->stptr->deleted = true;
+      delete_vertex( lvrun->stptr );      
+      return;
+    }
+  }
+}
+
 /**
  * Put vertices with 'K' fewer neighbors onto stack.
  */
@@ -111,12 +178,12 @@ static void put_vertices2stack()
   symtabnode *stptr;
   localvars *lvrun;
 
-  while ( !is_graph_empty() ) { // repeat until the graph is empty.
+  while ( !is_graph_empty() && is_graph_colorable() ) { // repeat until the graph is empty.
     lvrun = locals->next;
     while ( lvrun != NULL ) {
       stptr = lvrun->stptr;
       /* Pick a vertex not yet removed and has degree < 'K' to remove. */
-      if ( !(stptr->removed) && stptr->degree < K ) {
+      if ( !(stptr->removed) && !(stptr->deleted) && stptr->degree < K ) {
 	//	printf( "%s(degree=%d) is picked to be removed.\n", stptr->name, stptr->degree );
 	remove_vertex( stptr );
 	stack.vals[ ++(stack.top) ] = stptr; // push removed vertex to stack.
@@ -124,12 +191,21 @@ static void put_vertices2stack()
       lvrun = lvrun->next;
     }
   }
-  //printf( "Done! graph is empty now.\n" );
-  lvrun = locals->next;
-  while ( lvrun != NULL ) {
-    //printf( "%s(degree=%d)\n", lvrun->stptr->name, lvrun->stptr->degree );
-    lvrun = lvrun->next;
+
+  if ( !is_graph_empty() ) {
+    //printf( "Current graph is not colorable!\n" );
+    /* Pick a vertex to delete. */
+    find_a_vertex_to_delete();
+    put_vertices2stack();
+    //    exit( -1 );
   }
+
+  /* //printf( "Done! graph is empty now.\n" ); */
+  /* lvrun = locals->next; */
+  /* while ( lvrun != NULL ) { */
+  /*   //printf( "%s(degree=%d)\n", lvrun->stptr->name, lvrun->stptr->degree ); */
+  /*   lvrun = lvrun->next; */
+  /* } */
 }
 
 /**

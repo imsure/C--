@@ -46,6 +46,7 @@ typedef struct stblnode {
   struct colive_list *colives; // the list of varibles that co-live with the symbol.
   int degree;
   bool removed;
+  bool deleted;
   int regnum;
   bool is_loaded;
   bool is_dirty;
