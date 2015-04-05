@@ -210,13 +210,27 @@ prog
       }
 
       if ( perform_O1 == true && perform_O2 == true ) {
-	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
+	/* -O1 optimization. */
+	collect_labels( currfnbodyTree->tac_seq );
 	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	//print_bbl();
 	copy_propagation();
-	liveness_local();
+	reaching_defs( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	compute_live_ranges();
+	dead_code_elimination( currfnbodyTree->tac_seq );
 	peephole_stage2( currfnbodyTree->tac_seq );
+
+	/* -O2 optimization. */
+	//transform_cond_jump( currfnbodyTree->tac_seq );
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	reaching_defs( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	compute_live_ranges();
+	reg_alloc( currfnbodyTree->tac_seq );
+	//	printf( "Carrying out both -O1 & -O2 optimization.\n" );
       }
 
       /*----------------------------------------------------------
