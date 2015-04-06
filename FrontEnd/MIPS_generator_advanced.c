@@ -356,8 +356,12 @@ static void store_value_to_local( TAC *tac, int reg_num )
   switch ( stptr->type ) {
   case t_Int: // local int variable
     if ( stptr->regnum > 0 ) { // 'dest' has pre-assigned register.
-      printf( "\tmove $%d, $%d # Store local int %s to its pre-assigned register.\n",
-	      stptr->regnum, reg_num, stptr->name );
+      if ( stptr->regnum != reg_num ) { // if they are same, no need to move
+	printf( "\tmove $%d, $%d # Store local int %s to its pre-assigned register.\n",
+		stptr->regnum, reg_num, stptr->name );
+      } else {
+	printf( "# saved a move operation!\n" );
+      }
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
       /* printf( "\tsw $%d, -%d($fp) # Store to local int %s.\n", */
       /* 	      reg_num, stptr->offset2fp, stptr->name ); */
@@ -387,8 +391,12 @@ static void store_value_to_local( TAC *tac, int reg_num )
     break;
   case t_Tmp_Var: // local tmp variable
     if ( stptr->regnum > 0 ) { // 'dest' has pre-assigned register.
-      printf( "\tmove $%d, $%d # Store local tmp %s to its pre-assigned register.\n",
-	      stptr->regnum, reg_num, stptr->name );
+      if ( stptr->regnum != reg_num ) { // if they are same, no need to move
+	printf( "\tmove $%d, $%d # Store local tmp %s to its pre-assigned register.\n",
+		stptr->regnum, reg_num, stptr->name );
+      } else {
+	printf( "# saved a move operation!\n" );
+      }
       stptr->is_loaded = true; // indicate its value has been loaded to pre-assigned register.
       /* printf( "\tsw $%d, -%d($fp) # Store to tmp variable %s.\n", */
       /* 	      reg_num, stptr->offset2fp, stptr->name ); */
@@ -622,6 +630,17 @@ static void load_rhs_to_reg( address *operand, int reg_num, int *assigned_reg )
 static void tac2mips_assg( TAC *tac )
 {
   int assigned_reg = 0;
+
+  if ( tac->operand1->atype == AT_Intcon || tac->operand1->atype == AT_Charcon ) {
+    if ( tac->dest->val.stptr->regnum > 0 && tac->dest->val.stptr->type == t_Int ) {
+      printf( "# Load constant directly without going through a scratch register.\n" );
+      load_operand_to_reg( tac->operand1, tac->dest->val.stptr->regnum, &assigned_reg );
+      tac->dest->val.stptr->is_loaded = true;
+      tac->dest->val.stptr->is_dirty = true;
+      return;
+    }
+  }
+
   /* step1: Load value of operand1 into $8 if it is not pre-assigned a
      register, otherwise return the pre-assigned register number to
      'assigned_reg'. */
