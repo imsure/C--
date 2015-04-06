@@ -1,0 +1,114 @@
+*************Test results summary***************
+
+Total # of tests run: 86
+Total # of tests passed: 86
+Total # of tests failed: 0
+
+Use the number of instructions of tests run without any optimizations as benchmark:
+
+Total # of tests on which -O1 optimization increase performance: 86
+Total # of tests on which -O1 optimization decrease performance: 0
+
+Total # of tests on which -O2 optimization increase performance: 74
+Total # of tests on which -O2 optimization decrease performance: 12
+
+Total # of tests on which -O1&O2 optimization increase performance: 77
+Total # of tests on which -O1&O2 optimization decrease performance: 9
+
+Use the number of instructions as benchmark:
+
+Total # of tests on which -O1 optimization outperforms -O2 optimization: 50
+Total # of tests on which -O2 optimization outperforms -O1 optimization: 36
+
+Total # of tests on which -O1 optimization outperforms -O1&-O2 optimization: 16
+Total # of tests on which -O1&O2 optimization outperforms -O1 optimization: 70
+
+Total # of tests on which -O2 optimization outperforms -O1&O2 optimization: 6
+Total # of tests on which -O1&O2 optimization outperforms -O2 optimization: 80
+
+(For the detailed test result, please refer to result_stats.txt.)
+
+****************Optimizations implemented*******************
+
+******* O1 optimization *********
+- Peephole optimizations
+  - Simplify constant assignment:
+    assign constant directly to its destination without going through a tmp variable.
+    e.g. convert:
+    _t0 = 5;
+    x = _t0;
+    into:
+    x = 5;
+  - Tranform the relational opertors to eliminate unnecessary jumps:
+    e.g. convert:
+        if ( x > y ) goto _L1
+        goto L2
+    _L1:
+    into:
+        if ( x <= y ) goto L2
+    _L1:
+  - Delete redundant jumps:
+    e.g. convert:
+        goto _L1
+    _L1:
+    into:
+    _L1:
+  - Collapse jump chains:
+    Make jump branches directly to its final destination without going through
+    a chain of jumps.
+  - Pre-compute array indexes that are constant.
+    e.g. for A[2] where A is an array,
+    convert:
+    _tvar0 = 2
+    _tvar0 = _tvar0 * 4
+    _taddr2 = A + _tvar0
+    into:
+    _taddr2 = A + 8
+   - Delete redundant labels:
+    e.g. convert:
+    _L1:
+    _L2:
+    into:
+    _L2:
+  - Pre-compute constant arithmetic:
+    e.g.
+    convert: x = 4 * 8;
+    into: x = 32;
+
+- Copy propagation within basic blocks
+- Liveness analysis across basic blocks
+- Deadcode elimination based on information gained from
+  copy propagation and livenss analysis
+
+******* O2 optimization *********
+- Reaching definiation analysis across basic blocks
+- Liveness analysis across basic blocks
+- Live range identification based on information gained from reaching
+  definition and liveness analysis
+- Global register allocation based on graph coloring
+
+********* Cost/Benefit of using -O1 optimization ***************
+As we can see from *Test results summary* section, -O1 optimization always
+increases performance of C-- programs. This is because it only transfroms/simplies
+the intermediate code and eliminates unnecessary instructions without introducing
+any runtime overhead, thus results in better runtime behavior as well as samller
+size of final code.
+
+The cost of running -O1 optimization during compliation is relatively small because
+most optimizations requires O(n) time to run where n is the number of instructions.
+
+********* Cost/Benefit of using -O2 optimization ***************
+As we can see from *Test results summary* section, while -O2 optimization improves
+performance for most test cases due to significant reduced number of load/store instructions,
+this is not always the case.
+
+For some test cases which involve intensive function calls, we have
+to save the values in those registers that are allocated to some variables back to the memory
+locations of these variables before callee is called such that the callee can use these registers.
+This introduces significant amount of store/load operations during runtime if some functions
+repeatedly get called.
+
+The cost of running -O2 optimization during compliation becomes big as the size
+of the interference graph grows. The graph coloring algorithm implemented in my
+code takes roughly O(|V|^2*|E|) where |V| is the number of vertices and |E| is
+number of edges.
