@@ -1,602 +1,602 @@
-Test-case-1    instructions reads  writes branches   other   
-without-O1     18           3      2      2          11      
-with-O1        18           3      2      2          11      
-with-O2        18           3      2      2          11      
-with-O1O2      18           3      2      2          11      
+Test-case-1    instructions   reads          writes         branches       other   
+without-O1-O2  18             3              2              2              11      
+with-O1        18 (0.0%)      3 (0.0%)       2 (0.0%)       2 (0.0%)       11 (0.0%)
+with-O2        18 (0.0%)      3 (0.0%)       2 (0.0%)       2 (0.0%)       11 (0.0%)
+with-O1O2      18 (0.0%)      3 (0.0%)       2 (0.0%)       2 (0.0%)       11 (0.0%)
 
 
-Test-case-10   instructions reads  writes branches   other   
-without-O1     42           7      5      6          24      
-with-O1        40           6      4      6          24      
-with-O2        41           6      4      6          25      
-with-O1O2      40           6      4      6          24      
+Test-case-10   instructions   reads          writes         branches       other   
+without-O1-O2  42             7              5              6              24      
+with-O1        40 (4.8%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       24 (0.0%)
+with-O2        41 (2.4%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       25 (-4.2%)
+with-O1O2      40 (4.8%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       24 (0.0%)
 
 
-Test-case-11   instructions reads  writes branches   other   
-without-O1     40           7      5      6          22      
-with-O1        38           6      4      6          22      
-with-O2        39           6      4      6          23      
-with-O1O2      38           6      4      6          22      
+Test-case-11   instructions   reads          writes         branches       other   
+without-O1-O2  40             7              5              6              22      
+with-O1        38 (5.0%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       22 (0.0%)
+with-O2        39 (2.5%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       23 (-4.5%)
+with-O1O2      38 (5.0%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       22 (0.0%)
 
 
-Test-case-12   instructions reads  writes branches   other   
-without-O1     92           15     11     14         52      
-with-O1        86           12     8      14         52      
-with-O2        89           12     8      14         55      
-with-O1O2      86           12     8      14         52      
+Test-case-12   instructions   reads          writes         branches       other   
+without-O1-O2  92             15             11             14             52      
+with-O1        86 (6.5%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      52 (0.0%)
+with-O2        89 (3.3%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      55 (-5.8%)
+with-O1O2      86 (6.5%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      52 (0.0%)
 
 
-Test-case-13   instructions reads  writes branches   other   
-without-O1     86           15     11     14         46      
-with-O1        80           12     8      14         46      
-with-O2        83           12     8      14         49      
-with-O1O2      80           12     8      14         46      
+Test-case-13   instructions   reads          writes         branches       other   
+without-O1-O2  86             15             11             14             46      
+with-O1        80 (7.0%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      46 (0.0%)
+with-O2        83 (3.5%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      49 (-6.5%)
+with-O1O2      80 (7.0%)      12 (20.0%)     8 (27.3%)      14 (0.0%)      46 (0.0%)
 
 
-Test-case-14   instructions reads  writes branches   other   
-without-O1     42           7      5      6          24      
-with-O1        40           6      4      6          24      
-with-O2        41           6      4      6          25      
-with-O1O2      40           6      4      6          24      
+Test-case-14   instructions   reads          writes         branches       other   
+without-O1-O2  42             7              5              6              24      
+with-O1        40 (4.8%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       24 (0.0%)
+with-O2        41 (2.4%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       25 (-4.2%)
+with-O1O2      40 (4.8%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       24 (0.0%)
 
 
-Test-case-15   instructions reads  writes branches   other   
-without-O1     40           7      5      6          22      
-with-O1        38           6      4      6          22      
-with-O2        39           6      4      6          23      
-with-O1O2      38           6      4      6          22      
+Test-case-15   instructions   reads          writes         branches       other   
+without-O1-O2  40             7              5              6              22      
+with-O1        38 (5.0%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       22 (0.0%)
+with-O2        39 (2.5%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       23 (-4.5%)
+with-O1O2      38 (5.0%)      6 (14.3%)      4 (20.0%)      6 (0.0%)       22 (0.0%)
 
 
-Test-case-16   instructions reads  writes branches   other   
-without-O1     40           7      6      6          21      
-with-O1        38           6      5      6          21      
-with-O2        38           5      4      6          23      
-with-O1O2      37           5      4      6          22      
+Test-case-16   instructions   reads          writes         branches       other   
+without-O1-O2  40             7              6              6              21      
+with-O1        38 (5.0%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       21 (0.0%)
+with-O2        38 (5.0%)      5 (28.6%)      4 (33.3%)      6 (0.0%)       23 (-9.5%)
+with-O1O2      37 (7.5%)      5 (28.6%)      4 (33.3%)      6 (0.0%)       22 (-4.8%)
 
 
-Test-case-17   instructions reads  writes branches   other   
-without-O1     42           7      6      6          23      
-with-O1        40           6      5      6          23      
-with-O2        41           6      5      6          24      
-with-O1O2      40           6      5      6          23      
+Test-case-17   instructions   reads          writes         branches       other   
+without-O1-O2  42             7              6              6              23      
+with-O1        40 (4.8%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       23 (0.0%)
+with-O2        41 (2.4%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       24 (-4.3%)
+with-O1O2      40 (4.8%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       23 (0.0%)
 
 
-Test-case-18   instructions reads  writes branches   other   
-without-O1     64           11     8      10         35      
-with-O1        62           10     7      10         35      
-with-O2        62           9      6      10         37      
-with-O1O2      61           9      6      10         36      
+Test-case-18   instructions   reads          writes         branches       other   
+without-O1-O2  64             11             8              10             35      
+with-O1        62 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      35 (0.0%)
+with-O2        62 (3.1%)      9 (18.2%)      6 (25.0%)      10 (0.0%)      37 (-5.7%)
+with-O1O2      61 (4.7%)      9 (18.2%)      6 (25.0%)      10 (0.0%)      36 (-2.9%)
 
 
-Test-case-19   instructions reads  writes branches   other   
-without-O1     63           11     8      10         34      
-with-O1        61           9      7      10         35      
-with-O2        61           9      7      10         35      
-with-O1O2      61           9      7      10         35      
+Test-case-19   instructions   reads          writes         branches       other   
+without-O1-O2  63             11             8              10             34      
+with-O1        61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
+with-O2        61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
+with-O1O2      61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
 
 
-Test-case-2    instructions reads  writes branches   other   
-without-O1     42           7      6      6          23      
-with-O1        40           6      5      6          23      
-with-O2        41           6      5      6          24      
-with-O1O2      40           6      5      6          23      
+Test-case-2    instructions   reads          writes         branches       other   
+without-O1-O2  42             7              6              6              23      
+with-O1        40 (4.8%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       23 (0.0%)
+with-O2        41 (2.4%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       24 (-4.3%)
+with-O1O2      40 (4.8%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       23 (0.0%)
 
 
-Test-case-20   instructions reads  writes branches   other   
-without-O1     64           11     8      10         35      
-with-O1        63           9      7      10         37      
-with-O2        61           8      6      10         37      
-with-O1O2      62           8      6      10         38      
+Test-case-20   instructions   reads          writes         branches       other   
+without-O1-O2  64             11             8              10             35      
+with-O1        63 (1.6%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      37 (-5.7%)
+with-O2        61 (4.7%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      37 (-5.7%)
+with-O1O2      62 (3.1%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      38 (-8.6%)
 
 
-Test-case-21   instructions reads  writes branches   other   
-without-O1     65           11     8      10         36      
-with-O1        63           10     7      10         36      
-with-O2        64           10     7      10         37      
-with-O1O2      63           10     7      10         36      
+Test-case-21   instructions   reads          writes         branches       other   
+without-O1-O2  65             11             8              10             36      
+with-O1        63 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      36 (0.0%)
+with-O2        64 (1.5%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      37 (-2.8%)
+with-O1O2      63 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      36 (0.0%)
 
 
-Test-case-22   instructions reads  writes branches   other   
-without-O1     67           11     8      10         38      
-with-O1        65           10     7      10         38      
-with-O2        66           10     7      10         39      
-with-O1O2      65           10     7      10         38      
+Test-case-22   instructions   reads          writes         branches       other   
+without-O1-O2  67             11             8              10             38      
+with-O1        65 (3.0%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      38 (0.0%)
+with-O2        66 (1.5%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      39 (-2.6%)
+with-O1O2      65 (3.0%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      38 (0.0%)
 
 
-Test-case-23   instructions reads  writes branches   other   
-without-O1     65           11     8      10         36      
-with-O1        63           10     7      10         36      
-with-O2        64           10     7      10         37      
-with-O1O2      63           10     7      10         36      
+Test-case-23   instructions   reads          writes         branches       other   
+without-O1-O2  65             11             8              10             36      
+with-O1        63 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      36 (0.0%)
+with-O2        64 (1.5%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      37 (-2.8%)
+with-O1O2      63 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      36 (0.0%)
 
 
-Test-case-24   instructions reads  writes branches   other   
-without-O1     64           11     8      10         35      
-with-O1        63           9      7      10         37      
-with-O2        61           8      6      10         37      
-with-O1O2      62           8      6      10         38      
+Test-case-24   instructions   reads          writes         branches       other   
+without-O1-O2  64             11             8              10             35      
+with-O1        63 (1.6%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      37 (-5.7%)
+with-O2        61 (4.7%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      37 (-5.7%)
+with-O1O2      62 (3.1%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      38 (-8.6%)
 
 
-Test-case-25   instructions reads  writes branches   other   
-without-O1     62           11     8      10         33      
-with-O1        61           9      7      10         35      
-with-O2        59           8      6      10         35      
-with-O1O2      60           8      6      10         36      
+Test-case-25   instructions   reads          writes         branches       other   
+without-O1-O2  62             11             8              10             33      
+with-O1        61 (1.6%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-6.1%)
+with-O2        59 (4.8%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      35 (-6.1%)
+with-O1O2      60 (3.2%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      36 (-9.1%)
 
 
-Test-case-26   instructions reads  writes branches   other   
-without-O1     66           11     8      10         37      
-with-O1        64           10     7      10         37      
-with-O2        65           10     7      10         38      
-with-O1O2      64           10     7      10         37      
+Test-case-26   instructions   reads          writes         branches       other   
+without-O1-O2  66             11             8              10             37      
+with-O1        64 (3.0%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      37 (0.0%)
+with-O2        65 (1.5%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      38 (-2.7%)
+with-O1O2      64 (3.0%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      37 (0.0%)
 
 
-Test-case-27   instructions reads  writes branches   other   
-without-O1     64           11     8      10         35      
-with-O1        62           10     7      10         35      
-with-O2        62           9      6      10         37      
-with-O1O2      61           9      6      10         36      
+Test-case-27   instructions   reads          writes         branches       other   
+without-O1-O2  64             11             8              10             35      
+with-O1        62 (3.1%)      10 (9.1%)      7 (12.5%)      10 (0.0%)      35 (0.0%)
+with-O2        62 (3.1%)      9 (18.2%)      6 (25.0%)      10 (0.0%)      37 (-5.7%)
+with-O1O2      61 (4.7%)      9 (18.2%)      6 (25.0%)      10 (0.0%)      36 (-2.9%)
 
 
-Test-case-28   instructions reads  writes branches   other   
-without-O1     63           11     8      10         34      
-with-O1        61           9      7      10         35      
-with-O2        61           9      7      10         35      
-with-O1O2      61           9      7      10         35      
+Test-case-28   instructions   reads          writes         branches       other   
+without-O1-O2  63             11             8              10             34      
+with-O1        61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
+with-O2        61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
+with-O1O2      61 (3.2%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      35 (-2.9%)
 
 
-Test-case-29   instructions reads  writes branches   other   
-without-O1     61           11     8      10         32      
-with-O1        59           9      7      10         33      
-with-O2        58           8      6      10         34      
-with-O1O2      58           8      6      10         34      
+Test-case-29   instructions   reads          writes         branches       other   
+without-O1-O2  61             11             8              10             32      
+with-O1        59 (3.3%)      9 (18.2%)      7 (12.5%)      10 (0.0%)      33 (-3.1%)
+with-O2        58 (4.9%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      34 (-6.2%)
+with-O1O2      58 (4.9%)      8 (27.3%)      6 (25.0%)      10 (0.0%)      34 (-6.2%)
 
 
-Test-case-3    instructions reads  writes branches   other   
-without-O1     92           15     14     14         49      
-with-O1        86           12     11     14         49      
-with-O2        89           12     11     14         52      
-with-O1O2      86           12     11     14         49      
+Test-case-3    instructions   reads          writes         branches       other   
+without-O1-O2  92             15             14             14             49      
+with-O1        86 (6.5%)      12 (20.0%)     11 (21.4%)     14 (0.0%)      49 (0.0%)
+with-O2        89 (3.3%)      12 (20.0%)     11 (21.4%)     14 (0.0%)      52 (-6.1%)
+with-O1O2      86 (6.5%)      12 (20.0%)     11 (21.4%)     14 (0.0%)      49 (0.0%)
 
 
-Test-case-30   instructions reads  writes branches   other   
-without-O1     92           21     20     6          45      
-with-O1        66           12     11     6          37      
-with-O2        82           11     10     6          55      
-with-O1O2      65           11     10     6          38      
+Test-case-30   instructions   reads          writes         branches       other   
+without-O1-O2  92             21             20             6              45      
+with-O1        66 (28.3%)     12 (42.9%)     11 (45.0%)     6 (0.0%)       37 (17.8%)
+with-O2        82 (10.9%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       55 (-22.2%)
+with-O1O2      65 (29.3%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       38 (15.6%)
 
 
-Test-case-31   instructions reads  writes branches   other   
-without-O1     90           21     20     6          43      
-with-O1        64           12     11     6          35      
-with-O2        80           11     10     6          53      
-with-O1O2      63           11     10     6          36      
+Test-case-31   instructions   reads          writes         branches       other   
+without-O1-O2  90             21             20             6              43      
+with-O1        64 (28.9%)     12 (42.9%)     11 (45.0%)     6 (0.0%)       35 (18.6%)
+with-O2        80 (11.1%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       53 (-23.3%)
+with-O1O2      63 (30.0%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       36 (16.3%)
 
 
-Test-case-32   instructions reads  writes branches   other   
-without-O1     90           21     20     6          43      
-with-O1        64           12     11     6          35      
-with-O2        80           11     10     6          53      
-with-O1O2      63           11     10     6          36      
+Test-case-32   instructions   reads          writes         branches       other   
+without-O1-O2  90             21             20             6              43      
+with-O1        64 (28.9%)     12 (42.9%)     11 (45.0%)     6 (0.0%)       35 (18.6%)
+with-O2        80 (11.1%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       53 (-23.3%)
+with-O1O2      63 (30.0%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       36 (16.3%)
 
 
-Test-case-33   instructions reads  writes branches   other   
-without-O1     88           21     20     6          41      
-with-O1        62           12     11     6          33      
-with-O2        78           11     10     6          51      
-with-O1O2      61           11     10     6          34      
+Test-case-33   instructions   reads          writes         branches       other   
+without-O1-O2  88             21             20             6              41      
+with-O1        62 (29.5%)     12 (42.9%)     11 (45.0%)     6 (0.0%)       33 (19.5%)
+with-O2        78 (11.4%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       51 (-24.4%)
+with-O1O2      61 (30.7%)     11 (47.6%)     10 (50.0%)     6 (0.0%)       34 (17.1%)
 
 
-Test-case-34   instructions reads  writes branches   other   
-without-O1     300          77     76     6          141     
-with-O1        214          45     44     6          119     
-with-O2        258          35     34     6          183     
-with-O1O2      204          35     34     6          129     
+Test-case-34   instructions   reads          writes         branches       other   
+without-O1-O2  300            77             76             6              141     
+with-O1        214 (28.7%)    45 (41.6%)     44 (42.1%)     6 (0.0%)       119 (15.6%)
+with-O2        258 (14.0%)    35 (54.5%)     34 (55.3%)     6 (0.0%)       183 (-29.8%)
+with-O1O2      204 (32.0%)    35 (54.5%)     34 (55.3%)     6 (0.0%)       129 (8.5%)
 
 
-Test-case-35   instructions reads  writes branches   other   
-without-O1     280          77     76     6          121     
-with-O1        194          45     44     6          99      
-with-O2        238          35     34     6          163     
-with-O1O2      184          35     34     6          109     
+Test-case-35   instructions   reads          writes         branches       other   
+without-O1-O2  280            77             76             6              121     
+with-O1        194 (30.7%)    45 (41.6%)     44 (42.1%)     6 (0.0%)       99 (18.2%)
+with-O2        238 (15.0%)    35 (54.5%)     34 (55.3%)     6 (0.0%)       163 (-34.7%)
+with-O1O2      184 (34.3%)    35 (54.5%)     34 (55.3%)     6 (0.0%)       109 (9.9%)
 
 
-Test-case-36   instructions reads  writes branches   other   
-without-O1     290          77     71     6          136     
-with-O1        204          45     39     6          114     
-with-O2        248          35     29     6          178     
-with-O1O2      194          35     29     6          124     
+Test-case-36   instructions   reads          writes         branches       other   
+without-O1-O2  290            77             71             6              136     
+with-O1        204 (29.7%)    45 (41.6%)     39 (45.1%)     6 (0.0%)       114 (16.2%)
+with-O2        248 (14.5%)    35 (54.5%)     29 (59.2%)     6 (0.0%)       178 (-30.9%)
+with-O1O2      194 (33.1%)    35 (54.5%)     29 (59.2%)     6 (0.0%)       124 (8.8%)
 
 
-Test-case-37   instructions reads  writes branches   other   
-without-O1     153          31     22     19         81      
-with-O1        147          28     19     19         81      
-with-O2        145          23     14     19         89      
-with-O1O2      142          23     14     19         86      
+Test-case-37   instructions   reads          writes         branches       other   
+without-O1-O2  153            31             22             19             81      
+with-O1        147 (3.9%)     28 (9.7%)      19 (13.6%)     19 (0.0%)      81 (0.0%)
+with-O2        145 (5.2%)     23 (25.8%)     14 (36.4%)     19 (0.0%)      89 (-9.9%)
+with-O1O2      142 (7.2%)     23 (25.8%)     14 (36.4%)     19 (0.0%)      86 (-6.2%)
 
 
-Test-case-38   instructions reads  writes branches   other   
-without-O1     310          85     81     7          137     
-with-O1        186          39     35     7          105     
-with-O2        256          31     27     7          191     
-with-O1O2      178          31     27     7          113     
+Test-case-38   instructions   reads          writes         branches       other   
+without-O1-O2  310            85             81             7              137     
+with-O1        186 (40.0%)    39 (54.1%)     35 (56.8%)     7 (0.0%)       105 (23.4%)
+with-O2        256 (17.4%)    31 (63.5%)     27 (66.7%)     7 (0.0%)       191 (-39.4%)
+with-O1O2      178 (42.6%)    31 (63.5%)     27 (66.7%)     7 (0.0%)       113 (17.5%)
 
 
-Test-case-39   instructions reads  writes branches   other   
-without-O1     106          30     20     8          48      
-with-O1        98           26     16     8          48      
-with-O2        91           15     7      8          61      
-with-O1O2      87           15     7      8          57      
+Test-case-39   instructions   reads          writes         branches       other   
+without-O1-O2  106            30             20             8              48      
+with-O1        98 (7.5%)      26 (13.3%)     16 (20.0%)     8 (0.0%)       48 (0.0%)
+with-O2        91 (14.2%)     15 (50.0%)     7 (65.0%)      8 (0.0%)       61 (-27.1%)
+with-O1O2      87 (17.9%)     15 (50.0%)     7 (65.0%)      8 (0.0%)       57 (-18.8%)
 
 
-Test-case-4    instructions reads  writes branches   other   
-without-O1     66           14     13     6          33      
-with-O1        52           9      8      6          29      
-with-O2        60           8      7      6          39      
-with-O1O2      51           8      7      6          30      
+Test-case-4    instructions   reads          writes         branches       other   
+without-O1-O2  66             14             13             6              33      
+with-O1        52 (21.2%)     9 (35.7%)      8 (38.5%)      6 (0.0%)       29 (12.1%)
+with-O2        60 (9.1%)      8 (42.9%)      7 (46.2%)      6 (0.0%)       39 (-18.2%)
+with-O1O2      51 (22.7%)     8 (42.9%)      7 (46.2%)      6 (0.0%)       30 (9.1%)
 
 
-Test-case-40   instructions reads  writes branches   other   
-without-O1     299          80     77     7          135     
-with-O1        185          38     35     7          105     
-with-O2        248          29     26     7          186     
-with-O1O2      176          29     26     7          114     
+Test-case-40   instructions   reads          writes         branches       other   
+without-O1-O2  299            80             77             7              135     
+with-O1        185 (38.1%)    38 (52.5%)     35 (54.5%)     7 (0.0%)       105 (22.2%)
+with-O2        248 (17.1%)    29 (63.7%)     26 (66.2%)     7 (0.0%)       186 (-37.8%)
+with-O1O2      176 (41.1%)    29 (63.7%)     26 (66.2%)     7 (0.0%)       114 (15.6%)
 
 
-Test-case-41   instructions reads  writes branches   other   
-without-O1     88           18     17     14         39      
-with-O1        80           14     13     14         39      
-with-O2        77           7      6      14         50      
-with-O1O2      73           7      6      14         46      
+Test-case-41   instructions   reads          writes         branches       other   
+without-O1-O2  88             18             17             14             39      
+with-O1        80 (9.1%)      14 (22.2%)     13 (23.5%)     14 (0.0%)      39 (0.0%)
+with-O2        77 (12.5%)     7 (61.1%)      6 (64.7%)      14 (0.0%)      50 (-28.2%)
+with-O1O2      73 (17.0%)     7 (61.1%)      6 (64.7%)      14 (0.0%)      46 (-17.9%)
 
 
-Test-case-42   instructions reads  writes branches   other   
-without-O1     153          35     26     21         71      
-with-O1        126          24     15     16         71      
-with-O2        137          24     15     16         82      
-with-O1O2      126          24     15     16         71      
+Test-case-42   instructions   reads          writes         branches       other   
+without-O1-O2  153            35             26             21             71      
+with-O1        126 (17.6%)    24 (31.4%)     15 (42.3%)     16 (23.8%)     71 (0.0%)
+with-O2        137 (10.5%)    24 (31.4%)     15 (42.3%)     16 (23.8%)     82 (-15.5%)
+with-O1O2      126 (17.6%)    24 (31.4%)     15 (42.3%)     16 (23.8%)     71 (0.0%)
 
 
-Test-case-43   instructions reads  writes branches   other   
-without-O1     87           17     18     10         42      
-with-O1        72           10     11     9          42      
-with-O2        79           10     11     9          49      
-with-O1O2      72           10     11     9          42      
+Test-case-43   instructions   reads          writes         branches       other   
+without-O1-O2  87             17             18             10             42      
+with-O1        72 (17.2%)     10 (41.2%)     11 (38.9%)     9 (10.0%)      42 (0.0%)
+with-O2        79 (9.2%)      10 (41.2%)     11 (38.9%)     9 (10.0%)      49 (-16.7%)
+with-O1O2      72 (17.2%)     10 (41.2%)     11 (38.9%)     9 (10.0%)      42 (0.0%)
 
 
-Test-case-44   instructions reads  writes branches   other   
-without-O1     319          76     54     40         149     
-with-O1        302          68     46     39         149     
-with-O2        288          46     24     39         179     
-with-O1O2      280          46     24     39         171     
+Test-case-44   instructions   reads          writes         branches       other   
+without-O1-O2  319            76             54             40             149     
+with-O1        302 (5.3%)     68 (10.5%)     46 (14.8%)     39 (2.5%)      149 (0.0%)
+with-O2        288 (9.7%)     46 (39.5%)     24 (55.6%)     39 (2.5%)      179 (-20.1%)
+with-O1O2      280 (12.2%)    46 (39.5%)     24 (55.6%)     39 (2.5%)      171 (-14.8%)
 
 
-Test-case-45   instructions reads  writes branches   other   
-without-O1     1049         295    208    73         473     
-with-O1        950          248    161    68         473     
-with-O2        901          152    65     68         616     
-with-O1O2      854          152    65     68         569     
+Test-case-45   instructions   reads          writes         branches       other   
+without-O1-O2  1049           295            208            73             473     
+with-O1        950 (9.4%)     248 (15.9%)    161 (22.6%)    68 (6.8%)      473 (0.0%)
+with-O2        901 (14.1%)    152 (48.5%)    65 (68.8%)     68 (6.8%)      616 (-30.2%)
+with-O1O2      854 (18.6%)    152 (48.5%)    65 (68.8%)     68 (6.8%)      569 (-20.3%)
 
 
-Test-case-46   instructions reads  writes branches   other   
-without-O1     9859         2915   2068   732        4144    
-with-O1        8280         2186   1339   611        4144    
-with-O2        8403         1580   733    611        5479    
-with-O1O2      7674         1580   733    611        4750    
+Test-case-46   instructions   reads          writes         branches       other   
+without-O1-O2  9859           2915           2068           732            4144    
+with-O1        8280 (16.0%)   2186 (25.0%)   1339 (35.3%)   611 (16.5%)    4144 (0.0%)
+with-O2        8403 (14.8%)   1580 (45.8%)   733 (64.6%)    611 (16.5%)    5479 (-32.2%)
+with-O1O2      7674 (22.2%)   1580 (45.8%)   733 (64.6%)    611 (16.5%)    4750 (-14.6%)
 
 
-Test-case-47   instructions reads  writes branches   other   
-without-O1     2243         818    562    261        602     
-with-O1        1926         690    434    200        602     
-with-O2        1369         5      4      200        1160    
-with-O1O2      1241         5      4      200        1032    
+Test-case-47   instructions   reads          writes         branches       other   
+without-O1-O2  2243           818            562            261            602     
+with-O1        1926 (14.1%)   690 (15.6%)    434 (22.8%)    200 (23.4%)    602 (0.0%)
+with-O2        1369 (39.0%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1160 (-92.7%)
+with-O1O2      1241 (44.7%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1032 (-71.4%)
 
 
-Test-case-48   instructions reads  writes branches   other   
-without-O1     724          267    203    68         186     
-with-O1        640          232    168    54         186     
-with-O2        449          5      4      55         385     
-with-O1O2      412          5      4      53         350     
+Test-case-48   instructions   reads          writes         branches       other   
+without-O1-O2  724            267            203            68             186     
+with-O1        640 (11.6%)    232 (13.1%)    168 (17.2%)    54 (20.6%)     186 (0.0%)
+with-O2        449 (38.0%)    5 (98.1%)      4 (98.0%)      55 (19.1%)     385 (-107.0%)
+with-O1O2      412 (43.1%)    5 (98.1%)      4 (98.0%)      53 (22.1%)     350 (-88.2%)
 
 
-Test-case-49   instructions reads  writes branches   other   
-without-O1     5332         2000   1469   379        1484    
-with-O1        4677         1688   1157   348        1484    
-with-O2        3306         5      4      348        2949    
-with-O1O2      2994         5      4      348        2637    
+Test-case-49   instructions   reads          writes         branches       other   
+without-O1-O2  5332           2000           1469           379            1484    
+with-O1        4677 (12.3%)   1688 (15.6%)   1157 (21.2%)   348 (8.2%)     1484 (0.0%)
+with-O2        3306 (38.0%)   5 (99.8%)      4 (99.7%)      348 (8.2%)     2949 (-98.7%)
+with-O1O2      2994 (43.8%)   5 (99.8%)      4 (99.7%)      348 (8.2%)     2637 (-77.7%)
 
 
-Test-case-5    instructions reads  writes branches   other   
-without-O1     317          69     68     26         154     
-with-O1        233          39     38     26         130     
-with-O2        281          33     32     26         190     
-with-O1O2      227          33     32     26         136     
+Test-case-5    instructions   reads          writes         branches       other   
+without-O1-O2  317            69             68             26             154     
+with-O1        233 (26.5%)    39 (43.5%)     38 (44.1%)     26 (0.0%)      130 (15.6%)
+with-O2        281 (11.4%)    33 (52.2%)     32 (52.9%)     26 (0.0%)      190 (-23.4%)
+with-O1O2      227 (28.4%)    33 (52.2%)     32 (52.9%)     26 (0.0%)      136 (11.7%)
 
 
-Test-case-50   instructions reads  writes branches   other   
-without-O1     2243         818    562    261        602     
-with-O1        1926         690    434    200        602     
-with-O2        1369         5      4      200        1160    
-with-O1O2      1241         5      4      200        1032    
+Test-case-50   instructions   reads          writes         branches       other   
+without-O1-O2  2243           818            562            261            602     
+with-O1        1926 (14.1%)   690 (15.6%)    434 (22.8%)    200 (23.4%)    602 (0.0%)
+with-O2        1369 (39.0%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1160 (-92.7%)
+with-O1O2      1241 (44.7%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1032 (-71.4%)
 
 
-Test-case-51   instructions reads  writes branches   other   
-without-O1     5332         2000   1469   379        1484    
-with-O1        4677         1688   1157   348        1484    
-with-O2        3306         5      4      348        2949    
-with-O1O2      2994         5      4      348        2637    
+Test-case-51   instructions   reads          writes         branches       other   
+without-O1-O2  5332           2000           1469           379            1484    
+with-O1        4677 (12.3%)   1688 (15.6%)   1157 (21.2%)   348 (8.2%)     1484 (0.0%)
+with-O2        3306 (38.0%)   5 (99.8%)      4 (99.7%)      348 (8.2%)     2949 (-98.7%)
+with-O1O2      2994 (43.8%)   5 (99.8%)      4 (99.7%)      348 (8.2%)     2637 (-77.7%)
 
 
-Test-case-52   instructions reads  writes branches   other   
-without-O1     2243         818    562    261        602     
-with-O1        1926         690    434    200        602     
-with-O2        1369         5      4      200        1160    
-with-O1O2      1241         5      4      200        1032    
+Test-case-52   instructions   reads          writes         branches       other   
+without-O1-O2  2243           818            562            261            602     
+with-O1        1926 (14.1%)   690 (15.6%)    434 (22.8%)    200 (23.4%)    602 (0.0%)
+with-O2        1369 (39.0%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1160 (-92.7%)
+with-O1O2      1241 (44.7%)   5 (99.4%)      4 (99.3%)      200 (23.4%)    1032 (-71.4%)
 
 
-Test-case-53   instructions reads  writes branches   other   
-without-O1     311          94     79     30         108     
-with-O1        292          85     70     29         108     
-with-O2        284          47     46     29         162     
-with-O1O2      261          40     39     29         153     
+Test-case-53   instructions   reads          writes         branches       other   
+without-O1-O2  311            94             79             30             108     
+with-O1        292 (6.1%)     85 (9.6%)      70 (11.4%)     29 (3.3%)      108 (0.0%)
+with-O2        284 (8.7%)     47 (50.0%)     46 (41.8%)     29 (3.3%)      162 (-50.0%)
+with-O1O2      261 (16.1%)    40 (57.4%)     39 (50.6%)     29 (3.3%)      153 (-41.7%)
 
 
-Test-case-54   instructions reads  writes branches   other   
-without-O1     1375         402    387    100        486     
-with-O1        1342         386    371    99         486     
-with-O2        2027         593    592    99         743     
-with-O1O2      1899         537    536    99         727     
+Test-case-54   instructions   reads          writes         branches       other   
+without-O1-O2  1375           402            387            100            486     
+with-O1        1342 (2.4%)    386 (4.0%)     371 (4.1%)     99 (1.0%)      486 (0.0%)
+with-O2        2027 (-47.4%)  593 (-47.5%)   592 (-53.0%)   99 (1.0%)      743 (-52.9%)
+with-O1O2      1899 (-38.1%)  537 (-33.6%)   536 (-38.5%)   99 (1.0%)      727 (-49.6%)
 
 
-Test-case-55   instructions reads  writes branches   other   
-without-O1     1305         367    352    100        486     
-with-O1        1272         351    336    99         486     
-with-O2        2020         607    606    99         708     
-with-O1O2      1878         544    543    99         692     
+Test-case-55   instructions   reads          writes         branches       other   
+without-O1-O2  1305           367            352            100            486     
+with-O1        1272 (2.5%)    351 (4.4%)     336 (4.5%)     99 (1.0%)      486 (0.0%)
+with-O2        2020 (-54.8%)  607 (-65.4%)   606 (-72.2%)   99 (1.0%)      708 (-45.7%)
+with-O1O2      1878 (-43.9%)  544 (-48.2%)   543 (-54.3%)   99 (1.0%)      692 (-42.4%)
 
 
-Test-case-56   instructions reads  writes branches   other   
-without-O1     295          83     68     37         107     
-with-O1        274          76     61     30         107     
-with-O2        300          65     50     30         155     
-with-O1O2      293          65     50     30         148     
+Test-case-56   instructions   reads          writes         branches       other   
+without-O1-O2  295            83             68             37             107     
+with-O1        274 (7.1%)     76 (8.4%)      61 (10.3%)     30 (18.9%)     107 (0.0%)
+with-O2        300 (-1.7%)    65 (21.7%)     50 (26.5%)     30 (18.9%)     155 (-44.9%)
+with-O1O2      293 (0.7%)     65 (21.7%)     50 (26.5%)     30 (18.9%)     148 (-38.3%)
 
 
-Test-case-57   instructions reads  writes branches   other   
-without-O1     520          139    124    58         199     
-with-O1        485          125    110    51         199     
-with-O2        567          121    106    51         289     
-with-O1O2      553          121    106    51         275     
+Test-case-57   instructions   reads          writes         branches       other   
+without-O1-O2  520            139            124            58             199     
+with-O1        485 (6.7%)     125 (10.1%)    110 (11.3%)    51 (12.1%)     199 (0.0%)
+with-O2        567 (-9.0%)    121 (12.9%)    106 (14.5%)    51 (12.1%)     289 (-45.2%)
+with-O1O2      553 (-6.3%)    121 (12.9%)    106 (14.5%)    51 (12.1%)     275 (-38.2%)
 
 
-Test-case-58   instructions reads  writes branches   other   
-without-O1     140          40     35     10         55      
-with-O1        140          40     35     10         55      
-with-O2        145          31     30     10         74      
-with-O1O2      145          31     30     10         74      
+Test-case-58   instructions   reads          writes         branches       other   
+without-O1-O2  140            40             35             10             55      
+with-O1        140 (0.0%)     40 (0.0%)      35 (0.0%)      10 (0.0%)      55 (0.0%)
+with-O2        145 (-3.6%)    31 (22.5%)     30 (14.3%)     10 (0.0%)      74 (-34.5%)
+with-O1O2      145 (-3.6%)    31 (22.5%)     30 (14.3%)     10 (0.0%)      74 (-34.5%)
 
 
-Test-case-59   instructions reads  writes branches   other   
-without-O1     1574         419    400    162        593     
-with-O1        1495         381    362    159        593     
-with-O2        3050         1049   1048   159        794     
-with-O1O2      2902         994    993    159        756     
+Test-case-59   instructions   reads          writes         branches       other   
+without-O1-O2  1574           419            400            162            593     
+with-O1        1495 (5.0%)    381 (9.1%)     362 (9.5%)     159 (1.9%)     593 (0.0%)
+with-O2        3050 (-93.8%)  1049 (-150.4%) 1048 (-162.0%) 159 (1.9%)     794 (-33.9%)
+with-O1O2      2902 (-84.4%)  994 (-137.2%)  993 (-148.2%)  159 (1.9%)     756 (-27.5%)
 
 
-Test-case-6    instructions reads  writes branches   other   
-without-O1     40           7      6      6          21      
-with-O1        38           6      5      6          21      
-with-O2        38           5      4      6          23      
-with-O1O2      37           5      4      6          22      
+Test-case-6    instructions   reads          writes         branches       other   
+without-O1-O2  40             7              6              6              21      
+with-O1        38 (5.0%)      6 (14.3%)      5 (16.7%)      6 (0.0%)       21 (0.0%)
+with-O2        38 (5.0%)      5 (28.6%)      4 (33.3%)      6 (0.0%)       23 (-9.5%)
+with-O1O2      37 (7.5%)      5 (28.6%)      4 (33.3%)      6 (0.0%)       22 (-4.8%)
 
 
-Test-case-60   instructions reads  writes branches   other   
-without-O1     141          35     31     12         63      
-with-O1        133          31     27     12         63      
-with-O2        139          26     22     12         79      
-with-O1O2      133          25     21     12         75      
+Test-case-60   instructions   reads          writes         branches       other   
+without-O1-O2  141            35             31             12             63      
+with-O1        133 (5.7%)     31 (11.4%)     27 (12.9%)     12 (0.0%)      63 (0.0%)
+with-O2        139 (1.4%)     26 (25.7%)     22 (29.0%)     12 (0.0%)      79 (-25.4%)
+with-O1O2      133 (5.7%)     25 (28.6%)     21 (32.3%)     12 (0.0%)      75 (-19.0%)
 
 
-Test-case-61   instructions reads  writes branches   other   
-without-O1     131          35     31     12         53      
-with-O1        123          31     27     12         53      
-with-O2        133          28     22     12         71      
-with-O1O2      127          27     21     12         67      
+Test-case-61   instructions   reads          writes         branches       other   
+without-O1-O2  131            35             31             12             53      
+with-O1        123 (6.1%)     31 (11.4%)     27 (12.9%)     12 (0.0%)      53 (0.0%)
+with-O2        133 (-1.5%)    28 (20.0%)     22 (29.0%)     12 (0.0%)      71 (-34.0%)
+with-O1O2      127 (3.1%)     27 (22.9%)     21 (32.3%)     12 (0.0%)      67 (-26.4%)
 
 
-Test-case-62   instructions reads  writes branches   other   
-without-O1     106          25     23     10         48      
-with-O1        100          22     20     10         48      
-with-O2        104          19     17     10         58      
-with-O1O2      99           18     16     10         55      
+Test-case-62   instructions   reads          writes         branches       other   
+without-O1-O2  106            25             23             10             48      
+with-O1        100 (5.7%)     22 (12.0%)     20 (13.0%)     10 (0.0%)      48 (0.0%)
+with-O2        104 (1.9%)     19 (24.0%)     17 (26.1%)     10 (0.0%)      58 (-20.8%)
+with-O1O2      99 (6.6%)      18 (28.0%)     16 (30.4%)     10 (0.0%)      55 (-14.6%)
 
 
-Test-case-63   instructions reads  writes branches   other   
-without-O1     106          25     23     10         48      
-with-O1        100          22     20     10         48      
-with-O2        104          19     17     10         58      
-with-O1O2      99           18     16     10         55      
+Test-case-63   instructions   reads          writes         branches       other   
+without-O1-O2  106            25             23             10             48      
+with-O1        100 (5.7%)     22 (12.0%)     20 (13.0%)     10 (0.0%)      48 (0.0%)
+with-O2        104 (1.9%)     19 (24.0%)     17 (26.1%)     10 (0.0%)      58 (-20.8%)
+with-O1O2      99 (6.6%)      18 (28.0%)     16 (30.4%)     10 (0.0%)      55 (-14.6%)
 
 
-Test-case-64   instructions reads  writes branches   other   
-without-O1     75           17     16     8          34      
-with-O1        75           17     16     8          34      
-with-O2        75           13     12     8          42      
-with-O1O2      75           13     12     8          42      
+Test-case-64   instructions   reads          writes         branches       other   
+without-O1-O2  75             17             16             8              34      
+with-O1        75 (0.0%)      17 (0.0%)      16 (0.0%)      8 (0.0%)       34 (0.0%)
+with-O2        75 (0.0%)      13 (23.5%)     12 (25.0%)     8 (0.0%)       42 (-23.5%)
+with-O1O2      75 (0.0%)      13 (23.5%)     12 (25.0%)     8 (0.0%)       42 (-23.5%)
 
 
-Test-case-65   instructions reads  writes branches   other   
-without-O1     264          84     71     17         92      
-with-O1        233          69     56     16         92      
-with-O2        218          36     23     16         143     
-with-O1O2      201          35     22     16         128     
+Test-case-65   instructions   reads          writes         branches       other   
+without-O1-O2  264            84             71             17             92      
+with-O1        233 (11.7%)    69 (17.9%)     56 (21.1%)     16 (5.9%)      92 (0.0%)
+with-O2        218 (17.4%)    36 (57.1%)     23 (67.6%)     16 (5.9%)      143 (-55.4%)
+with-O1O2      201 (23.9%)    35 (58.3%)     22 (69.0%)     16 (5.9%)      128 (-39.1%)
 
 
-Test-case-66   instructions reads  writes branches   other   
-without-O1     639          247    167    36         189     
-with-O1        589          223    143    34         189     
-with-O2        504          108    58     34         304     
-with-O1O2      478          107    57     34         280     
+Test-case-66   instructions   reads          writes         branches       other   
+without-O1-O2  639            247            167            36             189     
+with-O1        589 (7.8%)     223 (9.7%)     143 (14.4%)    34 (5.6%)      189 (0.0%)
+with-O2        504 (21.1%)    108 (56.3%)    58 (65.3%)     34 (5.6%)      304 (-60.8%)
+with-O1O2      478 (25.2%)    107 (56.7%)    57 (65.9%)     34 (5.6%)      280 (-48.1%)
 
 
-Test-case-67   instructions reads  writes branches   other   
-without-O1     1037         411    253    38         335     
-with-O1        979          384    225    36         334     
-with-O2        801          173    71     36         521     
-with-O1O2      772          173    71     36         492     
+Test-case-67   instructions   reads          writes         branches       other   
+without-O1-O2  1037           411            253            38             335     
+with-O1        979 (5.6%)     384 (6.6%)     225 (11.1%)    36 (5.3%)      334 (0.3%)
+with-O2        801 (22.8%)    173 (57.9%)    71 (71.9%)     36 (5.3%)      521 (-55.5%)
+with-O1O2      772 (25.6%)    173 (57.9%)    71 (71.9%)     36 (5.3%)      492 (-46.9%)
 
 
-Test-case-68   instructions reads  writes branches   other   
-without-O1     671          226    158    53         234     
-with-O1        638          215    147    42         234     
-with-O2        679          188    120    42         329     
-with-O1O2      668          188    120    42         318     
+Test-case-68   instructions   reads          writes         branches       other   
+without-O1-O2  671            226            158            53             234     
+with-O1        638 (4.9%)     215 (4.9%)     147 (7.0%)     42 (20.8%)     234 (0.0%)
+with-O2        679 (-1.2%)    188 (16.8%)    120 (24.1%)    42 (20.8%)     329 (-40.6%)
+with-O1O2      668 (0.4%)     188 (16.8%)    120 (24.1%)    42 (20.8%)     318 (-35.9%)
 
 
-Test-case-69   instructions reads  writes branches   other   
-without-O1     314          87     72     30         125     
-with-O1        295          78     63     29         125     
-with-O2        288          48     47     29         164     
-with-O1O2      265          41     40     29         155     
+Test-case-69   instructions   reads          writes         branches       other   
+without-O1-O2  314            87             72             30             125     
+with-O1        295 (6.1%)     78 (10.3%)     63 (12.5%)     29 (3.3%)      125 (0.0%)
+with-O2        288 (8.3%)     48 (44.8%)     47 (34.7%)     29 (3.3%)      164 (-31.2%)
+with-O1O2      265 (15.6%)    41 (52.9%)     40 (44.4%)     29 (3.3%)      155 (-24.0%)
 
 
-Test-case-7    instructions reads  writes branches   other   
-without-O1     132          23     22     22         65      
-with-O1        122          18     17     22         65      
-with-O2        122          13     12     22         75      
-with-O1O2      117          13     12     22         70      
+Test-case-7    instructions   reads          writes         branches       other   
+without-O1-O2  132            23             22             22             65      
+with-O1        122 (7.6%)     18 (21.7%)     17 (22.7%)     22 (0.0%)      65 (0.0%)
+with-O2        122 (7.6%)     13 (43.5%)     12 (45.5%)     22 (0.0%)      75 (-15.4%)
+with-O1O2      117 (11.4%)    13 (43.5%)     12 (45.5%)     22 (0.0%)      70 (-7.7%)
 
 
-Test-case-70   instructions reads  writes branches   other   
-without-O1     1117         290    275    86         466     
-with-O1        1084         274    259    85         466     
-with-O2        1412         369    368    85         590     
-with-O1O2      1298         320    319    85         574     
+Test-case-70   instructions   reads          writes         branches       other   
+without-O1-O2  1117           290            275            86             466     
+with-O1        1084 (3.0%)    274 (5.5%)     259 (5.8%)     85 (1.2%)      466 (0.0%)
+with-O2        1412 (-26.4%)  369 (-27.2%)   368 (-33.8%)   85 (1.2%)      590 (-26.6%)
+with-O1O2      1298 (-16.2%)  320 (-10.3%)   319 (-16.0%)   85 (1.2%)      574 (-23.2%)
 
 
-Test-case-71   instructions reads  writes branches   other   
-without-O1     389          101    88     45         155     
-with-O1        367          93     80     39         155     
-with-O2        416          95     82     39         200     
-with-O1O2      406          94     81     39         192     
+Test-case-71   instructions   reads          writes         branches       other   
+without-O1-O2  389            101            88             45             155     
+with-O1        367 (5.7%)     93 (7.9%)      80 (9.1%)      39 (13.3%)     155 (0.0%)
+with-O2        416 (-6.9%)    95 (5.9%)      82 (6.8%)      39 (13.3%)     200 (-29.0%)
+with-O1O2      406 (-4.4%)    94 (6.9%)      81 (8.0%)      39 (13.3%)     192 (-23.9%)
 
 
-Test-case-72   instructions reads  writes branches   other   
-without-O1     689          224    155    53         257     
-with-O1        656          213    144    42         257     
-with-O2        655          178    109    42         326     
-with-O1O2      644          178    109    42         315     
+Test-case-72   instructions   reads          writes         branches       other   
+without-O1-O2  689            224            155            53             257     
+with-O1        656 (4.8%)     213 (4.9%)     144 (7.1%)     42 (20.8%)     257 (0.0%)
+with-O2        655 (4.9%)     178 (20.5%)    109 (29.7%)    42 (20.8%)     326 (-26.8%)
+with-O1O2      644 (6.5%)     178 (20.5%)    109 (29.7%)    42 (20.8%)     315 (-22.6%)
 
 
-Test-case-73   instructions reads  writes branches   other   
-without-O1     713          216    185    43         269     
-with-O1        658          189    158    42         269     
-with-O2        796          187    186    42         381     
-with-O1O2      735          170    169    42         354     
+Test-case-73   instructions   reads          writes         branches       other   
+without-O1-O2  713            216            185            43             269     
+with-O1        658 (7.7%)     189 (12.5%)    158 (14.6%)    42 (2.3%)      269 (0.0%)
+with-O2        796 (-11.6%)   187 (13.4%)    186 (-0.5%)    42 (2.3%)      381 (-41.6%)
+with-O1O2      735 (-3.1%)    170 (21.3%)    169 (8.6%)     42 (2.3%)      354 (-31.6%)
 
 
-Test-case-74   instructions reads  writes branches   other   
-without-O1     712          216    185    43         268     
-with-O1        657          189    158    42         268     
-with-O2        795          187    186    42         380     
-with-O1O2      734          170    169    42         353     
+Test-case-74   instructions   reads          writes         branches       other   
+without-O1-O2  712            216            185            43             268     
+with-O1        657 (7.7%)     189 (12.5%)    158 (14.6%)    42 (2.3%)      268 (0.0%)
+with-O2        795 (-11.7%)   187 (13.4%)    186 (-0.5%)    42 (2.3%)      380 (-41.8%)
+with-O1O2      734 (-3.1%)    170 (21.3%)    169 (8.6%)     42 (2.3%)      353 (-31.7%)
 
 
-Test-case-75   instructions reads  writes branches   other   
-without-O1     105          27     21     14         43      
-with-O1        90           21     15     11         43      
-with-O2        84           9      7      11         57      
-with-O1O2      78           9      7      11         51      
+Test-case-75   instructions   reads          writes         branches       other   
+without-O1-O2  105            27             21             14             43      
+with-O1        90 (14.3%)     21 (22.2%)     15 (28.6%)     11 (21.4%)     43 (0.0%)
+with-O2        84 (20.0%)     9 (66.7%)      7 (66.7%)      11 (21.4%)     57 (-32.6%)
+with-O1O2      78 (25.7%)     9 (66.7%)      7 (66.7%)      11 (21.4%)     51 (-18.6%)
 
 
-Test-case-76   instructions reads  writes branches   other   
-without-O1     102          24     25     6          47      
-with-O1        72           13     14     6          39      
-with-O2        88           10     11     6          61      
-with-O1O2      69           10     11     6          42      
+Test-case-76   instructions   reads          writes         branches       other   
+without-O1-O2  102            24             25             6              47      
+with-O1        72 (29.4%)     13 (45.8%)     14 (44.0%)     6 (0.0%)       39 (17.0%)
+with-O2        88 (13.7%)     10 (58.3%)     11 (56.0%)     6 (0.0%)       61 (-29.8%)
+with-O1O2      69 (32.4%)     10 (58.3%)     11 (56.0%)     6 (0.0%)       42 (10.6%)
 
 
-Test-case-77   instructions reads  writes branches   other   
-without-O1     98           24     25     6          43      
-with-O1        68           13     14     6          35      
-with-O2        84           10     11     6          57      
-with-O1O2      65           10     11     6          38      
+Test-case-77   instructions   reads          writes         branches       other   
+without-O1-O2  98             24             25             6              43      
+with-O1        68 (30.6%)     13 (45.8%)     14 (44.0%)     6 (0.0%)       35 (18.6%)
+with-O2        84 (14.3%)     10 (58.3%)     11 (56.0%)     6 (0.0%)       57 (-32.6%)
+with-O1O2      65 (33.7%)     10 (58.3%)     11 (56.0%)     6 (0.0%)       38 (11.6%)
 
 
-Test-case-78   instructions reads  writes branches   other   
-without-O1     814          292    227    29         266     
-with-O1        726          249    184    27         266     
-with-O2        578          57     57     27         437     
-with-O1O2      535          57     57     27         394     
+Test-case-78   instructions   reads          writes         branches       other   
+without-O1-O2  814            292            227            29             266     
+with-O1        726 (10.8%)    249 (14.7%)    184 (18.9%)    27 (6.9%)      266 (0.0%)
+with-O2        578 (29.0%)    57 (80.5%)     57 (74.9%)     27 (6.9%)      437 (-64.3%)
+with-O1O2      535 (34.3%)    57 (80.5%)     57 (74.9%)     27 (6.9%)      394 (-48.1%)
 
 
-Test-case-79   instructions reads  writes branches   other   
-without-O1     948          372    258    29         289     
-with-O1        860          329    215    27         289     
-with-O2        682          107    68     27         480     
-with-O1O2      639          107    68     27         437     
+Test-case-79   instructions   reads          writes         branches       other   
+without-O1-O2  948            372            258            29             289     
+with-O1        860 (9.3%)     329 (11.6%)    215 (16.7%)    27 (6.9%)      289 (0.0%)
+with-O2        682 (28.1%)    107 (71.2%)    68 (73.6%)     27 (6.9%)      480 (-66.1%)
+with-O1O2      639 (32.6%)    107 (71.2%)    68 (73.6%)     27 (6.9%)      437 (-51.2%)
 
 
-Test-case-8    instructions reads  writes branches   other   
-without-O1     64           14     13     6          31      
-with-O1        50           9      8      6          27      
-with-O2        58           8      7      6          37      
-with-O1O2      49           8      7      6          28      
+Test-case-8    instructions   reads          writes         branches       other   
+without-O1-O2  64             14             13             6              31      
+with-O1        50 (21.9%)     9 (35.7%)      8 (38.5%)      6 (0.0%)       27 (12.9%)
+with-O2        58 (9.4%)      8 (42.9%)      7 (46.2%)      6 (0.0%)       37 (-19.4%)
+with-O1O2      49 (23.4%)     8 (42.9%)      7 (46.2%)      6 (0.0%)       28 (9.7%)
 
 
-Test-case-80   instructions reads  writes branches   other   
-without-O1     946          372    258    29         287     
-with-O1        858          329    215    27         287     
-with-O2        680          107    68     27         478     
-with-O1O2      637          107    68     27         435     
+Test-case-80   instructions   reads          writes         branches       other   
+without-O1-O2  946            372            258            29             287     
+with-O1        858 (9.3%)     329 (11.6%)    215 (16.7%)    27 (6.9%)      287 (0.0%)
+with-O2        680 (28.1%)    107 (71.2%)    68 (73.6%)     27 (6.9%)      478 (-66.6%)
+with-O1O2      637 (32.7%)    107 (71.2%)    68 (73.6%)     27 (6.9%)      435 (-51.6%)
 
 
-Test-case-81   instructions reads  writes branches   other   
-without-O1     18048        6009   6007   1009       5023    
-with-O1        12045        4008   3006   1008       4023    
-with-O2        12043        5      4      1008       11026   
-with-O1O2      8042         5      4      1008       7025    
+Test-case-81   instructions   reads          writes         branches       other   
+without-O1-O2  18048          6009           6007           1009           5023    
+with-O1        12045 (33.3%)  4008 (33.3%)   3006 (50.0%)   1008 (0.1%)    4023 (19.9%)
+with-O2        12043 (33.3%)  5 (99.9%)      4 (99.9%)      1008 (0.1%)    11026 (-119.5%)
+with-O1O2      8042 (55.4%)   5 (99.9%)      4 (99.9%)      1008 (0.1%)    7025 (-39.9%)
 
 
-Test-case-82   instructions reads  writes branches   other   
-without-O1     5848         2009   1907   209        1723    
-with-O1        1245         408    306    108        423     
-with-O2        3843         5      4      208        3626    
-with-O1O2      842          5      4      108        725     
+Test-case-82   instructions   reads          writes         branches       other   
+without-O1-O2  5848           2009           1907           209            1723    
+with-O1        1245 (78.7%)   408 (79.7%)    306 (84.0%)    108 (48.3%)    423 (75.4%)
+with-O2        3843 (34.3%)   5 (99.8%)      4 (99.8%)      208 (0.5%)     3626 (-110.4%)
+with-O1O2      842 (85.6%)    5 (99.8%)      4 (99.8%)      108 (48.3%)    725 (57.9%)
 
 
-Test-case-83   instructions reads  writes branches   other   
-without-O1     3856         1213   1011   507        1125    
-with-O1        2347         708    506    310        823     
-with-O2        2549         5      4      408        2132    
-with-O1O2      1644         5      4      310        1325    
+Test-case-83   instructions   reads          writes         branches       other   
+without-O1-O2  3856           1213           1011           507            1125    
+with-O1        2347 (39.1%)   708 (41.6%)    506 (50.0%)    310 (38.9%)    823 (26.8%)
+with-O2        2549 (33.9%)   5 (99.6%)      4 (99.6%)      408 (19.5%)    2132 (-89.5%)
+with-O1O2      1644 (57.4%)   5 (99.6%)      4 (99.6%)      310 (38.9%)    1325 (-17.8%)
 
 
-Test-case-84   instructions reads  writes branches   other   
-without-O1     7058         2512   2310   210        2026    
-with-O1        2253         810    608    109        726     
-with-O2        4550         5      4      209        4332    
-with-O1O2      1448         5      4      109        1330    
+Test-case-84   instructions   reads          writes         branches       other   
+without-O1-O2  7058           2512           2310           210            2026    
+with-O1        2253 (68.1%)   810 (67.8%)    608 (73.7%)    109 (48.1%)    726 (64.2%)
+with-O2        4550 (35.5%)   5 (99.8%)      4 (99.8%)      209 (0.5%)     4332 (-113.8%)
+with-O1O2      1448 (79.5%)   5 (99.8%)      4 (99.8%)      109 (48.1%)    1330 (34.4%)
 
 
-Test-case-85   instructions reads  writes branches   other   
-without-O1     8858         3062   2710   510        2576    
-with-O1        4903         1610   1158   359        1776    
-with-O2        5750         5      4      459        5282    
-with-O1O2      3298         5      4      359        2930    
+Test-case-85   instructions   reads          writes         branches       other   
+without-O1-O2  8858           3062           2710           510            2576    
+with-O1        4903 (44.6%)   1610 (47.4%)   1158 (57.3%)   359 (29.6%)    1776 (31.1%)
+with-O2        5750 (35.1%)   5 (99.8%)      4 (99.9%)      459 (10.0%)    5282 (-105.0%)
+with-O1O2      3298 (62.8%)   5 (99.8%)      4 (99.9%)      359 (29.6%)    2930 (-13.7%)
 
 
-Test-case-86   instructions reads  writes branches   other   
-without-O1     445          85     66     82         212     
-with-O1        437          63     62     82         230     
-with-O2        418          58     48     82         230     
-with-O1O2      422          48     47     82         245     
+Test-case-86   instructions   reads          writes         branches       other   
+without-O1-O2  445            85             66             82             212     
+with-O1        437 (1.8%)     63 (25.9%)     62 (6.1%)      82 (0.0%)      230 (-8.5%)
+with-O2        418 (6.1%)     58 (31.8%)     48 (27.3%)     82 (0.0%)      230 (-8.5%)
+with-O1O2      422 (5.2%)     48 (43.5%)     47 (28.8%)     82 (0.0%)      245 (-15.6%)
 
 
-Test-case-9    instructions reads  writes branches   other   
-without-O1     299          69     68     26         136     
-with-O1        215          39     38     26         112     
-with-O2        263          33     32     26         172     
-with-O1O2      209          33     32     26         118     
+Test-case-9    instructions   reads          writes         branches       other   
+without-O1-O2  299            69             68             26             136     
+with-O1        215 (28.1%)    39 (43.5%)     38 (44.1%)     26 (0.0%)      112 (17.6%)
+with-O2        263 (12.0%)    33 (52.2%)     32 (52.9%)     26 (0.0%)      172 (-26.5%)
+with-O1O2      209 (30.1%)    33 (52.2%)     32 (52.9%)     26 (0.0%)      118 (13.2%)
 
 

@@ -12,6 +12,32 @@ stats_with_O1 = {}
 stats_with_O2 = {}
 stats_with_O1O2 = {}
 
+def fill_table( k, instr, rs, ws, brs, others, header ):
+    if header.endswith( '-O1' ):
+        v = stats_with_O1[ k ]
+    if header.endswith( '-O2' ):
+        v = stats_with_O2[ k ]
+    if header.endswith( '-O1O2' ):
+        v = stats_with_O1O2[ k ]
+
+    perc = ( int(instr) - int(v[0]) ) / float( instr )
+    v_instr = '{0} ({1:.1f}%)'.format(v[0], perc*100);
+
+    perc = ( int(rs) - int(v[1]) ) / float( rs )
+    v_rs = '{0} ({1:.1f}%)'.format(v[1], perc*100);
+
+    perc = ( int(ws) - int(v[2]) ) / float( ws )
+    v_ws = '{0} ({1:.1f}%)'.format(v[2], perc*100);
+
+    perc = ( int(brs) - int(v[3]) ) / float( brs )
+    v_brs = '{0} ({1:.1f}%)'.format(v[3], perc*100);
+
+    perc = ( int(others) - int(v[4]) ) / float( others )
+    v_others = '{0} ({1:.1f}%)'.format(v[4], perc*100);
+
+    print( '{0:14} {1:14} {2:14} {3:14} {4:14} {5:8}'.format(header, v_instr, v_rs,
+                                                           v_ws, v_brs, v_others ) )
+
 def performance():
     f = open( 'performance_all.txt' )
 
@@ -37,25 +63,15 @@ def performance():
     ## Print stats into a table.
     for k in sorted( stats_without_O1O2 ):
         v = stats_without_O1O2[ k ]
-        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format(k, 'instructions',
+        print( '{0:14} {1:14} {2:14} {3:14} {4:14} {5:8}'.format(k, 'instructions',
                                                                'reads', 'writes',
                                                                'branches', 'other') )
-        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('without-O1', v[0], v[1],
+        print( '{0:14} {1:14} {2:14} {3:14} {4:14} {5:8}'.format('without-O1-O2', v[0], v[1],
                                                                v[2], v[3], v[4]) )
-        k2 = k + '-O1'
-        v2 = stats_with_O1[ k2 ]
-        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('with-O1', v2[0], v2[1],
-                                                               v2[2], v2[3], v2[4]) )
 
-        k3 = k + '-O2'
-        v3 = stats_with_O2[ k3 ]
-        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('with-O2', v3[0], v3[1],
-                                                               v3[2], v3[3], v3[4]) )
-
-        k4 = k + '-O1O2'
-        v4 = stats_with_O1O2[ k4 ]
-        print( '{0:14} {1:12} {2:6} {3:6} {4:10} {5:8}'.format('with-O1O2', v4[0], v4[1],
-                                                               v4[2], v4[3], v4[4]) )
+        fill_table( k+'-O1', v[0], v[1], v[2], v[3], v[4], 'with-O1' )
+        fill_table( k+'-O2', v[0], v[1], v[2], v[3], v[4], 'with-O2' )
+        fill_table( k+'-O1O2', v[0], v[1], v[2], v[3], v[4], 'with-O1O2' )
 
         # total_cmp = int(v[0]) - int(v2[0])
         # read_cmp = int(v[1]) - int(v2[1])
@@ -67,7 +83,6 @@ def performance():
         
         print( '\n' )
 
-    
 ## The main function.
 def main():
     performance()
