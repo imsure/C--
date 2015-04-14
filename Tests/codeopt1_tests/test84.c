@@ -13,7 +13,7 @@ void main(void)
     j = (i+1)*i - 3;        /* this statement is dead! */
     k = k+i+1;
     j = 1;                  /* this statement is dead! */
-  }
+  };
   if (i > 0) {
     print_int(k);
     print_string("\n");

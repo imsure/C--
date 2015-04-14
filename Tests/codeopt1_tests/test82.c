@@ -11,7 +11,7 @@ void main(void)
     j = (2*i-1)/3;          /* this statement is dead! */
     j = (i+1)*i - 3;        /* this statement is dead! */
     j = 1;                  /* this statement is dead! */
-  }
+  };
   print_int(i);
   print_string("\n");
 }

@@ -18,7 +18,7 @@ void main(void)
     else {
       j = 0;
     }
-  }
+  };
   if (i > 0) {
     print_int(k);
     print_string("\n");
