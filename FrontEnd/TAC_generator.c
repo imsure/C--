@@ -1169,6 +1169,10 @@ TAC_seq *code_gen( tnode *t )
     t->tac_seq = code_gen( stList_Head(t) );
     for ( tntmp = stList_Rest( t ); tntmp != NULL;
 	  tntmp = stList_Rest(tntmp) ) {
+      if ( stList_Head(tntmp) == NULL ) {
+	/* Ignore the null tree node! */
+	continue;
+      }
       tmpcode = code_gen( stList_Head(tntmp) );
       t->tac_seq->end->next = tmpcode->start;
       tmpcode->start->prev = t->tac_seq->end;
