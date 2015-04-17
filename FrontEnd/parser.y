@@ -246,7 +246,8 @@ prog
 	reaching_defs( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 
-	avail_expr();
+	avail_expr( currfnbodyTree->tac_seq );
+	print_bbl();
       }
 
       /*----------------------------------------------------------

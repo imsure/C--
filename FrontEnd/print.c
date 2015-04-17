@@ -519,6 +519,15 @@ void print_bbl()
       //      print_bv( "     Used", bbl_run->used, num_vars-1 );
     }
 
+    /* Print out bit vectors for available expressions. */
+    if ( bbl_run->expr_gen && bbl_run->expr_kill &&
+	 bbl_run->expr_in && bbl_run->expr_out ) {
+      print_bv( "     Expr Gen", bbl_run->expr_gen, num_defuses-1 );
+      print_bv( "     Expr Kill", bbl_run->expr_kill, num_defuses-1 );
+      print_bv( "     Expr In", bbl_run->expr_in, num_defuses-1 );
+      print_bv( "     Expr Out", bbl_run->expr_out, num_defuses-1 );
+    }
+
     bbl_run = bbl_run->next;
   }  
 }

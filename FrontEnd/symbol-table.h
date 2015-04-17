@@ -52,6 +52,7 @@ typedef struct stblnode {
   bool is_dirty;
   bool saved;
   bitvec saved_regs;
+  bitvec *expr_bv; // set of expressions involve the variable.
 } symtabnode;
 
 typedef struct colive_list {

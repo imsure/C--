@@ -42,6 +42,12 @@ typedef struct basic_block_list {
   bitvec *liveout;
   bitvec *used; // the set of local variables that are used inside the block.
 
+  /* For available expression analysis. */
+  bitvec *expr_gen;
+  bitvec *expr_kill;
+  bitvec *expr_in;
+  bitvec *expr_out;
+
   int visit_counter;
 } bbl;
 
