@@ -47,6 +47,7 @@
   extern void compute_live_ranges();
   extern void reg_alloc();
   extern void avail_expr();
+  extern void common_subexpr_elimination( TAC_seq *tacseq );
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -247,7 +248,8 @@ prog
 	liveness_global( currfnbodyTree->tac_seq );
 
 	avail_expr( currfnbodyTree->tac_seq );
-	print_bbl();
+	common_subexpr_elimination( currfnbodyTree->tac_seq );
+	//print_bbl();
       }
 
       /*----------------------------------------------------------
