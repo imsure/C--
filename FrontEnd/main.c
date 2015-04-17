@@ -10,6 +10,7 @@ extern void spim_print_string();
 int status = 0;
 bool perform_O1 = false; // indicate whether perform -O1 optimization or not.
 bool perform_O2 = false; // indicate whether perform -O2 optimization or not.
+bool perform_O3 = false; // indicate whether perform -O3 optimization or not.
 bool tac_only = false; // indicate whether output TAC files only
 
 /**
@@ -35,6 +36,8 @@ int main( int argc, char *argv[] )
 	  perform_O1 = true; break;
 	case '2':
 	  perform_O2 = true; break;
+	case '3':
+	  perform_O3 = true; break;
 	default:
 	  break;
 	}

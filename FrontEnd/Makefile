@@ -23,6 +23,7 @@ CFILES = error.c \
 	liveness_global.c\
 	live_range.c\
 	reg_alloc.c\
+	common_sub_expr.c\
 	MIPS_generator_advanced.c
 
 OFILES = error.o \
@@ -42,6 +43,7 @@ OFILES = error.o \
 	liveness_global.o\
 	live_range.o\
 	reg_alloc.o\
+	common_sub_expr.o\
 	MIPS_generator_advanced.o
 
 .c.o :
@@ -77,6 +79,8 @@ liveness_global.o : global.h liveness_global.c
 live_range.o : global.h live_range.c
 
 reg_alloc.o : global.h reg_alloc.c
+
+common_sub_expr.o : global.h common_sub_expr.c
 
 MIPS_generator_advanced.o : global.h MIPS_generator_advanced.c
 

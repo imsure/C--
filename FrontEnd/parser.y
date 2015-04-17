@@ -46,10 +46,12 @@
   extern void dead_code_elimination( TAC_seq *tacseq );
   extern void compute_live_ranges();
   extern void reg_alloc();
+  extern void avail_expr();
 
   extern bool tac_only;
   extern bool perform_O1;
   extern bool perform_O2;
+  extern bool perform_O3;
 
   /*
    * struct treenode *currfnbodyTree is set to point to
@@ -232,6 +234,19 @@ prog
 	//print_bbl();
 	reg_alloc( currfnbodyTree->tac_seq );
 	//printf( "Carrying out both -O1 & -O2 optimization.\n" );
+      }
+
+      /* CSE optimization. invoked with -O3. */
+      if ( perform_O3 == true ) {
+	collect_labels( currfnbodyTree->tac_seq );
+	transform_cond_jump( currfnbodyTree->tac_seq );
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	reaching_defs( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+
+	avail_expr();
       }
 
       /*----------------------------------------------------------
