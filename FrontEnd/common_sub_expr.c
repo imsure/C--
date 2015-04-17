@@ -36,6 +36,31 @@ extern bbl *bhead;
 bitvec *uset;
 
 /**
+ * Check if 'var' is in a valid expression.
+ */
+static bool is_in_valid_expr( address *var )
+{
+  if ( is_valid_local( var ) ||
+       (var->atype == AT_Intcon || var->atype == AT_Charcon) ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Check if 'tac' is an instruction for calculating array adress.
+ */
+static bool is_array_addr_cal( TAC *tac )
+{
+  if ( tac->operand1->atype == AT_StRef &&
+       tac->operand1->val.stptr->type == t_Array &&
+       is_in_valid_expr(tac->operand2) ) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * For each local var/tmp compute the set of expressions that involve it.
  */
 static void compute_expr_bv( TAC_seq *tacseq )
@@ -44,6 +69,18 @@ static void compute_expr_bv( TAC_seq *tacseq )
 
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) ) {
+      if ( tac->optype != UnaryMinus && is_array_addr_cal(tac) ) {
+	/* We treat array address calculation specially. */
+	SET_BIT( uset, tac->id-1 );
+	if ( is_valid_local(tac->operand2) ) {
+	  if ( tac->operand2->val.stptr->expr_bv == NULL ) {
+	    tac->operand2->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
+	  }
+	  printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand2->val.stptr->name );
+	  SET_BIT( tac->operand2->val.stptr->expr_bv, tac->id-1 );
+	}
+      }
+
       if ( tac->optype == UnaryMinus ) {
 	if ( is_valid_local(tac->operand1) ) {
 	  if ( tac->operand1->val.stptr->expr_bv == NULL ) {
@@ -54,18 +91,22 @@ static void compute_expr_bv( TAC_seq *tacseq )
 	  SET_BIT( uset, tac->id-1 );
 	}
       } else {
-	if ( is_valid_local(tac->operand1) && is_valid_local(tac->operand2) ) {
-	  if ( tac->operand1->val.stptr->expr_bv == NULL ) {
-	    tac->operand1->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
+	if ( is_in_valid_expr(tac->operand1) && is_in_valid_expr(tac->operand2) ) {
+	  if ( is_valid_local(tac->operand1) ) {
+	    if ( tac->operand1->val.stptr->expr_bv == NULL ) {
+	      tac->operand1->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
+	    }
+	    printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand1->val.stptr->name );
+	    SET_BIT( tac->operand1->val.stptr->expr_bv, tac->id-1 );
 	  }
-	  printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand1->val.stptr->name );
-	  SET_BIT( tac->operand1->val.stptr->expr_bv, tac->id-1 );
 
-	  if ( tac->operand2->val.stptr->expr_bv == NULL ) {
-	    tac->operand2->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
+	  if ( is_valid_local(tac->operand2) ) {
+	    if ( tac->operand2->val.stptr->expr_bv == NULL ) {
+	      tac->operand2->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
+	    }
+	    printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand2->val.stptr->name );
+	    SET_BIT( tac->operand2->val.stptr->expr_bv, tac->id-1 );
 	  }
-	  printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand2->val.stptr->name );
-	  SET_BIT( tac->operand2->val.stptr->expr_bv, tac->id-1 );
 
 	  SET_BIT( uset, tac->id-1 );
 	}
