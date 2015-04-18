@@ -20,7 +20,7 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	sw $fp, 4($sp) # Save old $fp on stack
 	sw $ra, 0($sp) # Save old $ra on stack
 	la $fp, 0($sp) # Set up frame pointer
-	la $sp, -40($sp) # Allocate stack frame for locals/tmps
+	la $sp, -44($sp) # Allocate stack frame for locals/tmps
 	li $8, 0 # Load int constant shorter than 16-bits
 	sw $8, -4($fp) # Store to tmp variable _tvar0.
 	lw $8, -4($fp) # Load tmp variable _tvar0.
@@ -30,8 +30,8 @@ _f:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 _L0:	lw $8, -16($fp) # Load local int i.
 	li $9, 4 # Load int constant shorter than 16-bits
 	mul $10, $8, $9
-	sw $10, -0($fp) # Store to tmp variable _tvar4.
-	lw $8, -0($fp) # Load tmp variable _tvar4.
+	sw $10, -44($fp) # Store to tmp variable _tvar4.
+	lw $8, -44($fp) # Load tmp variable _tvar4.
 	sw $8, -8($fp) # Store to tmp variable _tvar1.
 	la $8, _a # Load address of global int array a.
 	lw $9, -8($fp) # Load tmp variable _tvar1.
@@ -40,7 +40,7 @@ _L0:	lw $8, -16($fp) # Load local int i.
 	lw $8, -16($fp) # Load local int i.
 	lw $9, -24($fp) # Load tmp address _taddr0.
 	sw $8, ($9) # Store value pointed by _taddr0 to int array element.
-	lw $8, -0($fp) # Load tmp variable _tvar4.
+	lw $8, -44($fp) # Load tmp variable _tvar4.
 	sw $8, -8($fp) # Store to tmp variable _tvar1.
 	lw $8, 8($fp) # Load address of formal int array x.
 	lw $9, -8($fp) # Load tmp variable _tvar1.

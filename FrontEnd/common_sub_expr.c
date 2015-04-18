@@ -13,6 +13,8 @@
 
 extern void printtac( TAC *tac );
 extern void print_bv( const char *name, bitvec *bv, int len );
+extern TAC *newTAC( SyntaxNodeType optype, address *operand1,
+		    address *operand2, address *dest );
 
 /**
  * total number of local variables/tmps
@@ -34,8 +36,15 @@ extern bbl *bhead;
  * instruction in the current processed procedure.
  */
 bitvec *uset;
+/**
+ * stack size for the current processed function.
+ * This may change since we will introduce new tmps for common
+ * subexpressions.
+ */
+int stack_size;
 
-static bool debug = true;
+//static bool debug = true;
+static bool debug = false;
 
 /**
  * Check if 'var' is in a valid expression.
@@ -308,24 +317,74 @@ static bool operands_equal_check( address *x, address *y )
  */
 static address *expr_match( TAC *target, bitvec *avail, TAC_seq *tacseq )
 {
+  TAC *tac_next, *newtac;
   TAC *tac = tacseq->start;
+  /* Tmp varaible used to hold the value of common subexpression if any. */
+  symtabnode *tmpvar = newtmp_var(); 
+  symtabnode *tmpdest; // used to hold dest of common subexpression if any.
+  SyntaxNodeType optype;
+  address *dest, *operand1, *operand_ret;
+  bool match_found = false;
 
   while ( tac != NULL ) {
+    if ( tac == target ) {
+      tac = tac->next;
+      continue;
+    }
+    
     if ( is_arith_op(tac->optype) && is_valid_expr(tac) ) {
       if ( TEST_BIT(avail, tac->id-1) ) { // see if 'tac' is in 'avail' set.
 	// see if expression in 'tac' matches expression in 'target'
 	if ( operands_equal_check(target->operand1, tac->operand1) &&
-	     operands_equal_check(target->operand2, tac->operand2) ) { 
-	  //printf( "A match of common subexpr found: " );
-	  //printtac(tac);
-	  //putchar( '\n' );
+	     operands_equal_check(target->operand2, tac->operand2) ) {
+	  if ( debug ) {
+	    printf( "A match of common subexpr found: " );
+	    printtac(tac);
+	    putchar( '\n' );
+	  }
+	  match_found = true;
+	  tac_next = tac->next;
+
+	  /* Transform 'tac' that contains a common subexpression. */
+	  tmpdest = tac->dest->val.stptr;
+	  tac->dest->val.stptr = tmpvar; // store value of common subexpression to 'tmpvar'.
+
+	  /* allocate stack space for 'tmpvar'. */
+	  stack_size += 4; // increment size of stack by 4.
+	  tmpvar->offset2fp = stack_size;
+
+	  /* create a new tac for assigning 'tmpvar' to 'tmpdest'. */
+	  optype = Assg;
+	  dest = (address *) zalloc( sizeof(address) );
+	  dest->atype = AT_StRef;
+	  dest->val.stptr = tmpdest;
+
+	  operand1 = (address *) zalloc( sizeof(address) );
+	  operand1->atype = AT_StRef;
+	  operand1->val.stptr = tmpvar;
+
+	  newtac = newTAC( optype, operand1, NULL, dest );
+
+	  /* chain instructions together. */
+	  tac->next = newtac;
+	  newtac->prev = tac;
+	  newtac->next = tac_next;
+	  tac_next->prev = newtac;
 	}
       }
     }
 
     tac = tac->next;
   }
-  return NULL;
+
+  if ( match_found ) {
+    operand_ret = (address *) zalloc( sizeof(address) );
+    operand_ret->atype = AT_StRef;
+    operand_ret->val.stptr = tmpvar;
+    return operand_ret;
+  } else {
+    return NULL;
+  }
 }
 
 static void common_subexpr_elimination_bb( bbl *bb, TAC_seq *tacseq )
@@ -343,6 +402,12 @@ static void common_subexpr_elimination_bb( bbl *bb, TAC_seq *tacseq )
   while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) && is_valid_expr(tac) ) {
       rhs = expr_match( tac, avail, tacseq );
+      if ( rhs != NULL ) {
+        /* Transform 'tac' into an assignment. */
+	tac->optype = Assg;
+	tac->operand1 = rhs;
+	tac->operand2 = NULL;
+      }
 
       /* update 'avail' set. */
       SET_BIT( avail, tac->id-1 ); // add current tac to avail set.
@@ -352,7 +417,22 @@ static void common_subexpr_elimination_bb( bbl *bb, TAC_seq *tacseq )
 	avail = bv_diff( avail, tac->dest->val.stptr->expr_bv, num_defuses-1 );
 	free( bvtmp );
       }
-    }
+    } else if ( is_arith_op(tac->optype) && is_valid_local(tac->dest) ) {
+      if ( tac->dest->val.stptr->expr_bv ) {
+	/* current tac kills all expression involving its destination variable. */
+	bvtmp = avail;
+	avail = bv_diff( avail, tac->dest->val.stptr->expr_bv, num_defuses-1 );
+	free( bvtmp );
+      }
+    } else if ( (tac->optype == Assg || tac->optype == Retrieve) &&
+		is_valid_local(tac->dest) ) {
+      if ( tac->dest->val.stptr->expr_bv ) {
+	/* current tac kills all expression involving its destination variable. */
+	bvtmp = avail;
+	avail = bv_diff( avail, tac->dest->val.stptr->expr_bv, num_defuses-1 );
+	free( bvtmp );
+      }
+    } 
     ++iternum;
     tac = tac->next;
   }
@@ -366,10 +446,21 @@ static void common_subexpr_elimination_bb( bbl *bb, TAC_seq *tacseq )
 void common_subexpr_elimination( TAC_seq *tacseq )
 {
   bbl *bbl_run;
+  TAC *tac = tacseq->start->next; // 'enter func stack size' tac
+  
+  stack_size = tac->operand2->val.iconst; // operand2 is the size of stack.
+  if ( debug ) {
+    printf( "stack size before cse: %d\n", stack_size );
+  }
 
   bbl_run = bhead;
   while( bbl_run != NULL ) {
     common_subexpr_elimination_bb( bbl_run, tacseq );
     bbl_run = bbl_run->next;
-  }  
+  }
+
+  tac->operand2->val.iconst = stack_size; // update stack size.
+  if ( debug ) {
+    printf( "stack size after cse: %d\n", stack_size );
+  }
 }
