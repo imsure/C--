@@ -100,6 +100,7 @@ typedef struct three_address_code {
           // to some local variables/tmps or it reads some local
           // variables/tmps. It is used for computing reaching definitions.
   bool is_dead; // indicate if TAC is dead.
+  int num_uses;
 } TAC;
 
 /**

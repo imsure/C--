@@ -33,13 +33,14 @@ extern int num_defuses;
  */
 extern bbl *bhead;
 
-static bool debug = true; // debug switch for the module.
+static bool debug = false; // debug switch for the module.
 
 /**
  * Counter the number of defs of local var/tmp 'stptr' in the
  * set of reaching definition 'rf'.
+ * 'tmptac' is used for holding the address of tac that defines 'stptr'.
  */
-static int count_num_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq )
+static int count_num_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq, TAC **tmptac )
 {
   TAC *tac = tacseq->start;
   int def_counter = 0;
@@ -49,13 +50,81 @@ static int count_num_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq )
 	 || tac->optype == Retrieve ) { // only look for instructions that define a variable.
       if ( TEST_BIT(rf, tac->id-1) ) { // see if 'tac' is in 'rf' set.
 	if ( tac->dest->val.stptr == stptr ) {
+	  tac->num_uses += 1; // increment num_uses counter to indicate it is used once.
 	  ++def_counter; // update counter
+	  *tmptac = tac;
 	}
       }
     }
     tac = tac->next;
   }
   return def_counter;
+}
+
+/**
+ * Kill the defs in the set of reaching definition 'rf' that define 'stptr'.
+ */
+static void kill_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+
+  while ( tac != NULL ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg
+	 || tac->optype == Retrieve ) { // only look for instructions that define a variable.
+      if ( TEST_BIT(rf, tac->id-1) ) { // see if 'tac' is in 'rf' set.
+	if ( tac->dest->val.stptr == stptr ) {
+	  CLEAR_BIT( rf, tac->id-1 );
+	}
+      }
+    }
+    tac = tac->next;
+  }
+}
+
+/**
+ * Peform copy propagation on a local var/tmp
+ * given the set of reaching definition 'rf', 'operand' on which we
+ * try to propagate and tac sequence.
+ */
+static void copy_propagation_on_operand( bitvec *rf,
+					 address **operand_target,
+					 TAC_seq *tacseq )
+{
+  TAC *tmptac;
+  int def_counter = 0; // used to hold the number of defs of a local var/tmp.
+  address *operand = *operand_target;
+
+  if ( is_valid_local(operand) ) {
+    def_counter = count_num_defs( rf, operand->val.stptr, tacseq, &tmptac );
+    if ( debug ) {
+      printf( "Number of def for %s reaches here is %d\n",
+	      operand->val.stptr->name, def_counter );
+    }
+    if ( def_counter == 0 ) { return; }
+    if ( def_counter > 1 ) {
+      /* Multiple definitions of 'operand' reaches current use of 'operand'.
+	 Cannot do copy propagation on 'operand'. */
+      return;
+    }
+    if ( def_counter == 1 ) {
+      if ( debug ) {
+	printf( "The only TAC that defines %s: ", operand->val.stptr->name );
+	printtac( tmptac );
+	putchar( '\n' );
+      }
+      if ( tmptac->optype == Assg ) { // copy instruction
+	if ( tmptac->operand1->atype == AT_Intcon ||
+	     tmptac->operand1->atype == AT_Charcon ) {
+	  /* Constant can be safely propagated. */
+	  tmptac->num_uses--; // decrement num_uses counter.
+	  if ( debug ) {
+	    printf( "Propagating constant %d\n", tmptac->operand1->val.iconst );
+	  }
+	  *operand_target = tmptac->operand1;
+	}
+      }
+    }
+  }
 }
 
 /**
@@ -66,31 +135,40 @@ static void global_copy_propagation_bb( bbl *bb, TAC_seq *tacseq )
   TAC *tac = bb->first_tac;
   bitvec *rf; // record set of reaching defs at each point in the 'bb'.
   int iternum = 0;
-  int def_counter = 0; // used to hold the number of defs of a local var/tmp.
+
+  if ( debug ) {
+    printf( "Start processing block %s\n", bb->first_tac->dest->val.label );
+  }
 
   rf = bb->in; // initialized with the set of defs that reaches to the entry of the block.
   while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) { // def & use
-      if ( is_valid_local(tac->operand1) ) {
-	def_counter = count_num_defs( rf, tac->operand1->val.stptr, tacseq );
-	if ( debug ) {
-	  printf( "Number of def for %s reaches here is %d\n",
-		  tac->operand1->val.stptr->name, def_counter );
-	}
-      }
+      copy_propagation_on_operand( rf, &(tac->operand1), tacseq );
+      copy_propagation_on_operand( rf, &(tac->operand2), tacseq );
 
-      if ( is_valid_local(tac->operand2) ) {
-	def_counter = count_num_defs( rf, tac->operand2->val.stptr, tacseq );
-	if ( debug ) {
-	  printf( "Number of def for %s reaches here is %d\n",
-		  tac->operand2->val.stptr->name, def_counter );
-	}
+      /* Update reaching definition set 'rf'. */
+      if ( is_valid_local(tac->dest) ) {
+	/* tac->dest kills all defs in 'rf' that define tac->dest. */
+	kill_defs( rf, tac->dest->val.stptr, tacseq );
+	SET_BIT( rf, tac->id-1 ); // add current tac into 'rf' set.
       }
+    } else if ( is_relational_op(tac->optype) ) { // use only
+      copy_propagation_on_operand( rf, &(tac->operand1), tacseq );
+      copy_propagation_on_operand( rf, &(tac->operand2), tacseq );
     } else if ( tac->optype == Retrieve ) { // def only
-    } else if ( tac->optype == Return ) { // use only
+      /* Update reaching definition set 'rf'. */
+      if ( is_valid_local(tac->dest) ) {
+	/* tac->dest kills all defs in 'rf' that define tac->dest. */
+	kill_defs( rf, tac->dest->val.stptr, tacseq );
+	SET_BIT( rf, tac->id-1 ); // add current tac into 'rf' set.
+      }      
     }
     tac = tac->next;
     ++iternum;
+  }
+
+  if ( debug ) {
+    printf( "End of processing block %s\n", bb->first_tac->dest->val.label );
   }
 }
 

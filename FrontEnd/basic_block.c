@@ -170,7 +170,7 @@ static void construct_bb_control_flow()
 /**
  * Construct control flow information for basic blocks.
  */
-static void count_tac_num()
+void count_tac_num()
 {
   TAC *tac;
   bbl *bbl_run;
