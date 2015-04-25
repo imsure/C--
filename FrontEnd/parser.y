@@ -50,6 +50,7 @@
   extern void common_subexpr_elimination( TAC_seq *tacseq );
   extern void compute_num_vars( TAC_seq *tacseq );
   extern void compute_num_defuses( TAC_seq *tacseq );
+  extern void global_copy_propagation( TAC_seq *tacseq );
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -259,6 +260,7 @@ prog
 
 	/* Carry out reaching definition analysis for global copy propagation. */
 	reaching_defs( currfnbodyTree->tac_seq );
+	global_copy_propagation( currfnbodyTree->tac_seq );
 	//print_bbl();
       }
 

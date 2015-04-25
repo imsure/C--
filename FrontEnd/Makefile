@@ -24,6 +24,7 @@ CFILES = error.c \
 	live_range.c\
 	reg_alloc.c\
 	common_sub_expr.c\
+	global_copy_propagation.c\
 	MIPS_generator_advanced.c
 
 OFILES = error.o \
@@ -44,6 +45,7 @@ OFILES = error.o \
 	live_range.o\
 	reg_alloc.o\
 	common_sub_expr.o\
+	global_copy_propagation.o\
 	MIPS_generator_advanced.o
 
 .c.o :
@@ -81,6 +83,8 @@ live_range.o : global.h live_range.c
 reg_alloc.o : global.h reg_alloc.c
 
 common_sub_expr.o : global.h common_sub_expr.c
+
+global_copy_propagation.o : global.h global_copy_propagation.c
 
 MIPS_generator_advanced.o : global.h MIPS_generator_advanced.c
 

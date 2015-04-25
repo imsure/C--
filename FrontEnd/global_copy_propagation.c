@@ -36,14 +36,73 @@ extern bbl *bhead;
 static bool debug = true; // debug switch for the module.
 
 /**
+ * Counter the number of defs of local var/tmp 'stptr' in the
+ * set of reaching definition 'rf'.
+ */
+static int count_num_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq )
+{
+  TAC *tac = tacseq->start;
+  int def_counter = 0;
+
+  while ( tac != NULL ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg
+	 || tac->optype == Retrieve ) { // only look for instructions that define a variable.
+      if ( TEST_BIT(rf, tac->id-1) ) { // see if 'tac' is in 'rf' set.
+	if ( tac->dest->val.stptr == stptr ) {
+	  ++def_counter; // update counter
+	}
+      }
+    }
+    tac = tac->next;
+  }
+  return def_counter;
+}
+
+/**
+ * We carry out global copy propagation per basic block.
+ */
+static void global_copy_propagation_bb( bbl *bb, TAC_seq *tacseq )
+{
+  TAC *tac = bb->first_tac;
+  bitvec *rf; // record set of reaching defs at each point in the 'bb'.
+  int iternum = 0;
+  int def_counter = 0; // used to hold the number of defs of a local var/tmp.
+
+  rf = bb->in; // initialized with the set of defs that reaches to the entry of the block.
+  while ( iternum < bb->numtacs ) {
+    if ( is_arith_op(tac->optype) || tac->optype == Assg ) { // def & use
+      if ( is_valid_local(tac->operand1) ) {
+	def_counter = count_num_defs( rf, tac->operand1->val.stptr, tacseq );
+	if ( debug ) {
+	  printf( "Number of def for %s reaches here is %d\n",
+		  tac->operand1->val.stptr->name, def_counter );
+	}
+      }
+
+      if ( is_valid_local(tac->operand2) ) {
+	def_counter = count_num_defs( rf, tac->operand2->val.stptr, tacseq );
+	if ( debug ) {
+	  printf( "Number of def for %s reaches here is %d\n",
+		  tac->operand2->val.stptr->name, def_counter );
+	}
+      }
+    } else if ( tac->optype == Retrieve ) { // def only
+    } else if ( tac->optype == Return ) { // use only
+    }
+    tac = tac->next;
+    ++iternum;
+  }
+}
+
+/**
  * Entry point for global copy propagation.
- *
+p *
  * Algorithm:
  * For each basic block:
  *     For each intruction that defines/uses a local variable/tmp:
  *     (Assg, arithmetic, Retrieve, Return)
  *         Compute set of reaching definitions just before the instruction;
- *         If the instruction is arithmetic or Return:
+ *         If the instruction is arithmetic or Assg or Return:
  *             For each local var/tmp 'x' used on the RHS:
  *                 Check the set of reaching definitions that reaches to this point:
  *                 case-1: no definition of 'x' reaches to this point, just continue;
@@ -64,4 +123,11 @@ static bool debug = true; // debug switch for the module.
  */
 void global_copy_propagation( TAC_seq *tacseq )
 {
+  bbl *bbl_run;
+  
+  bbl_run = bhead;
+  while( bbl_run != NULL ) {
+    global_copy_propagation_bb( bbl_run, tacseq );
+    bbl_run = bbl_run->next;
+  }
 }
