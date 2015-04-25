@@ -662,7 +662,6 @@ static void tac2mips_assg( TAC *tac )
  */
 static void tac2mips_enterfunc( TAC *tac )
 {
-  int i, counter = 0;
   int stack_size = tac->operand2->val.iconst;
   
   printf( "\tla $sp, -8($sp) # Allocate space for old $fp and $ra\n" );

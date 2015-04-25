@@ -18,21 +18,6 @@ int num_vars = 0; // total number of variables inside the current
 extern bbl *bhead; // header to the basic block list of the current function.
 
 /**
- * Check if address 'var' is a valid local variable, either
- * user defined or compiler generated tmp variables. The name
- * of local array variable is excluded.
- */
-static bool valid_local( address *var )
-{
-  if ( var != NULL && var->atype == AT_StRef &&
-       var->val.stptr->scope == Local &&
-       var->val.stptr->type != t_Array ) {
-    return true;
-  }
-  return false;
-}
-
-/**
  * Count the number of the local variables and assign the ids to them
  * in the TAC sequence 'tacseq' which represents the current processed
  * producedure/function.
@@ -73,22 +58,6 @@ static int count_assign_varids( TAC_seq *tacseq )
   }
 
   return var_counter;
-}
-
-/**
- * Check if 'tac' is a special instruction for calculating
- * the address of an array element, like: _taddr0 = x + 4
- * where x is the name of array.
- */
-static bool array_addr_cal_tac( TAC *tac)
-{
-  if ( is_arith_op(tac->optype) &&
-       tac->dest->val.stptr->type == t_Tmp_Addr &&
-       tac->operand1->atype == AT_StRef &&
-       tac->operand1->val.stptr->type == t_Array ) {
-    return true;
-  }
-  return false;
 }
      
 /**

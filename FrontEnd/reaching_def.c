@@ -159,7 +159,6 @@ static void compute_inout()
   bbl *bbl_run;
   bitvec *bvtmp, *oldout;
   bool change;
-  int iter_num = 0;
 
   /* Initialize in and out set for each basic block. */
   bbl_run = bhead;
