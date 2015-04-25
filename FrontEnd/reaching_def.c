@@ -38,6 +38,11 @@ static int func_num_defuses( TAC_seq *tacseq )
   return def_counter;
 }
 
+void compute_num_defuses( TAC_seq *tacseq )
+{
+  num_defuses = func_num_defuses( tacseq );
+}
+
 /**
  * Compute the set of definitions for each local variables/tmps.
  * The results are stored in the their symbol table entries.
@@ -45,7 +50,8 @@ static int func_num_defuses( TAC_seq *tacseq )
 static void compute_defset_locals( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
-  num_defuses = func_num_defuses( tacseq );
+
+  compute_num_defuses( tacseq );
 
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ||

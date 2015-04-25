@@ -360,12 +360,17 @@ static void remove_dead_code( TAC_seq *tacseq )
   }
 }
 
+void compute_num_vars( TAC_seq *tacseq )
+{
+  num_vars = count_assign_varids( tacseq );
+}
+
 /**
  * Carry out intra-procedural liveness analysis.
  */
 void liveness_global( TAC_seq *tacseq )
 {
-  num_vars = count_assign_varids( tacseq );
+  compute_num_vars( tacseq );
   compute_defuse();
   compute_inout();
 }

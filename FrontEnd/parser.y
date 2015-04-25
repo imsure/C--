@@ -48,6 +48,8 @@
   extern void reg_alloc();
   extern void avail_expr();
   extern void common_subexpr_elimination( TAC_seq *tacseq );
+  extern void compute_num_vars( TAC_seq *tacseq );
+  extern void compute_num_defuses( TAC_seq *tacseq );
 
   extern bool tac_only;
   extern bool perform_O1;
@@ -244,8 +246,10 @@ prog
 	delete_redundant_jump( currfnbodyTree->tac_seq );
 	collapse_label_chain( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	reaching_defs( currfnbodyTree->tac_seq );
-	liveness_global( currfnbodyTree->tac_seq );
+	//reaching_defs( currfnbodyTree->tac_seq );
+	//liveness_global( currfnbodyTree->tac_seq );
+	compute_num_vars( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
 
 	avail_expr( currfnbodyTree->tac_seq );
 	common_subexpr_elimination( currfnbodyTree->tac_seq );
