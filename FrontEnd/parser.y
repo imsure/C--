@@ -257,6 +257,7 @@ prog
 	avail_expr( currfnbodyTree->tac_seq );
 	common_subexpr_elimination( currfnbodyTree->tac_seq );
 
+	/* Carry out reaching definition analysis for global copy propagation. */
 	reaching_defs( currfnbodyTree->tac_seq );
 	//print_bbl();
       }
