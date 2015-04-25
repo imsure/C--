@@ -175,7 +175,7 @@ prog
       /**
        * Carry out only -O1 optimizations:
        * peephole optimization;
-       * copy propagation;
+       * local copy propagation;
        * dead code elimination.
        */
       if ( perform_O1 == true && perform_O2 == false ) {
