@@ -348,6 +348,7 @@ static address *expr_match( TAC *target, bitvec *avail, TAC_seq *tacseq )
 	  /* Transform 'tac' that contains a common subexpression. */
 	  tmpdest = tac->dest->val.stptr;
 	  tac->dest->val.stptr = tmpvar; // store value of common subexpression to 'tmpvar'.
+	  tmpvar->varid = ++num_vars; // assign 'varid' to 'tmpvar' and update 'num_var'
 
 	  /* allocate stack space for 'tmpvar'. */
 	  stack_size += 4; // increment size of stack by 4.
@@ -364,6 +365,7 @@ static address *expr_match( TAC *target, bitvec *avail, TAC_seq *tacseq )
 	  operand1->val.stptr = tmpvar;
 
 	  newtac = newTAC( optype, operand1, NULL, dest );
+	  newtac->id = ++num_defuses;
 
 	  /* chain instructions together. */
 	  tac->next = newtac;

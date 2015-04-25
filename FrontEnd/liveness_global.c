@@ -13,8 +13,8 @@
 
 extern void printtac( TAC *tac );
 
-int num_vars; // total number of variables inside the current
-              // processed function. This will be the size of bit vectors.
+int num_vars = 0; // total number of variables inside the current
+                  // processed function. This will be the size of bit vectors.
 extern bbl *bhead; // header to the basic block list of the current function.
 
 /**
@@ -371,6 +371,7 @@ void compute_num_vars( TAC_seq *tacseq )
 void liveness_global( TAC_seq *tacseq )
 {
   compute_num_vars( tacseq );
+  
   compute_defuse();
   compute_inout();
 }

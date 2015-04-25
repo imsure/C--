@@ -207,7 +207,8 @@ prog
 	delete_redundant_jump( currfnbodyTree->tac_seq );
 	collapse_label_chain( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	reaching_defs( currfnbodyTree->tac_seq );
+	//reaching_defs( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	compute_live_ranges();
 	reg_alloc( currfnbodyTree->tac_seq );
@@ -220,7 +221,8 @@ prog
 	peephole_stage1( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
 	copy_propagation();
-	reaching_defs( currfnbodyTree->tac_seq );
+	//reaching_defs( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	//	compute_live_ranges();
 	dead_code_elimination( currfnbodyTree->tac_seq );
@@ -231,7 +233,8 @@ prog
 	delete_redundant_jump( currfnbodyTree->tac_seq );
 	collapse_label_chain( currfnbodyTree->tac_seq );
 	construct_basic_block( currfnbodyTree->tac_seq );
-	reaching_defs( currfnbodyTree->tac_seq );
+	//reaching_defs( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
 	liveness_global( currfnbodyTree->tac_seq );
 	compute_live_ranges();
 	//print_bbl();
@@ -253,6 +256,8 @@ prog
 
 	avail_expr( currfnbodyTree->tac_seq );
 	common_subexpr_elimination( currfnbodyTree->tac_seq );
+
+	reaching_defs( currfnbodyTree->tac_seq );
 	//print_bbl();
       }
 

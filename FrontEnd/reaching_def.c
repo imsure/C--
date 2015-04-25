@@ -11,7 +11,7 @@
 #include "syntax-tree.h"
 #include "basic_block.h"
 
-int num_defuses; // total number of definitions inside the current processed function.
+int num_defuses = 0; // total number of definitions inside the current processed function.
 extern bbl *bhead; // header to the basic block list of the current function.
 
 /**
