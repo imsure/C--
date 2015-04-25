@@ -43,8 +43,8 @@ bitvec *uset;
  */
 int stack_size;
 
-//static bool debug = true;
-static bool debug = false;
+static bool debug = true;
+//static bool debug = false;
 
 /**
  * Check if 'var' is in a valid expression.
@@ -339,7 +339,9 @@ static address *expr_match( TAC *target, bitvec *avail, TAC_seq *tacseq )
 	     operands_equal_check(target->operand2, tac->operand2) ) {
 	  if ( debug ) {
 	    printf( "A match of common subexpr found: " );
-	    printtac(tac);
+	    printtac( tac );
+	    printf( "For: ");
+	    printtac( target );
 	    putchar( '\n' );
 	  }
 	  match_found = true;
