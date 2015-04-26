@@ -24,7 +24,7 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	la $sp, -64($sp) # Allocate stack frame for locals/tmps
 	li $8, 0 # Load int constant shorter than 16-bits
 	move $12, $8 # Store local tmp _tvar0 to its pre-assigned register.
-	move $11, $12 # Store local int j0 to its pre-assigned register.
+	move $14, $12 # Store local int j0 to its pre-assigned register.
 	li $8, 0 # Load int constant shorter than 16-bits
 	move $12, $8 # Store local tmp _tvar0 to its pre-assigned register.
 	move $13, $12 # Store local int i to its pre-assigned register.
@@ -32,7 +32,7 @@ main:	la $sp, -8($sp) # Allocate space for old $fp and $ra
 	.text
 _L0:	li $8, 1 # Load int constant shorter than 16-bits
 	move $12, $8 # Store local tmp _tvar1 to its pre-assigned register.
-	add $10, $11, $12
+	add $10, $14, $12
 	move $12, $10 # Store local tmp _tvar1 to its pre-assigned register.
 	move $11, $12 # Store local int j1 to its pre-assigned register.
 	li $8, 1 # Load int constant shorter than 16-bits

@@ -114,8 +114,14 @@ static void live_range_bb( bbl *bb, TAC *tac, live_range *lr,
      can reach to the exist of the block, recursively compute the live
      range for the variable by going down the control-flow-graph. */
   if ( TEST_BIT( bb->liveout, tac->dest->val.stptr->varid-1 ) ) { //&&
-       //       TEST_BIT( bb->out, tac->id-1 ) ) {
+       //TEST_BIT( bb->out, tac->id-1 ) ) {
+    /* if ( strcmp(tac->dest->val.stptr->name, "j0") == 0 ) { */
+    /*   printf( "processing j0!!!!!! in bb: %s\n", bb->first_tac->dest->val.label ); */
+    /* } */
     if ( bb->visit_counter >= 2 ) {
+      if ( bb->last_tac->id > 0 ) {
+	SET_BIT( lr->val, bb->last_tac->id-1 );
+      }
       return;
     }
     bb->visit_counter++;
