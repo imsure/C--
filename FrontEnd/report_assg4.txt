@@ -1,0 +1,162 @@
+*************Test result summary***************
+
+Total # of tests run: 90
+Total # of tests passed: 90
+Total # of tests failed: 0
+
+---------------------------------------------------------------------------------
+We use percentage reduction in the number of instructions executed
+against tests run without any optimizations to evaluate optimization performance.
+---------------------------------------------------------------------------------
+
+---------------------------------------
+Overall performance of -O3 optimization
+---------------------------------------
+
+Total # of tests on which -O3 optimization increases performance: 90
+Total # of tests on which -O3 optimization decreases performance: 0
+
+----------------------------------------------------------------------
+Overall comparison of -O1, -O2, -O3 and their combinations:
+----------------------------------------------------------------------
+
+Number of test cases where -O1 -O2 -O3 together performs best: 64
+Number of test cases where -O1 -O3 together performs best: 5
+Number of test cases where -O2 -O3 together performs best: 0
+Number of test cases where -O1 -O2 together performs best: 11
+Number of test cases where -O3 performs best: 0
+Number of test cases where -O2 performs best: 2
+Number of test cases where -O1 best: 8
+
+(For the detailed test result, please refer to performance_stats.txt.)
+
+-----------
+Conclusions
+-----------
+
+# O3 optimization generally improves performance, but is more
+  effective when used with other optimization swithes.
+# O1, O2 and O3 combined together gives the best optimization results.
+# Using O2 optimization only sometimes decreases performance due to
+  frequently transfering data in between stack and registers becasue
+  of making function calls in side a loop or recursive function calls.
+# O1 optimization is essential and should always be turned on to
+  produce better quality code.
+
+
+****************Optimizations implemented*******************
+
+---------------
+O3 optimization
+---------------
+- Global common subexpression elimination
+- Global constant propgation
+  (tried global copy propagtion first, but couldn't achieve it, so
+   only did constant propagation.)
+
+---------------
+O2 optimization
+---------------
+- Reaching definiation analysis across basic blocks
+- Liveness analysis across basic blocks
+- Live range identification based on information gained from reaching
+  definition and liveness analysis
+- Global register allocation based on graph coloring
+
+----------------
+O1 optimization
+----------------
+- Peephole optimizations
+  - Simplify constant assignment:
+    assign constant directly to its destination without going through a tmp variable.
+    e.g. convert:
+    _t0 = 5;
+    x = _t0;
+    into:
+    x = 5;
+  - Tranform the relational opertors to eliminate unnecessary jumps:
+    e.g. convert:
+        if ( x > y ) goto _L1
+        goto L2
+    _L1:
+    into:
+        if ( x <= y ) goto L2
+    _L1:
+  - Delete redundant jumps:
+    e.g. convert:
+        goto _L1
+    _L1:
+    into:
+    _L1:
+  - Collapse jump chains:
+    Make jump branches directly to its final destination without going through
+    a chain of jumps.
+  - Pre-compute array indexes that are constant.
+    e.g. for A[2] where A is an array,
+    convert:
+    _tvar0 = 2
+    _tvar0 = _tvar0 * 4
+    _taddr2 = A + _tvar0
+    into:
+    _taddr2 = A + 8
+   - Delete redundant labels:
+    e.g. convert:
+    _L1:
+    _L2:
+    into:
+    _L2:
+  - Pre-compute constant arithmetic:
+    e.g.
+    convert: x = 4 * 8;
+    into: x = 32;
+
+- Copy propagation within basic blocks
+- Liveness analysis across basic blocks
+- Deadcode elimination based on information gained from
+  copy propagation and livenss analysis
+
+--------------------------------------
+Cost/Benefit of using -O3 optimization
+--------------------------------------
+As we can see from *Test results summary* section, -O3 optimization
+always improves performance of C-- programs. This is because by
+eliminating common subexpressions, we are reducing the number of
+arithmetic operations. And applying global constant progation
+iteratively can cause many constant assignment to be dead code and
+can further be deleted.
+
+The cost of running -O3 optimization in general is O(n^2) because it
+requires two linear scan of code sequence to identify common
+subexpressions and eliminate them, this is also true for global
+constant propagation. Run time can be improved by using more advanced
+data structures like hash table or binary search tree.
+
+--------------------------------------
+Cost/Benefit of using -O2 optimization
+--------------------------------------
+As we can see from *Test results summary* section, while -O2 optimization improves
+performance for most test cases due to significant reduced number of load/store instructions,
+this is not always the case.
+
+For some test cases which involve intensive function calls, we have
+to save the values in those registers that are allocated to some variables back to the memory
+locations of these variables before callee is called such that the callee can use these registers.
+This introduces significant amount of store/load operations during runtime if some functions
+repeatedly get called.
+
+The cost of running -O2 optimization during compliation becomes big as the size
+of the interference graph grows. The graph coloring algorithm implemented in my
+code takes roughly O(|V|^2*|E|) where |V| is the number of vertices and |E| is
+number of edges.
+
+--------------------------------------
+Cost/Benefit of using -O1 optimization
+--------------------------------------
+As we can see from *Test results summary* section, -O1 optimization always
+increases performance of C-- programs. This is because it only transfroms/simplies
+the intermediate code and eliminates unnecessary instructions without introducing
+any runtime overhead, thus results in better runtime behavior as well as samller
+size of final code.
+
+The cost of running -O1 optimization during compliation is relatively small because
+most optimizations requires O(n) time to run where n is the number of instructions.
