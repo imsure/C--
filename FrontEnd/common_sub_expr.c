@@ -43,8 +43,8 @@ bitvec *uset;
  */
 int stack_size;
 
-static bool debug = true;
-//static bool debug = false;
+//static bool debug = true;
+static bool debug = false;
 
 /**
  * Check if 'var' is in a valid expression.
@@ -258,13 +258,15 @@ void avail_expr( TAC_seq *tacseq )
 {
   bbl *bbl_run;
 
-  //printf( "Number of local variables/tmps = %d\n", num_vars );
-  //printf( "Number of defs/uses of local vars/tmps = %d\n", num_defuses );
+  if ( debug ) {
+    printf( "Number of local variables/tmps = %d\n", num_vars );
+    printf( "Number of defs/uses of local vars/tmps = %d\n", num_defuses );
+  }
 
   uset = NEW_BV( num_defuses-1 );
   /* For each local var/tmp compute the set of expressions that involve it. */
   compute_expr_bv( tacseq );
-  //  print_bv( "Uset", uset, num_defuses-1 );
+  //print_bv( "Uset", uset, num_defuses-1 );
 
   /* For each block, compute its gen and kill set. */
   bbl_run = bhead;
