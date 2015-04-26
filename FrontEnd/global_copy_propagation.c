@@ -92,10 +92,9 @@ static void copy_propagation_on_operand( bitvec *rf,
 					 address **operand_target,
 					 TAC_seq *tacseq, bbl *bb, TAC *curr_tac )
 {
-  TAC *tmptac, *tmptac2, *tac;
+  TAC *tmptac;
   int def_counter = 0; // used to hold the number of defs of a local var/tmp.
   address *operand = *operand_target;
-  bool defined = false;
 
   if ( is_valid_local(operand) ) {
     def_counter = count_num_defs( rf, operand->val.stptr, tacseq, &tmptac );
@@ -103,10 +102,6 @@ static void copy_propagation_on_operand( bitvec *rf,
       printf( "Number of def for %s reaches here is %d\n",
 	      operand->val.stptr->name, def_counter );
     }
-    /* if ( strcmp(operand->val.stptr->name, "res") == 0 ) { */
-    /*   printf( "def counter = %d\n", def_counter ); */
-    /*   print_bv( "RF", rf, num_defuses-1 ); */
-    /* } */
     
     if ( def_counter == 0 ) { return; }
     if ( def_counter > 1 ) {
