@@ -14,6 +14,8 @@
 int num_defuses = 0; // total number of definitions inside the current processed function.
 extern bbl *bhead; // header to the basic block list of the current function.
 
+static bool debug = false;
+
 /**
  * Compute the total number of possbile definitions/uses of local
  * variables/tmps in the TAC sequence 'tacseq' for a producedure/function.
@@ -51,7 +53,7 @@ static void compute_defset_locals( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
 
-  compute_num_defuses( tacseq );
+  //  compute_num_defuses( tacseq );
 
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ||
@@ -60,7 +62,9 @@ static void compute_defset_locals( TAC_seq *tacseq )
 	if ( tac->dest->val.stptr->bv == NULL ) {
 	  tac->dest->val.stptr->bv = NEW_BV( num_defuses-1 );
 	}
-	//printf( "set %d to bit vec of %s\n", tac->id, tac->dest->val.stptr->name );		
+	if ( debug ) {
+	  printf( "set %d to bit vec of %s\n", tac->id, tac->dest->val.stptr->name );
+	}
 	SET_BIT( tac->dest->val.stptr->bv, tac->id-1 );
       }
     }
@@ -96,6 +100,11 @@ static void compute_genkill_bb( bbl *bb )
     tac = tac->next;
     ++iternum;
   }
+
+  /* if ( strcmp(bb->first_tac->dest->val.label, "_L11") == 0 ) { */
+  /*   print_bv( "Gen set for _L11", bb->gen, num_defuses-1 ); */
+  /*   print_bv( "Kill set for _L11", bb->kill, num_defuses-1 ); */
+  /* } */
 }
 
 /**
@@ -131,6 +140,11 @@ static bitvec *compute_inset_bb( bbl *bb )
     free( bvtmp );
     cfl = cfl->next;
   }
+
+  /* if ( strcmp(bb->first_tac->dest->val.label, "_L11") == 0 ) { */
+  /*   print_bv( "In set for _L11", res, num_defuses-1 ); */
+  /* } */
+
   return res;
 }
 
@@ -157,7 +171,7 @@ static bitvec *compute_outset_bb( bbl *bb )
 static void compute_inout()
 {
   bbl *bbl_run;
-  bitvec *bvtmp, *oldout;
+  bitvec *bvtmp, *oldout, *oldin;
   bool change;
 
   /* Initialize in and out set for each basic block. */
@@ -178,18 +192,21 @@ static void compute_inout()
     change = false;
     bbl_run = bhead;
     while( bbl_run != NULL ) {
+      oldin = bbl_run->in;
       bbl_run->in = compute_inset_bb( bbl_run );
       oldout = bbl_run->out;
       bbl_run->out = compute_outset_bb( bbl_run );
-      if ( bv_unequal_check(oldout, bbl_run->out, num_defuses-1) == true ) {
+      if ( bv_unequal_check(oldout, bbl_run->out, num_defuses-1) == true ||
+	   bv_unequal_check(oldin, bbl_run->in, num_defuses-1) == true ) {
 	//	printf( "Iteration %d: change is true\n", iter_num );
 	change = true;
       }
+      free( oldin );
       free( oldout );
       bbl_run = bbl_run->next;
     }
   }
-  //  printf( "Converge!\n" );
+  //  printf( "Converge!\n" );  
 }
 
 
@@ -221,5 +238,5 @@ void reaching_defs( TAC_seq *tacseq )
   compute_defset_locals( tacseq );
   compute_genkill();
   compute_inout();
-  //print_var_defs( tacseq );
+  //  print_var_defs( tacseq );
 }

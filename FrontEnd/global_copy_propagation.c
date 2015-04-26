@@ -101,6 +101,11 @@ static void copy_propagation_on_operand( bitvec *rf,
       printf( "Number of def for %s reaches here is %d\n",
 	      operand->val.stptr->name, def_counter );
     }
+    /* if ( strcmp(operand->val.stptr->name, "res") == 0 ) { */
+    /*   printf( "def counter = %d\n", def_counter ); */
+    /*   print_bv( "RF", rf, num_defuses-1 ); */
+    /* } */
+    
     if ( def_counter == 0 ) { return; }
     if ( def_counter > 1 ) {
       /* Multiple definitions of 'operand' reaches current use of 'operand'.
@@ -142,7 +147,13 @@ static void global_copy_propagation_bb( bbl *bb, TAC_seq *tacseq )
     printf( "Start processing block %s\n", bb->first_tac->dest->val.label );
   }
 
-  rf = bb->in; // initialized with the set of defs that reaches to the entry of the block.
+  rf = NEW_BV( num_defuses-1 );
+  rf = bv_union( rf, bb->in, num_defuses-1 ); // initialized with the set of defs that reaches to the entry of the block.
+
+  /* if ( strcmp(bb->first_tac->dest->val.label, "_L11") == 0 ) { */
+  /*   print_bv( "Initial RF", rf, num_defuses-1 ); */
+  /* } */
+
   while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) { // def & use
       copy_propagation_on_operand( rf, &(tac->operand1), tacseq );
@@ -251,7 +262,10 @@ p *
 void global_copy_propagation( TAC_seq *tacseq )
 {
   bbl *bbl_run;
-  
+
+  //  printf( "Number of local variables/tmps = %d\n", num_vars );
+  //  printf( "Number of defs/uses of local vars/tmps = %d\n", num_defuses );
+
   bbl_run = bhead;
   while( bbl_run != NULL ) {
     global_copy_propagation_bb( bbl_run, tacseq );
