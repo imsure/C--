@@ -409,7 +409,7 @@ static int calculate( SyntaxNodeType optype, int v1, int v2 )
 /**
  * Pre-calculate constant arithmetic like: x = 4 * 7 --> x = 28
  */
-static void collapse_constant_arith( TAC_seq *tacseq )
+void collapse_constant_arith( TAC_seq *tacseq )
 {
   TAC *tac = tacseq->start;
   
@@ -423,6 +423,12 @@ static void collapse_constant_arith( TAC_seq *tacseq )
 					       tac->operand2->val.iconst );
 	tac->optype = Assg; // change optype
 	tac->operand2 = NULL;
+      } else if ( (tac->operand2->atype == AT_Intcon || tac->operand2->atype == AT_Charcon)
+		  && tac->operand1->atype == AT_StRef && tac->optype == Mult ) {
+	if ( tac->operand1->val.iconst == 1 ) {
+	  tac->optype = Assg; // change optype
+	  tac->operand2 = NULL;
+	}
       }
     }
     tac = tac->next;

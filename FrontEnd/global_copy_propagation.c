@@ -17,6 +17,7 @@
  */
 extern void printtac( TAC *tac );
 extern void print_bv( const char *name, bitvec *bv, int len );
+extern void copy_propagation();
 
 /**
  * total number of local variables/tmps
@@ -89,11 +90,12 @@ static void kill_defs( bitvec *rf, symtabnode *stptr, TAC_seq *tacseq )
  */
 static void copy_propagation_on_operand( bitvec *rf,
 					 address **operand_target,
-					 TAC_seq *tacseq )
+					 TAC_seq *tacseq, bbl *bb, TAC *curr_tac )
 {
-  TAC *tmptac;
+  TAC *tmptac, *tmptac2, *tac;
   int def_counter = 0; // used to hold the number of defs of a local var/tmp.
   address *operand = *operand_target;
+  bool defined = false;
 
   if ( is_valid_local(operand) ) {
     def_counter = count_num_defs( rf, operand->val.stptr, tacseq, &tmptac );
@@ -127,6 +129,8 @@ static void copy_propagation_on_operand( bitvec *rf,
 	    printf( "Propagating constant %d\n", tmptac->operand1->val.iconst );
 	  }
 	  *operand_target = tmptac->operand1;
+	} else if ( is_valid_local(tmptac->operand1) ) {
+	  /* First check if any definition of tmptac->operand1 reaches here. */
 	}
       }
     }
@@ -156,8 +160,8 @@ static void global_copy_propagation_bb( bbl *bb, TAC_seq *tacseq )
 
   while ( iternum < bb->numtacs ) {
     if ( is_arith_op(tac->optype) || tac->optype == Assg ) { // def & use
-      copy_propagation_on_operand( rf, &(tac->operand1), tacseq );
-      copy_propagation_on_operand( rf, &(tac->operand2), tacseq );
+      copy_propagation_on_operand( rf, &(tac->operand1), tacseq, bb, tac );
+      copy_propagation_on_operand( rf, &(tac->operand2), tacseq, bb, tac );
 
       if ( tac->optype == UnaryMinus && (tac->operand1->atype == AT_Intcon ||
 					 tac->operand1->atype == AT_Charcon) ) {
@@ -175,8 +179,8 @@ static void global_copy_propagation_bb( bbl *bb, TAC_seq *tacseq )
 	SET_BIT( rf, tac->id-1 ); // add current tac into 'rf' set.
       }
     } else if ( is_relational_op(tac->optype) ) { // use only
-      copy_propagation_on_operand( rf, &(tac->operand1), tacseq );
-      copy_propagation_on_operand( rf, &(tac->operand2), tacseq );
+      copy_propagation_on_operand( rf, &(tac->operand1), tacseq, bb, tac );
+      copy_propagation_on_operand( rf, &(tac->operand2), tacseq, bb, tac );
     } else if ( tac->optype == Retrieve ) { // def only
       /* Update reaching definition set 'rf'. */
       if ( is_valid_local(tac->dest) ) {
