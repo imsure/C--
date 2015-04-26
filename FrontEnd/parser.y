@@ -256,21 +256,26 @@ prog
 	//liveness_global( currfnbodyTree->tac_seq );
 
 	compute_num_defuses( currfnbodyTree->tac_seq );
+	avail_expr( currfnbodyTree->tac_seq );
+	common_subexpr_elimination( currfnbodyTree->tac_seq );
+
 	while ( cse_cp_iter > 0 ) {
+	  //	  printf( "CSE & CP iteration: %d\n", cse_cp_iter );
+	  collapse_label_chain( currfnbodyTree->tac_seq );
+	  construct_basic_block( currfnbodyTree->tac_seq );
 	  count_tac_num(); // recount tac nums since CSE may introduce new instructions!
 	  
-	  compute_num_vars( currfnbodyTree->tac_seq );
-	  //	  compute_num_defuses( currfnbodyTree->tac_seq );
-	  //	  printf( "CSE & CP iteration: %d\n", cse_cp_iter );
-	  avail_expr( currfnbodyTree->tac_seq );
-	  //	  printf( "Computing avail expr.\n" );
-	  common_subexpr_elimination( currfnbodyTree->tac_seq );
+	  //compute_num_vars( currfnbodyTree->tac_seq );
+	  /* compute_num_defuses( currfnbodyTree->tac_seq ); */
+	  /* avail_expr( currfnbodyTree->tac_seq ); */
+	  /* //	  printf( "Computing avail expr.\n" ); */
+	  /* common_subexpr_elimination( currfnbodyTree->tac_seq ); */
 
-	  count_tac_num(); // recount tac nums since CSE may introduce new instructions!
-	  compute_num_vars( currfnbodyTree->tac_seq );
+	  //compute_num_vars( currfnbodyTree->tac_seq );
 
 	  /* Carry out reaching definition analysis for global copy propagation. */
 	  reaching_defs( currfnbodyTree->tac_seq );
+	  //	  printf( "Reaching def done\n" );
 	  global_copy_propagation( currfnbodyTree->tac_seq );
 
 	  //print_bbl();

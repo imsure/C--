@@ -229,7 +229,7 @@ static void delete_unused_defs( TAC_seq *tacseq )
       }
     }
     tac = tac->next;
-  }  
+  }
 }
 
 /**

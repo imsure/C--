@@ -12,7 +12,7 @@ bool perform_O1 = false; // indicate whether perform -O1 optimization or not.
 bool perform_O2 = false; // indicate whether perform -O2 optimization or not.
 bool perform_O3 = false; // indicate whether perform -O3 optimization or not.
 bool tac_only = false; // indicate whether output TAC files only
-int cse_cp_iter = 2; // number of {CSE & Copy Propagation} iterations.
+int cse_cp_iter = 5; // number of {CSE & Copy Propagation} iterations.
 
 /**
  * Print out help info.
