@@ -184,7 +184,7 @@ prog
        * local copy propagation;
        * dead code elimination.
        */
-      if ( perform_O1 == true && perform_O2 == false ) {
+      if ( perform_O1 == true && perform_O2 == false && perform_O3 == false ) {
 	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
 	
 	/* Attention: peephole stage1 optimization must be done before
@@ -205,7 +205,7 @@ prog
        * Carry out only -O2 optimizations:
        * register allocation.
        */
-      if ( perform_O1 == false && perform_O2 == true ) {
+      if ( perform_O1 == false && perform_O2 == true && perform_O3 == false ) {
 	collect_labels( currfnbodyTree->tac_seq ); // used by peephole optimization.
 	transform_cond_jump( currfnbodyTree->tac_seq );
 	delete_redundant_jump( currfnbodyTree->tac_seq );
@@ -219,7 +219,7 @@ prog
 	//print_bbl();
       }
 
-      if ( perform_O1 == true && perform_O2 == true ) {
+      if ( perform_O1 == true && perform_O2 == true && perform_O3 == false ) {
 	/* -O1 optimization. */
 	collect_labels( currfnbodyTree->tac_seq );
 	peephole_stage1( currfnbodyTree->tac_seq );
@@ -247,7 +247,7 @@ prog
       }
 
       /* CSE optimization. invoked with -O3. */
-      if ( perform_O3 == true ) {
+      if ( perform_O3 == true && perform_O2 == false && perform_O1 == false ) {
 	collect_labels( currfnbodyTree->tac_seq );
 	transform_cond_jump( currfnbodyTree->tac_seq );
 	delete_redundant_jump( currfnbodyTree->tac_seq );
@@ -275,6 +275,126 @@ prog
 
 	  cse_cp_iter--;
 	}
+      }
+
+      if ( perform_O1 == true && perform_O3 == true && perform_O2 == false ) {
+	/* -O1 optimization. */
+	collect_labels( currfnbodyTree->tac_seq );
+	peephole_stage1( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	//copy_propagation();
+	//reaching_defs( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	//	compute_live_ranges();
+	dead_code_elimination( currfnbodyTree->tac_seq );
+	peephole_stage2( currfnbodyTree->tac_seq );
+
+	/* -O3 */
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+
+	count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	avail_expr( currfnbodyTree->tac_seq );
+	common_subexpr_elimination( currfnbodyTree->tac_seq );
+
+	while ( cse_cp_iter > 0 ) {
+	  //	  printf( "CSE & CP iteration: %d\n", cse_cp_iter );
+	  collapse_label_chain( currfnbodyTree->tac_seq );
+	  construct_basic_block( currfnbodyTree->tac_seq );
+	  count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	  
+	  /* Carry out reaching definition analysis for global copy propagation. */
+	  reaching_defs( currfnbodyTree->tac_seq );
+	  //	  printf( "Reaching def done\n" );
+	  global_copy_propagation( currfnbodyTree->tac_seq );
+	  collapse_constant_arith( currfnbodyTree->tac_seq );
+	  //print_bbl();
+
+	  cse_cp_iter--;
+	}
+      }
+
+      if ( perform_O3 == true && perform_O2 == true && perform_O1 == false ) {
+	collect_labels( currfnbodyTree->tac_seq );
+	transform_cond_jump( currfnbodyTree->tac_seq );
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+
+	/* compute_num_defuses( currfnbodyTree->tac_seq ); */
+	/* avail_expr( currfnbodyTree->tac_seq ); */
+	/* common_subexpr_elimination( currfnbodyTree->tac_seq ); */
+
+	while ( cse_cp_iter > 0 ) {
+	  collapse_label_chain( currfnbodyTree->tac_seq );
+	  construct_basic_block( currfnbodyTree->tac_seq );
+	  count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	  
+	  /* Carry out reaching definition analysis for global copy propagation. */
+	  reaching_defs( currfnbodyTree->tac_seq );
+	  global_copy_propagation( currfnbodyTree->tac_seq );
+	  collapse_constant_arith( currfnbodyTree->tac_seq );
+	  cse_cp_iter--;
+	}
+
+	count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	/* -O2 optimization. */
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	compute_live_ranges();
+	reg_alloc( currfnbodyTree->tac_seq );
+      }
+
+      if ( perform_O3 == true && perform_O2 == true && perform_O1 == true ) {
+	/* -O1 optimization. */
+	collect_labels( currfnbodyTree->tac_seq );
+	peephole_stage1( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	//copy_propagation();
+	//reaching_defs( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	//	compute_live_ranges();
+	dead_code_elimination( currfnbodyTree->tac_seq );
+	peephole_stage2( currfnbodyTree->tac_seq );
+
+	/* -O3 */
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+
+	count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	avail_expr( currfnbodyTree->tac_seq );
+	common_subexpr_elimination( currfnbodyTree->tac_seq );
+
+	while ( cse_cp_iter > 0 ) {
+	  collapse_label_chain( currfnbodyTree->tac_seq );
+	  construct_basic_block( currfnbodyTree->tac_seq );
+	  count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	  
+	  /* Carry out reaching definition analysis for global copy propagation. */
+	  reaching_defs( currfnbodyTree->tac_seq );
+	  global_copy_propagation( currfnbodyTree->tac_seq );
+	  collapse_constant_arith( currfnbodyTree->tac_seq );
+	  cse_cp_iter--;
+	}
+
+	count_tac_num(); // recount tac nums since CSE may introduce new instructions!
+	/* -O2 optimization. */
+	delete_redundant_jump( currfnbodyTree->tac_seq );
+	collapse_label_chain( currfnbodyTree->tac_seq );
+	construct_basic_block( currfnbodyTree->tac_seq );
+	compute_num_defuses( currfnbodyTree->tac_seq );
+	liveness_global( currfnbodyTree->tac_seq );
+	compute_live_ranges();
+	reg_alloc( currfnbodyTree->tac_seq );
       }
 
       /*----------------------------------------------------------

@@ -76,9 +76,11 @@ static bool is_array_addr_cal( TAC *tac )
  */
 static bool is_valid_expr( TAC *tac )
 {
+  /* if ( (tac->optype == UnaryMinus && is_valid_local(tac->operand1)) || */
+  /*      (is_in_valid_expr(tac->operand1) && is_in_valid_expr(tac->operand2)) || */
+  /*      is_array_addr_cal( tac ) ) { */
   if ( (tac->optype == UnaryMinus && is_valid_local(tac->operand1)) ||
-       (is_in_valid_expr(tac->operand1) && is_in_valid_expr(tac->operand2)) ||
-       is_array_addr_cal( tac ) ) {
+       (is_in_valid_expr(tac->operand1) && is_in_valid_expr(tac->operand2)) ) {
     return true;
   }
   return false;
@@ -93,17 +95,17 @@ static void compute_expr_bv( TAC_seq *tacseq )
 
   while ( tac != NULL ) {
     if ( is_arith_op(tac->optype) ) {
-      if ( tac->optype != UnaryMinus && is_array_addr_cal(tac) ) {
-	/* We treat array address calculation specially. */
-	SET_BIT( uset, tac->id-1 );
-	if ( is_valid_local(tac->operand2) ) {
-	  if ( tac->operand2->val.stptr->expr_bv == NULL ) {
-	    tac->operand2->val.stptr->expr_bv = NEW_BV( num_defuses-1 );
-	  }
-	  //	  printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand2->val.stptr->name );
-	  SET_BIT( tac->operand2->val.stptr->expr_bv, tac->id-1 );
-	}
-      }
+      /* if ( tac->optype != UnaryMinus && is_array_addr_cal(tac) ) { */
+      /* 	/\* We treat array address calculation specially. *\/ */
+      /* 	SET_BIT( uset, tac->id-1 ); */
+      /* 	if ( is_valid_local(tac->operand2) ) { */
+      /* 	  if ( tac->operand2->val.stptr->expr_bv == NULL ) { */
+      /* 	    tac->operand2->val.stptr->expr_bv = NEW_BV( num_defuses-1 ); */
+      /* 	  } */
+      /* 	  //	  printf( "add tac %d to bit vec expr_bv of %s\n", tac->id, tac->operand2->val.stptr->name ); */
+      /* 	  SET_BIT( tac->operand2->val.stptr->expr_bv, tac->id-1 ); */
+      /* 	} */
+      /* } */
 
       if ( tac->optype == UnaryMinus ) {
 	if ( is_valid_local(tac->operand1) ) {
